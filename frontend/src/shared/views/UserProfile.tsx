@@ -6,7 +6,7 @@ const UserProfile = () => {
 
   if (error) {
     return (
-      <div className="bg-red-200">
+      <div className="">
         <h1>CodeJam</h1>
         <p>Error : {error.message}</p>
       </div>
@@ -14,7 +14,7 @@ const UserProfile = () => {
   }
 
   return (
-    <div className="bg-red-200">
+    <div className="">
       <h1>CodeJam</h1>
       <p>Hello {data.users[0]?.username ?? 'CodeJamer'}</p>
     </div>
