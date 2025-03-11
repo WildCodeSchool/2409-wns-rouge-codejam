@@ -16,7 +16,7 @@ const UserProfile = () => {
   return (
     <div className="bg-red-200">
       <h1>CodeJam</h1>
-      <p>Hello {data.users[0].username ?? 'CodeJamer'}</p>
+      <p>Hello {data.users[0]?.username ?? 'CodeJamer'}</p>
     </div>
   )
 }
