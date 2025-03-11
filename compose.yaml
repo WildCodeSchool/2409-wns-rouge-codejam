@@ -1,0 +1,49 @@
+services:
+  db:
+    container_name: codejam-db
+    image: postgres
+    ports:
+      - 5432:5432
+    volumes:
+      - dbdata:/var/lib/postgresql/data
+    env_file:
+      - database.env
+
+  backend:
+    build: ./backend
+    volumes:
+      - ./backend/src:/app/src/
+    env_file:
+      - database.env
+      - backend.env
+    depends_on:
+      db:
+        condition: service_started
+
+  frontend:
+    build: ./frontend
+    environment:
+      GRAPHQL_SCHEMA_URL: http://backend:3000
+    volumes:
+      - ./frontend/src:/app/src/
+      - ./frontend/vite.config.ts:/app/vite.config.ts
+      - ./frontend/codegen.ts:/app/codegen.ts
+      - ./frontend/index.html:/app/index.html
+      - ./frontend/public/:/app/public/
+    depends_on:
+      backend:
+        condition: service_started
+
+  nginx:
+    image: nginx
+    volumes:
+      - ./nginx:/etc/nginx
+    ports:
+      - 8080:80
+    depends_on:
+      - backend
+      - frontend
+
+volumes:
+  dbdata:
+    driver: local
