@@ -1,12 +1,12 @@
 import { Outlet } from 'react-router-dom'
+import NavBar from './NavBar'
 
 const Layout = () => {
   return (
-    <>
-      <main className="m-auto mt-20 mb-44 max-w-screen-xl px-8">
-        <Outlet />
-      </main>
-    </>
+    <main className="m-auto p-4">
+      <NavBar />
+      <Outlet />
+    </main>
   )
 }
 
