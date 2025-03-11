@@ -81,10 +81,11 @@ export class UsersResolver {
     @Arg('data', () => UserCreateInput) data: UserCreateInput,
   ): Promise<User> {
     const newUser = new User()
-
     try {
       const hashedPassword = await argon2.hash(data.password)
-      Object.assign(newUser, { ...data, password: hashedPassword })
+      Object.assign(newUser, { ...data, hashedPassword,
+                password: null, // remove clear password
+       })
     } catch (err) {
       throw new Error((err as Error).message)
     }

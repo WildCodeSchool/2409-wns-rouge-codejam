@@ -11,6 +11,7 @@ async function initialize() {
 
   const schema = await buildSchema({
     resolvers: [UsersResolver],
+    validate: true, // enable 'class-validator' integration: automatically validate all input arguments
     authChecker: customAuthChecker,
   })
   const server = new ApolloServer({ schema })
