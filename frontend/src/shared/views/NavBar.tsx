@@ -1,5 +1,5 @@
-import SignIn from './SignIn'
-import SignUp from './SignUp'
+import SignIn from '../../features/auth/views/SignIn'
+import SignUp from '../../features/auth/views/SignUp'
 
 const NavBar = () => {
   return (
