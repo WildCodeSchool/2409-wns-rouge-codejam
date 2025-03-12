@@ -1,5 +1,5 @@
 import { useSuspenseQuery } from '@apollo/client'
-import { GET_USERS } from '../api/users'
+import { GET_USERS } from '../api/getUsers'
 
 const UserProfile = () => {
   const { data, error } = useSuspenseQuery(GET_USERS)
