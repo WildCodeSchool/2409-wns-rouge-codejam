@@ -1,4 +1,4 @@
-import { WHO_AM_I } from '@/shared/api/users'
+import { WHO_AM_I } from '@/shared/api/whoAmI'
 import { useQuery } from '@apollo/client'
 import { Navigate } from 'react-router-dom'
 

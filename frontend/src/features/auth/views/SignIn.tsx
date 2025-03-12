@@ -12,9 +12,7 @@ const SignIn = () => {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant="outline" className="cursor-pointer">
-          Sign in
-        </Button>
+        <Button variant="outline">Sign in</Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>

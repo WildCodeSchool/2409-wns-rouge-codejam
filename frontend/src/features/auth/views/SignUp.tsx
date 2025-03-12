@@ -7,20 +7,27 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/shared/components/ui/dialog'
+import SignUpForm from './SignUpForm'
+import { useState } from 'react'
 
 const SignUp = () => {
+  const [open, setOpen] = useState<boolean>(true)
+
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" className="cursor-pointer">
-          Sign up
-        </Button>
+        <Button variant="outline">Sign up</Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Sign up</DialogTitle>
+          <DialogTitle className="text-center text-3xl">Sign up</DialogTitle>
           <DialogDescription></DialogDescription>
         </DialogHeader>
+        <SignUpForm
+          callbackOnSubmit={() => {
+            setOpen(false)
+          }}
+        />
       </DialogContent>
     </Dialog>
   )
