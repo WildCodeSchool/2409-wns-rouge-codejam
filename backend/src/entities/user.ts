@@ -35,11 +35,19 @@ export class User extends BaseEntity {
   @Field(() => ID)
   id!: number
 
-  @Column({ type: 'varchar', unique: true, length: USERNAME_CONSTRAINTS.maxLength })
+  @Column({
+    type: 'varchar',
+    unique: true,
+    length: USERNAME_CONSTRAINTS.maxLength,
+  })
   @Field(() => String, { nullable: true })
   username!: string
 
-  @Column({ type: 'varchar', length: EMAIL_CONSTRAINTS.maxLength, unique: true })
+  @Column({
+    type: 'varchar',
+    length: EMAIL_CONSTRAINTS.maxLength,
+    unique: true,
+  })
   @Field(() => String)
   email!: string
 
@@ -68,7 +76,7 @@ export class UserCreateInput {
   email!: string
 
   @Field(() => String)
-    @IsStrongPassword(PASSWORD_CONSTRAINTS, {
+  @IsStrongPassword(PASSWORD_CONSTRAINTS, {
     message: `Please make sure your password meet the strength requirements: between ${PASSWORD_CONSTRAINTS.minLength.toString()} and ${PASSWORD_CONSTRAINTS.maxLength.toString()} long, including at least ${PASSWORD_CONSTRAINTS.minLowercase.toString()} lowercase letter, ${PASSWORD_CONSTRAINTS.minUppercase.toString()} uppercase letter, ${PASSWORD_CONSTRAINTS.minNumbers.toString()} number, and ${PASSWORD_CONSTRAINTS.minSymbols.toString()} symbol.`,
   })
   password!: string
