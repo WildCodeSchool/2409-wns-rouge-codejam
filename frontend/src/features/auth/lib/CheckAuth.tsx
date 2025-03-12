@@ -15,7 +15,7 @@ export function CheckAuth(
     const me = data?.whoAmI
 
     if (me === undefined)
-      return <div className="m-auto h-full text-center">Chargement...</div>
+      return <div className="m-auto h-full text-center">Loading...</div>
 
     switch (authState) {
       case 'auth': {
