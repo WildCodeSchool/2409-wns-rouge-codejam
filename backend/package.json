@@ -10,7 +10,7 @@
     "lint": "eslint --fix .",
     "format:lint": "pnpm run format && pnpm run lint",
     "test": "jest",
-    "test:watch": "jest --watch",
+    "test:watch": "jest --watchAll",
     "test:db": "docker rm --force pgtest ; docker run -d -p 5434:5432 --name pgtest -e POSTGRES_PASSWORD=test postgres && POSTGRES_HOST=localhost POSTGRES_PORT=5434 POSTGRES_USER=postgres POSTGRES_PASSWORD=test POSTGRES_DB=postgres NODE_ENV=test NODE_OPTIONS=\"$NODE_OPTIONS --experimental-vm-modules\" pnpm test:watch",
     "restore:db": "./database/init_db.sh"
   },
