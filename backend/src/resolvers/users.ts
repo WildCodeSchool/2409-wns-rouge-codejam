@@ -76,10 +76,16 @@ export class UsersResolver {
     return true
   }
 
-  @Mutation(() => User)
+  @Mutation(() => User, { nullable: true })
   async createUser(
     @Arg('data', () => UserCreateInput) data: UserCreateInput,
-  ): Promise<User> {
+  ): Promise<User | null> {
+    // Verify if user already exists (email and username should both be unique)
+    const userInDB = await User.findOne({
+      where: [{ email: data.email }, { username: data.username }], // at least one should match
+    })
+    if (userInDB) return null
+
     const newUser = new User()
     try {
       const hashedPassword = await argon2.hash(data.password)
@@ -91,9 +97,6 @@ export class UsersResolver {
     } catch (err) {
       throw new Error((err as Error).message)
     }
-
-    const errors = await validate(newUser)
-    if (errors.length) throw validationError(errors)
 
     await User.save(newUser)
     const user = await User.findOne({

@@ -5,7 +5,7 @@ import { User, UserCreateInput } from '../../src/entities/user'
 import { assert } from '../utils/assert'
 
 type CreateUserMutation = {
-  createUser: User
+  createUser: User | null
 }
 
 export async function UsersResolverTest(testArgs: TestArgs) {
@@ -15,7 +15,6 @@ export async function UsersResolverTest(testArgs: TestArgs) {
       email: 'john-doe@email.com',
       password: 'Super-John-Doe-123',
     }
-
     it('should fail if invalid username', async () => {
       if (!testArgs.server) {
         throw new Error('Test server is not initialized')
@@ -102,7 +101,7 @@ export async function UsersResolverTest(testArgs: TestArgs) {
       const { data, errors } = response.body.singleResult
       expect(errors).toBeUndefined()
       expect(data).toBeDefined()
-      assert(data !== undefined && data !== null)
+      assert(data !== undefined && data !== null && data.createUser !== null)
       const userId = data.createUser.id
       expect(userId).toBeDefined()
 
@@ -117,6 +116,46 @@ export async function UsersResolverTest(testArgs: TestArgs) {
 
       // Store user ID for later tests.
       testArgs.data.user = userInDB.id
+    })
+
+    it('should fail if email already exist', async () => {
+      if (!testArgs.server) {
+        throw new Error('Test server is not initialized')
+      }
+      const response =
+        await testArgs.server.executeOperation<CreateUserMutation>({
+          query: CREATE_USER,
+          // Same email as previous test but different username
+          variables: { data: { ...validUserInfo, username: 'john' } },
+        })
+      // Check API response.
+      assert(response.body.kind === 'single')
+      const { data, errors } = response.body.singleResult
+      expect(errors).toBeUndefined()
+      expect(data).toBeDefined()
+      assert(data !== undefined && data !== null)
+      expect(data.createUser).toBeNull()
+    })
+
+    it('should fail if username already exist', async () => {
+      if (!testArgs.server) {
+        throw new Error('Test server is not initialized')
+      }
+      const response =
+        await testArgs.server.executeOperation<CreateUserMutation>({
+          query: CREATE_USER,
+          // Same username as previous test but different email
+          variables: {
+            data: { ...validUserInfo, email: '123' + validUserInfo.email },
+          },
+        })
+      // Check API response.
+      assert(response.body.kind === 'single')
+      const { data, errors } = response.body.singleResult
+      expect(errors).toBeUndefined()
+      expect(data).toBeDefined()
+      assert(data !== undefined && data !== null)
+      expect(data.createUser).toBeNull()
     })
   })
 }
