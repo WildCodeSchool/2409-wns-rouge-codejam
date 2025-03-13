@@ -40,7 +40,9 @@ export async function getUserFromContext(
   if (!token) return null
 
   const userId = getUserIdFromToken(token)
+
   const user = await User.findOne({ where: { id: userId } })
+
   if (!user) return null
 
   return user
