@@ -13,3 +13,10 @@ export const LOGIN = `#graphql
     }
   }
 `
+export const WHO_AM_I = `#graphql
+  query whoAmI {
+    whoAmI {
+      id
+    }
+  }
+`

@@ -61,7 +61,7 @@ export class UsersResolver {
   @Query(() => User, { nullable: true })
   async whoAmI(@Ctx() context: ContextType): Promise<User | null> {
     const user = await getUserFromContext(context)
-    return user || null
+    return user
   }
 
   @Mutation(() => User, { nullable: true })

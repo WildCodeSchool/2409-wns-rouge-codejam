@@ -1,5 +1,5 @@
 import { describe, expect, it } from '@jest/globals'
-import { CREATE_USER, LOGIN } from '../api/users'
+import { CREATE_USER, LOGIN, WHO_AM_I } from '../api/users'
 import { TestArgs } from '../index.spec'
 import { User, UserCreateInput } from '../../src/entities/user'
 import { assert } from '../utils/assert'
@@ -10,6 +10,10 @@ type CreateUserMutation = {
 
 type LoginUserMutation = {
   login: User | null
+}
+
+type WhoAmIMutation = {
+  whoAmI: User | null
 }
 
 const validUserInfo: UserCreateInput = {
@@ -120,9 +124,27 @@ export async function UsersResolverTest(testArgs: TestArgs) {
       expect(userInDB?.hashedPassword).not.toBe(validUserInfo.password)
 
       // Store user ID for later tests.
-      testArgs.data.userId = userInDB.id
+      testArgs.data.user = userInDB
     })
   })
+
+  describe('whoAmI', () => {
+    it('should return null if user not logged in', async () => {
+      if (!testArgs.server) {
+        throw new Error('Test server is not initialized')
+      }
+      const response = await testArgs.server.executeOperation<WhoAmIMutation>({
+        query: WHO_AM_I,
+      })
+      // Check API response.
+      assert(response.body.kind === 'single')
+      const { data, errors } = response.body.singleResult
+      expect(errors).toBeUndefined
+      assert(data !== null && data !== undefined)
+      expect(data.whoAmI).toBeNull()
+    })
+  })
+
   describe('login', () => {
     it('should fail if invalid email', async () => {
       if (!testArgs.server) {
@@ -211,7 +233,32 @@ export async function UsersResolverTest(testArgs: TestArgs) {
       expect(errors).toBeUndefined()
       expect(data).toBeDefined()
       assert(data !== undefined && data !== null && data.login !== null)
-      expect(Number(data.login.id)).toBe(testArgs.data.userId)
+      expect(Number(data.login.id)).toBe(testArgs.data.user.id)
+    })
+  })
+
+  describe('whoAmI', () => {
+    it('should return user if login succesfull', async () => {
+      if (!testArgs.server) {
+        throw new Error('Test server is not initialized')
+      }
+      const response = await testArgs.server.executeOperation<WhoAmIMutation>(
+        {
+          query: WHO_AM_I,
+        },
+        {
+          // Simulate user is in context
+          contextValue: {
+            user: testArgs.data.user,
+          },
+        },
+      )
+      // Check API response.
+      assert(response.body.kind === 'single')
+      const { data, errors } = response.body.singleResult
+      expect(errors).toBeUndefined()
+      assert(data !== undefined && data !== null)
+      expect(Number(data.whoAmI?.id)).toBe(testArgs.data.user.id)
     })
   })
 }
