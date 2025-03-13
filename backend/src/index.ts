@@ -1,18 +1,12 @@
 import 'reflect-metadata'
-import { dataSource } from './db'
+import { dataSource } from './datasource'
 import { ApolloServer } from '@apollo/server'
 import { startStandaloneServer } from '@apollo/server/standalone'
-import { buildSchema } from 'type-graphql'
-import { UsersResolver } from './resolvers/users'
-import { customAuthChecker } from './auth/custom-auth-checker'
+import { getSchema } from './schema'
 
 async function initialize() {
   await dataSource.initialize()
-
-  const schema = await buildSchema({
-    resolvers: [UsersResolver],
-    authChecker: customAuthChecker,
-  })
+  const schema = await getSchema()
   const server = new ApolloServer({ schema })
 
   const { url } = await startStandaloneServer(server, {
@@ -21,7 +15,7 @@ async function initialize() {
       return { req, res }
     },
   })
-  console.log(`GraphQl server ready at ${url}`)
+  console.info(`GraphQl server ready at ${url}`)
 }
 
 initialize()
