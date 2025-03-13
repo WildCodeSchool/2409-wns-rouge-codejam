@@ -10,8 +10,8 @@ import {
 import SignUpForm from './SignUpForm'
 import { useState } from 'react'
 
-const SignUp = () => {
-  const [open, setOpen] = useState<boolean>(true)
+const SignUpDialog = () => {
+  const [open, setOpen] = useState<boolean>(false)
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -33,4 +33,4 @@ const SignUp = () => {
   )
 }
 
-export default SignUp
+export default SignUpDialog

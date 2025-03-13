@@ -8,7 +8,7 @@ import {
   DialogTrigger,
 } from '@/shared/components/ui/dialog'
 
-const SignIn = () => {
+const SignInDialog = () => {
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -24,4 +24,4 @@ const SignIn = () => {
   )
 }
 
-export default SignIn
+export default SignInDialog
