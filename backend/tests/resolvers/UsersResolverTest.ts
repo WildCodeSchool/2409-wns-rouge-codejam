@@ -4,7 +4,7 @@ import { TestArgs } from '../index.spec'
 import { User, UserCreateInput } from '../../src/entities/user'
 import { assert } from '../utils/assert'
 
-type CreateUserMation = {
+type CreateUserMutation = {
   createUser: User
 }
 
@@ -21,12 +21,11 @@ export async function UsersResolverTest(testArgs: TestArgs) {
         throw new Error('Test server is not initialized')
       }
       const invalidUserInfo = { ...validUserInfo, username: 'j' }
-      const response = await testArgs.server.executeOperation<CreateUserMation>(
-        {
+      const response =
+        await testArgs.server.executeOperation<CreateUserMutation>({
           query: CREATE_USER,
           variables: { data: invalidUserInfo },
-        },
-      )
+        })
       // Check API response.
       assert(response.body.kind === 'single')
       const { errors } = response.body.singleResult
@@ -46,12 +45,11 @@ export async function UsersResolverTest(testArgs: TestArgs) {
         throw new Error('Test server is not initialized')
       }
       const invalidUserInfo = { ...validUserInfo, email: 'john' }
-      const response = await testArgs.server.executeOperation<CreateUserMation>(
-        {
+      const response =
+        await testArgs.server.executeOperation<CreateUserMutation>({
           query: CREATE_USER,
           variables: { data: invalidUserInfo },
-        },
-      )
+        })
       // Check API response.
       assert(response.body.kind === 'single')
       const { errors } = response.body.singleResult
@@ -71,12 +69,11 @@ export async function UsersResolverTest(testArgs: TestArgs) {
         throw new Error('Test server is not initialized')
       }
       const invalidUserInfo = { ...validUserInfo, password: 'secret' }
-      const response = await testArgs.server.executeOperation<CreateUserMation>(
-        {
+      const response =
+        await testArgs.server.executeOperation<CreateUserMutation>({
           query: CREATE_USER,
           variables: { data: invalidUserInfo },
-        },
-      )
+        })
       // Check API response.
       assert(response.body.kind === 'single')
       const { errors } = response.body.singleResult
@@ -95,12 +92,11 @@ export async function UsersResolverTest(testArgs: TestArgs) {
       if (!testArgs.server) {
         throw new Error('Test server is not initialized')
       }
-      const response = await testArgs.server.executeOperation<CreateUserMation>(
-        {
+      const response =
+        await testArgs.server.executeOperation<CreateUserMutation>({
           query: CREATE_USER,
           variables: { data: validUserInfo },
-        },
-      )
+        })
       // Check API response.
       assert(response.body.kind === 'single')
       const { data, errors } = response.body.singleResult
