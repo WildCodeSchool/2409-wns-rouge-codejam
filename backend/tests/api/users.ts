@@ -5,3 +5,11 @@ export const CREATE_USER = `#graphql
     }
   }
 `
+
+export const LOGIN = `#graphql
+  mutation login($data: UserLoginInput!) {
+    login(data: $data) {
+      id
+    }
+  }
+`
