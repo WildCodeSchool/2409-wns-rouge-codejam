@@ -22,27 +22,33 @@ import { AuthContextType, ContextType } from '../auth/custom-auth-checker'
 
 @Resolver()
 export class UsersResolver {
-  @Mutation(() => User)
+  @Mutation(() => User, { nullable: true })
   async createUser(
     @Arg('data', () => UserCreateInput) data: UserCreateInput,
-  ): Promise<User> {
-    const newUser = new User()
+  ): Promise<User | null> {
     try {
+      // Verify if user already exists (email and username should both be unique)
+      const userInDB = await User.findOne({
+        where: [{ email: data.email }, { username: data.username }], // at least one should match
+      })
+      if (userInDB) return null
+
+      const newUser = new User()
       const hashedPassword = await argon2.hash(data.password)
       Object.assign(newUser, {
         ...data,
         hashedPassword,
         password: null, // remove clear password
       })
+      await User.save(newUser)
+      const user = await User.findOne({
+        where: { id: newUser.id },
+      })
+      if (!user) throw new Error('The given user does not exist')
+      return user
     } catch (err) {
       throw new Error((err as Error).message)
     }
-    await User.save(newUser)
-    const user = await User.findOne({
-      where: { id: newUser.id },
-    })
-    if (!user) throw new Error('The given user does not exist')
-    return user
   }
 
   @Query(() => [User])
