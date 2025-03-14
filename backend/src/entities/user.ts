@@ -83,6 +83,17 @@ export class UserCreateInput {
 }
 
 @InputType()
+export class UserLoginInput {
+  @Field(() => String)
+  @IsEmail({}, { message: 'Invalid email address' })
+  @MaxLength(EMAIL_CONSTRAINTS.maxLength)
+  email!: string
+
+  @Field(() => String)
+  password!: string
+}
+
+@InputType()
 export class UserUpdateInput {
   @Field(() => String, { nullable: true })
   username!: string
