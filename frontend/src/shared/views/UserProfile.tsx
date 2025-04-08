@@ -14,8 +14,7 @@ const UserProfile = () => {
   }
 
   return (
-    <div className="">
-      <h1>CodeJam</h1>
+    <div className="py-4">
       <p>Hello {data.users[0]?.username ?? 'CodeJamer'}</p>
     </div>
   )
