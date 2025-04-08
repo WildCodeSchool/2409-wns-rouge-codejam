@@ -4,11 +4,13 @@ import { Toaster } from '../components/ui/sonner'
 
 const Layout = () => {
   return (
-    <main className="m-auto p-4">
+    <div className="m-auto p-4">
       <NavBar />
-      <Outlet />
+      <main>
+        <Outlet />
+      </main>
       <Toaster richColors />
-    </main>
+    </div>
   )
 }
 

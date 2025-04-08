@@ -15,12 +15,10 @@ import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/
  */
 type Documents = {
     "\n  mutation createUser($data: UserCreateInput!) {\n    createUser(data: $data) {\n      email\n      username\n      id\n    }\n  }\n": typeof types.CreateUserDocument,
-    "\n  query users {\n    users {\n      id\n      username\n      email\n    }\n  }\n": typeof types.UsersDocument,
     "\n  query whoAmI {\n    whoAmI {\n      id\n      username\n      email\n    }\n  }\n": typeof types.WhoAmIDocument,
 };
 const documents: Documents = {
     "\n  mutation createUser($data: UserCreateInput!) {\n    createUser(data: $data) {\n      email\n      username\n      id\n    }\n  }\n": types.CreateUserDocument,
-    "\n  query users {\n    users {\n      id\n      username\n      email\n    }\n  }\n": types.UsersDocument,
     "\n  query whoAmI {\n    whoAmI {\n      id\n      username\n      email\n    }\n  }\n": types.WhoAmIDocument,
 };
 
@@ -42,10 +40,6 @@ export function gql(source: string): unknown;
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function gql(source: "\n  mutation createUser($data: UserCreateInput!) {\n    createUser(data: $data) {\n      email\n      username\n      id\n    }\n  }\n"): (typeof documents)["\n  mutation createUser($data: UserCreateInput!) {\n    createUser(data: $data) {\n      email\n      username\n      id\n    }\n  }\n"];
-/**
- * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
- */
-export function gql(source: "\n  query users {\n    users {\n      id\n      username\n      email\n    }\n  }\n"): (typeof documents)["\n  query users {\n    users {\n      id\n      username\n      email\n    }\n  }\n"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

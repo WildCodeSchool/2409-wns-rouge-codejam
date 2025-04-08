@@ -47,6 +47,7 @@ const SignUpForm = (props: SignUpFormPropsType) => {
     resolver: zodResolver(formSchema),
     mode: 'onChange',
     reValidateMode: 'onChange',
+    shouldFocusError: true,
   })
 
   async function onSubmit(values: SignUpFormType) {
