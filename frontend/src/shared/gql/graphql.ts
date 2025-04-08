@@ -20,9 +20,9 @@ export type Scalars = {
 
 export type Mutation = {
   __typename?: 'Mutation';
-  createUser: User;
+  createUser?: Maybe<User>;
   deleteUser: Scalars['Boolean']['output'];
-  login: Scalars['Boolean']['output'];
+  login?: Maybe<User>;
   logout: Scalars['Boolean']['output'];
   updateUser: User;
 };
@@ -39,8 +39,7 @@ export type MutationDeleteUserArgs = {
 
 
 export type MutationLoginArgs = {
-  email: Scalars['String']['input'];
-  password: Scalars['String']['input'];
+  data: UserLoginInput;
 };
 
 
@@ -77,6 +76,11 @@ export type UserCreateInput = {
   username: Scalars['String']['input'];
 };
 
+export type UserLoginInput = {
+  email: Scalars['String']['input'];
+  password: Scalars['String']['input'];
+};
+
 export type UserUpdateInput = {
   email?: InputMaybe<Scalars['String']['input']>;
   password?: InputMaybe<Scalars['String']['input']>;
@@ -88,7 +92,7 @@ export type CreateUserMutationVariables = Exact<{
 }>;
 
 
-export type CreateUserMutation = { __typename?: 'Mutation', createUser: { __typename?: 'User', email: string, username?: string | null, id: string } };
+export type CreateUserMutation = { __typename?: 'Mutation', createUser?: { __typename?: 'User', email: string, username?: string | null, id: string } | null };
 
 export type UsersQueryVariables = Exact<{ [key: string]: never; }>;
 
