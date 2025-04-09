@@ -49,6 +49,14 @@ pnpm run test:db
 > Due to the use of `tsx` to run TS files in Node and the use of ESM syntax (`"type": "module"` in `package.json` ), the option `NODE_OPTIONS="$NODE_OPTIONS --experimental-vm-modules"` need to be added to the `pnpm` script to activate ESM support with JEST tests
 > (cf. [documentation](https://jestjs.io/docs/next/ecmascript-modules)).
 
+### Run frontend tests
+
+To run frontend unit & integration tests (watch mode):
+
+```sh
+pnpm run test
+```
+
 ### 🚧Populate the database with initial data
 
 1. If the application is running, first stop the containers:
