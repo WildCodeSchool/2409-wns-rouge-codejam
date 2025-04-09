@@ -12,11 +12,11 @@ const SignInDialog = () => {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant="outline">Sign in</Button>
+        <Button variant="outline">Sign In</Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Sign in</DialogTitle>
+          <DialogTitle>Sign In</DialogTitle>
           <DialogDescription></DialogDescription>
         </DialogHeader>
       </DialogContent>

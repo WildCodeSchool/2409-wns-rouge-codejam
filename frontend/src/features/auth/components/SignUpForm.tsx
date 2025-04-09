@@ -1,3 +1,9 @@
+import { useForm } from 'react-hook-form'
+import { toast } from 'sonner'
+import { z } from 'zod'
+import { useMutation } from '@apollo/client'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { CREATE_USER } from '@/shared/api/createUser'
 import { Button } from '@/shared/components/ui/button'
 import {
   Form,
@@ -8,12 +14,6 @@ import {
   FormMessage,
 } from '@/shared/components/ui/form'
 import { Input } from '@/shared/components/ui/input'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { z } from 'zod'
-import { useMutation } from '@apollo/client'
-import { CREATE_USER } from '@/shared/api/createUser'
-import { toast } from 'sonner'
 import PasswordVisibiltyInput from '@/shared/components/PasswordVisibiltyInput'
 
 const formSchema = z
@@ -45,12 +45,22 @@ const SignUpForm = (props: SignUpFormPropsType) => {
 
   const form = useForm<SignUpFormType>({
     resolver: zodResolver(formSchema),
-    mode: 'onChange',
-    reValidateMode: 'onChange',
-    shouldFocusError: true,
+    mode: 'onBlur', // 	validation strategy before submitting
+    reValidateMode: 'onBlur', // validation strategy after submitting
+    shouldFocusError: true, // focus first field with an error if the form that fails validation ()
   })
 
-  async function onSubmit(values: SignUpFormType) {
+  const handleChange = (
+    e: React.FormEvent<HTMLElement>,
+    onChange: (...event: unknown[]) => void,
+  ) => {
+    onChange(e)
+    if (e.target instanceof HTMLInputElement) {
+      form.clearErrors(e.target.name as keyof SignUpFormType)
+    }
+  }
+
+  const onSubmit = async (values: SignUpFormType) => {
     try {
       const { data } = await createUser({
         variables: {
@@ -88,6 +98,7 @@ const SignUpForm = (props: SignUpFormPropsType) => {
         aria-label="signup form"
         onSubmit={form.handleSubmit(onSubmit)}
         className="space-y-8"
+        noValidate
       >
         <FormField
           control={form.control}
@@ -96,7 +107,11 @@ const SignUpForm = (props: SignUpFormPropsType) => {
             return (
               <FormItem>
                 <FormLabel>Email</FormLabel>
-                <FormControl>
+                <FormControl
+                  onChange={(e) => {
+                    handleChange(e, field.onChange)
+                  }}
+                >
                   <Input
                     type="email"
                     placeholder="Enter your email"
@@ -115,7 +130,11 @@ const SignUpForm = (props: SignUpFormPropsType) => {
             return (
               <FormItem>
                 <FormLabel>Username</FormLabel>
-                <FormControl>
+                <FormControl
+                  onChange={(e) => {
+                    handleChange(e, field.onChange)
+                  }}
+                >
                   <Input placeholder="Enter your username" {...field} />
                 </FormControl>
                 <FormMessage />
@@ -130,9 +149,7 @@ const SignUpForm = (props: SignUpFormPropsType) => {
             return (
               <FormItem>
                 <FormLabel>Password</FormLabel>
-                <FormControl>
-                  <PasswordVisibiltyInput field={field} name="Password" />
-                </FormControl>
+                <PasswordVisibiltyInput field={field} />
                 <FormMessage />
               </FormItem>
             )
@@ -145,12 +162,7 @@ const SignUpForm = (props: SignUpFormPropsType) => {
             return (
               <FormItem>
                 <FormLabel>Confirm password</FormLabel>
-                <FormControl>
-                  <PasswordVisibiltyInput
-                    field={field}
-                    name="Confirm password"
-                  />
-                </FormControl>
+                <PasswordVisibiltyInput {...field} />
                 <FormMessage />
               </FormItem>
             )
@@ -162,7 +174,7 @@ const SignUpForm = (props: SignUpFormPropsType) => {
           className="w-full"
           type="submit"
         >
-          Sign up
+          Sign Up
         </Button>
       </form>
     </Form>

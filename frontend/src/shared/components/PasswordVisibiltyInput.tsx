@@ -1,27 +1,32 @@
-import { Button } from '@/shared/components/ui/button'
-import { Eye, EyeClosed } from 'lucide-react'
-import { Input } from '@/shared/components/ui/input'
-import { ControllerRenderProps } from 'react-hook-form'
 import { useState } from 'react'
+import { ControllerRenderProps } from 'react-hook-form'
+import { Eye, EyeClosed } from 'lucide-react'
 import { SignUpFormType } from '@/features/auth/components/SignUpForm'
+import { Button } from '@/shared/components/ui/button'
+import { FormControl } from '@/shared/components/ui/form'
+import { Input } from '@/shared/components/ui/input'
 
-type PasswordVisibiltyInputPropsType = {
-  field?: ControllerRenderProps<SignUpFormType>
-  name: string
+type PasswordVisibiltyInputProps = {
+  field?: ControllerRenderProps<SignUpFormType, keyof SignUpFormType>
+  onChange?: (e: React.FormEvent<HTMLElement>) => void
 }
 
-const PasswordVisibiltyInput = (props: PasswordVisibiltyInputPropsType) => {
+const PasswordVisibiltyInput = ({
+  onChange,
+  field,
+}: PasswordVisibiltyInputProps) => {
   const [isVisible, setIsVisible] = useState<boolean>(false)
-
   return (
     <div className="relative">
-      <Input
-        data-testid="custom-password-field"
-        aria-label={props.name}
-        className="w-full"
-        type={isVisible ? 'text' : 'password'}
-        {...props.field}
-      />
+      <FormControl onChange={onChange}>
+        <Input
+          data-testid="custom-password-field"
+          className="w-full"
+          type={isVisible ? 'text' : 'password'}
+          {...field}
+        />
+      </FormControl>
+
       <Button
         type="button"
         aria-label={isVisible ? 'Hide password' : 'Show password'}
