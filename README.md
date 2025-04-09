@@ -39,7 +39,7 @@ or simply press <kbd>Ctrl</kbd>+<kbd>C</kbd> for a graceful stop.
 
 ### Run backend tests
 
-To run backend unit & integration tests (watch mode):
+To run backend unit & integration tests:
 
 ```sh
 pnpm run test:db
@@ -51,11 +51,17 @@ pnpm run test:db
 
 ### Run frontend tests
 
-To run frontend unit & integration tests (watch mode):
+To run frontend unit & integration tests:
 
-```sh
-pnpm run test
-```
+- in _single-run_ mode:
+  ```sh
+  pnpm run test
+  ```
+- in _watch_ mode:
+
+  ```sh
+  pnpm run test:watch
+  ```
 
 ### 🚧Populate the database with initial data
 

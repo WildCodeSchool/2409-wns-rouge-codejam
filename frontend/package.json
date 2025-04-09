@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "test": "vitest",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "codegen": "npx graphql-codegen --watch",
     "build": "tsc -b && vite build",
     "preview": "vite preview",
