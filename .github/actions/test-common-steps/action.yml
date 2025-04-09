@@ -1,0 +1,21 @@
+name: "Setup Env"
+description: "Common setup steps for testing"
+inputs:
+  directory:
+    description: "Name of the directory"
+    required: true
+  script:
+    description: "Name of the test script"
+    required: true
+    default: test
+runs:
+  using: "composite"
+  steps:
+    # Install pnpm as package manager
+    - name: Install pnpm
+      shell: bash
+      run: npm install -g pnpm@latest-10
+    # Run frontend tests
+    - name: Go to ${{ inputs.directory }} and run tests
+      shell: bash
+      run: cd ${{ inputs.directory }} && pnpm install && pnpm run ${{ inputs.script}}

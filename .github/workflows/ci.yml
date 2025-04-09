@@ -14,7 +14,9 @@ jobs:
       backend: ${{ steps.filter.outputs.backend }}
       frontend: ${{ steps.filter.outputs.frontend }}
     steps:
-      # For pull requests it's not necessary to checkout the code
+      # For pull requests, it's not necessary to checkout the code
+      - name: Check out code
+        uses: actions/checkout@v4
       - uses: dorny/paths-filter@v3
         id: filter
         with:
@@ -29,27 +31,25 @@ jobs:
     if: ${{ needs.changes.outputs.frontend == 'true' }}
     runs-on: ubuntu-latest
     steps:
-      # Install pnpm as package manager
-      - name: Install pnpm
-        run: npm install -g pnpm@latest-10
-      # Retrieve code from the repository
+      # Retrieve code from the repository (mandatory prior to using the custom local action)
       - name: Check out code
         uses: actions/checkout@v4
-      # Run frontend tests
-      - name: Go to frontend and run tests
-        run: cd frontend && pnpm install && pnpm run test
+      # Re-use custom action to install pnpm and checkout code
+      - uses: ./.github/actions/test-common-steps
+        with:
+          directory: "frontend"
+          script: "test"
 
   test-backend:
     needs: changes
     if: ${{ needs.changes.outputs.backend == 'true' }}
     runs-on: ubuntu-latest
     steps:
-      # Install pnpm as package manager
-      - name: Install pnpm
-        run: npm install -g pnpm@latest-10
-      # Retrieve code from the repository
+      # Retrieve code from the repository (mandatory prior to using the custom local action)
       - name: Check out code
         uses: actions/checkout@v4
-      # Run frontend tests
-      - name: Go to backend and run tests
-        run: cd backend && pnpm install && pnpm run test:db
+      # Re-use custom action to install pnpm and checkout code
+      - uses: ./.github/actions/test-common-steps
+        with:
+          directory: "backend"
+          script: "test:db"
