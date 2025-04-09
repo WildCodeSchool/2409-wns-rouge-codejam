@@ -1,12 +1,16 @@
 import { Outlet } from 'react-router-dom'
+import NavBar from './NavBar'
+import { Toaster } from '../components/ui/sonner'
 
 const Layout = () => {
   return (
-    <>
-      <main className="m-auto mt-20 mb-44 max-w-screen-xl px-8">
+    <div className="m-auto p-4">
+      <NavBar />
+      <main>
         <Outlet />
       </main>
-    </>
+      <Toaster richColors />
+    </div>
   )
 }
 

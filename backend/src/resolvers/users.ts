@@ -7,7 +7,12 @@ import {
   Query,
   Resolver,
 } from 'type-graphql'
-import { User, UserCreateInput, UserUpdateInput } from '../entities/user'
+import {
+  User,
+  UserCreateInput,
+  UserLoginInput,
+  UserUpdateInput,
+} from '../entities/user'
 import { validate } from 'class-validator'
 import { getUserFromContext, validationError } from './utils'
 import jwt from 'jsonwebtoken'
@@ -17,6 +22,35 @@ import { AuthContextType, ContextType } from '../auth/custom-auth-checker'
 
 @Resolver()
 export class UsersResolver {
+  @Mutation(() => User, { nullable: true })
+  async createUser(
+    @Arg('data', () => UserCreateInput) data: UserCreateInput,
+  ): Promise<User | null> {
+    try {
+      // Verify if user already exists (email and username should both be unique)
+      const userInDB = await User.findOne({
+        where: [{ email: data.email }, { username: data.username }], // at least one should match
+      })
+      if (userInDB) return null
+
+      const newUser = new User()
+      const hashedPassword = await argon2.hash(data.password)
+      Object.assign(newUser, {
+        ...data,
+        hashedPassword,
+        password: null, // remove clear password
+      })
+      await User.save(newUser)
+      const user = await User.findOne({
+        where: { id: newUser.id },
+      })
+      if (!user) throw new Error('The given user does not exist')
+      return user
+    } catch (err) {
+      throw new Error((err as Error).message)
+    }
+  }
+
   @Query(() => [User])
   async users(): Promise<User[]> {
     const users = await User.find()
@@ -33,39 +67,42 @@ export class UsersResolver {
   @Query(() => User, { nullable: true })
   async whoAmI(@Ctx() context: ContextType): Promise<User | null> {
     const user = await getUserFromContext(context)
-    return user || null
+    return user
   }
 
-  @Mutation(() => Boolean)
+  @Mutation(() => User, { nullable: true })
   async login(
     @Ctx() context: ContextType,
-    @Arg('email', () => String) email: string,
-    @Arg('password', () => String) password: string,
-  ): Promise<boolean> {
-    if (context.user) throw new Error('Already logged in')
-
-    const user = await User.findOne({
-      where: { email },
-    })
-    if (!user) throw new Error('Invalid credentials')
-
+    @Arg('data', () => UserLoginInput) data: UserLoginInput,
+  ): Promise<User | null> {
     try {
-      const valid = await argon2.verify(user.hashedPassword, password)
-      if (!valid) throw new Error('Invalid credentials')
+      if (context.user) throw new Error('Already logged in')
+
+      const user = await User.findOne({
+        where: { email: data.email },
+      })
+      if (!user) return null
+
+      const valid = await argon2.verify(user.hashedPassword, data.password)
+      if (!valid) return null
+
+      if (process.env.NODE_ENV !== 'test') {
+        const token = jwt.sign(
+          { userId: user.id },
+          process.env.JWT_SECRET || '',
+          {
+            expiresIn: '24h',
+          },
+        )
+        new Cookies(context.req, context.res).set('access_token', token, {
+          httpOnly: true,
+          secure: false,
+        })
+      }
+      return user
     } catch (err) {
-      throw new Error((err as Error).message)
+      throw new Error(err instanceof Error ? err.message : JSON.stringify(err))
     }
-
-    const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET || '', {
-      expiresIn: '24h',
-    })
-
-    new Cookies(context.req, context.res).set('access_token', token, {
-      httpOnly: true,
-      secure: false,
-    })
-
-    return true
   }
 
   @Authorized()
@@ -74,30 +111,6 @@ export class UsersResolver {
     const cookies = new Cookies(context.req, context.res)
     cookies.set('access_token', '', { maxAge: 0 })
     return true
-  }
-
-  @Mutation(() => User)
-  async createUser(
-    @Arg('data', () => UserCreateInput) data: UserCreateInput,
-  ): Promise<User> {
-    const newUser = new User()
-
-    try {
-      const hashedPassword = await argon2.hash(data.password)
-      Object.assign(newUser, { ...data, password: hashedPassword })
-    } catch (err) {
-      throw new Error((err as Error).message)
-    }
-
-    const errors = await validate(newUser)
-    if (errors.length) throw validationError(errors)
-
-    await User.save(newUser)
-    const user = await User.findOne({
-      where: { id: newUser.id },
-    })
-    if (!user) throw new Error('The given user does not exist')
-    return user
   }
 
   @Authorized()
