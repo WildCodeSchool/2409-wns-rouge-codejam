@@ -52,10 +52,7 @@ jobs:
           script: "test:db"
 
   build-frontend:
-    needs: test-frontend
     # Run job only if:
-    # - the frontend code has changed
-    # - the `test-frontend` job has been completed successfully
     # - the commit is on the main branch
     # - the commit is tagged starting with v
     if: ${{ github.ref == 'refs/heads/main' && startsWith(github.ref_name, 'v') }}
@@ -82,9 +79,7 @@ jobs:
           tags: ${{ vars.DOCKERHUB_USERNAME }}/frontend:${{ github.ref_name }}
 
   build-backend:
-    needs: test-backend
     # Run job only if:
-    # - the backend code has changed
     # - the commit is on the main branch
     # - the commit is tagged starting with v
     if: ${{ github.ref == 'refs/heads/main' && startsWith(github.ref_name, 'v') }}
