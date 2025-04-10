@@ -28,13 +28,20 @@ jobs:
         with:
           username: ${{ vars.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: "Debugging..."
+        run: |
+          echo "DOCKERHUB_USERNAME: ${{ vars.DOCKERHUB_USERNAME }}"
+          echo "GITHUB_REF_NAME: ${{ github.ref_name }}"
+          echo "DOCKER IMAGE NAME: ${{ vars.DOCKERHUB_USERNAME }}/frontend:${{ github.ref_name }}"
+          echo "DOCKER IMAGE NAME V2: codejam/frontend:${{ github.ref_name }}"
+      # Set up the default context for Buildx
       # Build and push the properly tagged Docker image to Docker Hub using Buildx. By default, this actions use the Git context so there is no need to use the `actions/checkout` action to check out the repository as this will ne done directly by BuildKit.
       - name: Build and push
-        uses: docker/build-push-action@v4
+        uses: docker/build-push-action@v6
         with:
           push: true
           context: "{{defaultContext}}:frontend"
-          tags: ${{ vars.DOCKERHUB_USERNAME }}/frontend-${{ github.ref_name }}
+          tags: codejam/frontend:${{ github.ref_name }}
 
   build-backend:
     runs-on: ubuntu-latest
@@ -53,8 +60,8 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       # Build and push the properly tagged Docker image to Docker Hub using Buildx. By default, this actions use the Git context so there is no need to use the `actions/checkout` action to check out the repository as this will ne done directly by BuildKit.
       - name: Build and push
-        uses: docker/build-push-action@v4
+        uses: docker/build-push-action@v6
         with:
           push: true
           context: "{{defaultContext}}:backend"
-          tags: ${{ vars.DOCKERHUB_USERNAME }}/backend-${{ github.ref_name }}
+          tags: codejam/backend:${{ github.ref_name }}
