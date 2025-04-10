@@ -22,6 +22,12 @@ jobs:
               - 'backend/**'
             frontend:
               - 'frontend/**'
+      - name: Debugging...
+        run: |
+          echo "Github ref: ${{ github.ref }}"
+          echo "Github ref_name: ${{ github.ref_name }}"
+          echo "Is main branch: ${{ github.ref == 'refs/heads/main' }}"
+          echo "Is tag starting with v: ${{ startsWith(github.ref_name, 'v') }}"
 
   test-frontend:
     needs: changes
