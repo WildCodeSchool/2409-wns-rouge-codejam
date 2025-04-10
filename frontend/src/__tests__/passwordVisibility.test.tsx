@@ -1,6 +1,6 @@
 import { fireEvent, render, screen } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
-import PasswordVisibiltyInput from '@/shared/components/PasswordVisibiltyInput'
+import PasswordVisibiltyInput from '@/features/auth/components/PasswordVisibiltyInput'
 
 describe('Password visibility input', () => {
   it('should switch the visibilty of the password when we click on the eye', () => {

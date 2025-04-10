@@ -1,3 +1,4 @@
+// import { Info } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { z } from 'zod'
@@ -14,7 +15,8 @@ import {
   FormMessage,
 } from '@/shared/components/ui/form'
 import { Input } from '@/shared/components/ui/input'
-import PasswordVisibiltyInput from '@/shared/components/PasswordVisibiltyInput'
+import { Spinner } from '@/shared/components/ui/spinner'
+import PasswordVisibiltyInput from '@/features/auth/components/PasswordVisibiltyInput'
 
 const formSchema = z
   .object({
@@ -50,6 +52,8 @@ const SignUpForm = (props: SignUpFormPropsType) => {
     shouldFocusError: true, // focus first field with an error if the form that fails validation ()
   })
 
+  const isSubmitting = form.formState.isSubmitting
+
   const handleChange = (
     e: React.FormEvent<HTMLElement>,
     onChange: (...event: unknown[]) => void,
@@ -62,27 +66,30 @@ const SignUpForm = (props: SignUpFormPropsType) => {
 
   const onSubmit = async (values: SignUpFormType) => {
     try {
-      const { data } = await createUser({
-        variables: {
-          data: {
-            username: values.username,
-            email: values.email,
-            password: values.password,
-          },
-        },
-      })
+      console.log('validating...')
+      await new Promise((resolve) => setTimeout(resolve, 4000))
+      console.log('submitting...')
+      // const { data } = await createUser({
+      //   variables: {
+      //     data: {
+      //       username: values.username,
+      //       email: values.email,
+      //       password: values.password,
+      //     },
+      //   },
+      // })
 
-      if (data?.createUser) {
-        toast.success(`Welcome ${data.createUser.username ?? 'Codejamer'}`, {
-          description: 'Successful registration',
-        })
+      // if (data?.createUser) {
+      //   toast.success(`Welcome ${data.createUser.username ?? 'Codejamer'}`, {
+      //     description: 'Successful registration',
+      //   })
 
-        if (props.callbackOnSubmit) {
-          props.callbackOnSubmit()
-        }
-      } else {
-        throw new Error('User creation failed unexpectedly')
-      }
+      //   if (props.callbackOnSubmit) {
+      //     props.callbackOnSubmit()
+      //   }
+      // } else {
+      //   throw new Error('User creation failed unexpectedly')
+      // }
     } catch (err) {
       console.error('Catch :', err)
 
@@ -115,6 +122,7 @@ const SignUpForm = (props: SignUpFormPropsType) => {
                   <Input
                     type="email"
                     placeholder="Enter your email"
+                    disabled={isSubmitting}
                     {...field}
                   />
                 </FormControl>
@@ -135,7 +143,11 @@ const SignUpForm = (props: SignUpFormPropsType) => {
                     handleChange(e, field.onChange)
                   }}
                 >
-                  <Input placeholder="Enter your username" {...field} />
+                  <Input
+                    placeholder="Enter your username"
+                    disabled={isSubmitting}
+                    {...field}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -145,11 +157,20 @@ const SignUpForm = (props: SignUpFormPropsType) => {
         <FormField
           control={form.control}
           name="password"
-          render={({ field }) => {
+          render={({ field: { onChange, ...restField } }) => {
             return (
               <FormItem>
-                <FormLabel>Password</FormLabel>
-                <PasswordVisibiltyInput field={field} />
+                <FormLabel>
+                  Password
+                  {/* <Info aria-hidden="true" role="img" size={15} /> */}
+                </FormLabel>
+                <PasswordVisibiltyInput
+                  onChange={(e) => {
+                    handleChange(e, onChange)
+                  }}
+                  disabled={isSubmitting}
+                  field={restField}
+                />
                 <FormMessage />
               </FormItem>
             )
@@ -158,11 +179,17 @@ const SignUpForm = (props: SignUpFormPropsType) => {
         <FormField
           control={form.control}
           name="confirmPassword"
-          render={({ field }) => {
+          render={({ field: { onChange, ...restField } }) => {
             return (
               <FormItem>
                 <FormLabel>Confirm password</FormLabel>
-                <PasswordVisibiltyInput {...field} />
+                <PasswordVisibiltyInput
+                  onChange={(e) => {
+                    handleChange(e, onChange)
+                  }}
+                  disabled={isSubmitting}
+                  field={restField}
+                />
                 <FormMessage />
               </FormItem>
             )
@@ -173,8 +200,9 @@ const SignUpForm = (props: SignUpFormPropsType) => {
           id="signup-submit"
           className="w-full"
           type="submit"
+          disabled={isSubmitting}
         >
-          Sign Up
+          {isSubmitting ? <Spinner show size="small" /> : 'Sign Up'}
         </Button>
       </form>
     </Form>

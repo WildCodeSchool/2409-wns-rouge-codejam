@@ -7,12 +7,17 @@ import { FormControl } from '@/shared/components/ui/form'
 import { Input } from '@/shared/components/ui/input'
 
 type PasswordVisibiltyInputProps = {
-  field?: ControllerRenderProps<SignUpFormType, keyof SignUpFormType>
   onChange?: (e: React.FormEvent<HTMLElement>) => void
+  disabled?: boolean
+  field?: Omit<
+    ControllerRenderProps<SignUpFormType, keyof SignUpFormType>,
+    'onChange'
+  >
 }
 
 const PasswordVisibiltyInput = ({
   onChange,
+  disabled,
   field,
 }: PasswordVisibiltyInputProps) => {
   const [isVisible, setIsVisible] = useState<boolean>(false)
@@ -23,10 +28,10 @@ const PasswordVisibiltyInput = ({
           data-testid="custom-password-field"
           className="w-full"
           type={isVisible ? 'text' : 'password'}
+          disabled={disabled}
           {...field}
         />
       </FormControl>
-
       <Button
         type="button"
         aria-label={isVisible ? 'Hide password' : 'Show password'}
