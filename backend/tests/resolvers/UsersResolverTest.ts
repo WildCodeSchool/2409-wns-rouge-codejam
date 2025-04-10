@@ -25,6 +25,7 @@ const validUserInfo: UserCreateInput = {
 export async function UsersResolverTest(testArgs: TestArgs) {
   describe('createUser', () => {
     it('should fail if invalid username', async () => {
+      expect(1 + 1).toBe(2)
       if (!testArgs.server) {
         throw new Error('Test server is not initialized')
       }

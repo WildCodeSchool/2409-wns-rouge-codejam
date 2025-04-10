@@ -58,7 +58,7 @@ jobs:
     # - the `test-frontend` job has been completed successfully
     # - the commit is on the main branch
     # - the commit is tagged starting with v
-    if: ${{ github.ref == 'refs/heads/main' }} && startsWith(${{ github.ref }}, 'refs/tags/v')
+    if: ${{ github.ref == 'refs/heads/main' && startsWith(github.ref_name, 'v') }}
     runs-on: ubuntu-latest
     steps:
       # Enable multi-platform builds within Docker workflows by installing QEMU static binaries
@@ -87,7 +87,7 @@ jobs:
     # - the backend code has changed
     # - the commit is on the main branch
     # - the commit is tagged starting with v
-    if: ${{ github.ref == 'refs/heads/main' }} && startsWith(${{ github.ref }}, 'refs/tags/v')
+    if: ${{ github.ref == 'refs/heads/main' && startsWith(github.ref_name, 'v') }}
     runs-on: ubuntu-latest
     steps:
       # Enable multi-platform builds within Docker workflows by installing QEMU static binaries
