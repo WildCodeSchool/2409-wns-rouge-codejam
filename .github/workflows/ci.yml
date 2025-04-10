@@ -50,3 +50,62 @@ jobs:
         with:
           directory: "backend"
           script: "test:db"
+
+  build-frontend:
+    needs: test-frontend
+    # Run job only if:
+    # - the frontend code has changed
+    # - the `test-frontend` job has been completed successfully
+    # - the commit is on the main branch
+    # - the commit is tagged starting with v
+    if: ${{ github.ref == 'refs/heads/main' }} && startsWith(${{ github.ref }}, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    steps:
+      # Enable multi-platform builds within Docker workflows by installing QEMU static binaries
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+      # Create and boot a builder to be used in the following steps
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      # Log in to Docker Hub using personal access token
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ vars.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      # Build and push the properly tagged Docker image to Docker Hub using Buildx. By default, this actions use the Git context so there is no need to use the `actions/checkout` action to check out the repository as this will ne done directly by BuildKit.
+      - name: Build and push
+        uses: docker/build-push-action@v4
+        with:
+          push: true
+          context: "{{defaultContext}}:frontend"
+          tags: ${{ vars.DOCKERHUB_USERNAME }}/frontend:${{ github.ref_name }}
+
+  build-backend:
+    needs: test-backend
+    # Run job only if:
+    # - the backend code has changed
+    # - the commit is on the main branch
+    # - the commit is tagged starting with v
+    if: ${{ github.ref == 'refs/heads/main' }} && startsWith(${{ github.ref }}, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    steps:
+      # Enable multi-platform builds within Docker workflows by installing QEMU static binaries
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+      # Create and boot a builder to be used in the following steps
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      # Log in to Docker Hub using personal access token
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ vars.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      # Build and push the properly tagged Docker image to Docker Hub using Buildx. By default, this actions use the Git context so there is no need to use the `actions/checkout` action to check out the repository as this will ne done directly by BuildKit.
+      - name: Build and push
+        uses: docker/build-push-action@v4
+        with:
+          push: true
+          context: "{{defaultContext}}:backend"
+          tags: ${{ vars.DOCKERHUB_USERNAME }}/backend:${{ github.ref_name }}
