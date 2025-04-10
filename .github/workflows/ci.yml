@@ -1,0 +1,55 @@
+name: ci
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  # Job to run change detection: enable conditional execution of workflow steps and jobs, based on the files modified by pull request, on a feature branch, or by the recently pushed commits
+  changes:
+    runs-on: ubuntu-latest
+    # Set job outputs to values from filter step
+    outputs:
+      backend: ${{ steps.filter.outputs.backend }}
+      frontend: ${{ steps.filter.outputs.frontend }}
+    steps:
+      # For pull requests, it's not necessary to checkout the code
+      - name: Check out code
+        uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            backend:
+              - 'backend/**'
+            frontend:
+              - 'frontend/**'
+
+  test-frontend:
+    needs: changes
+    if: ${{ needs.changes.outputs.frontend == 'true' }}
+    runs-on: ubuntu-latest
+    steps:
+      # Retrieve code from the repository (mandatory prior to using the custom local action)
+      - name: Check out code
+        uses: actions/checkout@v4
+      # Re-use custom action to install pnpm and checkout code
+      - uses: ./.github/actions/test-common-steps
+        with:
+          directory: "frontend"
+          script: "test"
+
+  test-backend:
+    needs: changes
+    if: ${{ needs.changes.outputs.backend == 'true' }}
+    runs-on: ubuntu-latest
+    steps:
+      # Retrieve code from the repository (mandatory prior to using the custom local action)
+      - name: Check out code
+        uses: actions/checkout@v4
+      # Re-use custom action to install pnpm and checkout code
+      - uses: ./.github/actions/test-common-steps
+        with:
+          directory: "backend"
+          script: "test:db"

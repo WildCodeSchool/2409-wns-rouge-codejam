@@ -41,6 +41,7 @@ export class UsersResolver {
         password: null, // remove clear password
       })
       await User.save(newUser)
+      // check ci
       const user = await User.findOne({
         where: { id: newUser.id },
       })
