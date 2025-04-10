@@ -4,12 +4,12 @@ inputs:
   directory:
     description: "Name of the directory"
     required: true
-  # docker-username:
-  #   description: "Docker username"
-  #   required: true
-  # docker-token:
-  #   description: "Docker personnal access token"
-  #   required: true
+  docker-username:
+    description: "Docker username"
+    required: true
+  docker-token:
+    description: "Docker personnal access token"
+    required: true
   docker-repository:
     description: "Name of Dockerhub repository"
     required: true
@@ -26,8 +26,8 @@ runs:
     - name: Login to Docker Hub
       uses: docker/login-action@v3
       with:
-        username: ${{ vars.DOCKERHUB_USERNAME }}
-        password: ${{ secrets.DOCKERHUB_TOKEN }}
+        username: ${{ inputs.docker-username }}
+        password: ${{ inputs.docker-token }}
     # Build and push the properly tagged Docker image to Docker Hub using Buildx. By default, this actions use the Git context so there is no need to use the `actions/checkout` action to check out the repository as this will ne done directly by BuildKit.
     - name: Build and push
       uses: docker/build-push-action@v6

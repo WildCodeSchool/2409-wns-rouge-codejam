@@ -21,8 +21,8 @@ jobs:
       - uses: ./.github/actions/build-common-steps
         with:
           directory: "frontend"
-          # docker-username: ${{ vars.DOCKERHUB_USERNAME }}
-          # docker-token: ${{ secrets.DOCKERHUB_TOKEN }}
+          docker-username: ${{ vars.DOCKERHUB_USERNAME }}
+          docker-token: ${{ secrets.DOCKERHUB_TOKEN }}
           docker-repository: ${{ vars.DOCKERHUB_REPO_FRONTEND }}
 
   build-backend:
@@ -35,6 +35,6 @@ jobs:
       - uses: ./.github/actions/build-common-steps
         with:
           directory: "frontend"
-          # docker-username: ${{ vars.DOCKERHUB_USERNAME }}
-          # docker-token: ${{ secrets.DOCKERHUB_TOKEN }}
+          docker-username: ${{ vars.DOCKERHUB_USERNAME }}
+          docker-token: ${{ secrets.DOCKERHUB_TOKEN }}
           docker-repository: ${{ vars.DOCKERHUB_REPO_BACKEND }}
