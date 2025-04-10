@@ -1,13 +1,13 @@
 name: ci
 
-on:
-  push:
-    if: "!startsWith(github.ref, 'refs/tags/')"
+on: push
 
 jobs:
   # Job to run change detection: enable conditional execution of workflow steps and jobs, based on the files modified by pull request, on a feature branch, or by the recently pushed commits
   changes:
     runs-on: ubuntu-latest
+    # Avoid running the job when a tag is pushed
+    if: ${{ !startsWith(github.ref, 'refs/tags/') }}
     # Set job outputs to values from filter step
     outputs:
       backend: ${{ steps.filter.outputs.backend }}
@@ -24,13 +24,6 @@ jobs:
               - 'backend/**'
             frontend:
               - 'frontend/**'
-
-      - name: Debugging...
-        run: |
-          echo "Github ref: ${{ github.ref }}"
-          echo "Github ref_name: ${{ github.ref_name }}"
-          echo "Is main branch: ${{ github.ref == 'refs/heads/main' }}"
-          echo "Is tag starting with v: ${{ startsWith(github.ref_name, 'v') }}"
 
   test-frontend:
     needs: changes
