@@ -1,4 +1,4 @@
-FROM node:20-alpine3.21
+FROM node:23-alpine3.21
 
 WORKDIR /app
 RUN apk add curl
@@ -11,4 +11,4 @@ COPY src src
 
 EXPOSE 3000
 
-CMD pnpm start
+CMD ["pnpm", "start"]
