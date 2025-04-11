@@ -16,11 +16,11 @@ const SignUpDialog = () => {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline">Sign up</Button>
+        <Button variant="outline">Sign Up</Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle className="text-center text-3xl">Sign up</DialogTitle>
+          <DialogTitle className="text-center text-3xl">Sign Up</DialogTitle>
           <DialogDescription></DialogDescription>
         </DialogHeader>
         <SignUpForm

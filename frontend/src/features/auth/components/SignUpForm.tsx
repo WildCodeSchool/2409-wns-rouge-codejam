@@ -1,3 +1,8 @@
+import { useForm } from 'react-hook-form'
+import { toast } from 'sonner'
+import { useMutation } from '@apollo/client'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { CREATE_USER } from '@/shared/api/createUser'
 import { Button } from '@/shared/components/ui/button'
 import {
   Form,
@@ -8,33 +13,10 @@ import {
   FormMessage,
 } from '@/shared/components/ui/form'
 import { Input } from '@/shared/components/ui/input'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { z } from 'zod'
-import { useMutation } from '@apollo/client'
-import { CREATE_USER } from '@/shared/api/createUser'
-import { toast } from 'sonner'
-import PasswordVisibiltyInput from '@/shared/components/PasswordVisibiltyInput'
-
-const formSchema = z
-  .object({
-    email: z.string().email('Must be an email'),
-    username: z.string().min(2).max(50),
-    password: z
-      .string()
-      .min(16, 'Must contain at least 16 character(s)')
-      .regex(/[A-Z]/, 'Must contain at least an uppercase letter')
-      .regex(/[a-z]/, 'Must contain at least an lowercase letter')
-      .regex(/[0-9]/, 'Must contain at least a number')
-      .regex(/[^A-Za-z0-9]/, 'Must contain at least a special character'),
-    confirmPassword: z.string(),
-  })
-  .refine((data) => data.password === data.confirmPassword, {
-    message: "Passwords don't match",
-    path: ['confirmPassword'],
-  })
-
-export type SignUpFormType = z.infer<typeof formSchema>
+import { Spinner } from '@/shared/components/ui/spinner'
+import PasswordTooltip from '@/features/auth/components/PasswordTooltip'
+import PasswordVisibiltyInput from '@/features/auth/components/PasswordVisibiltyInput'
+import { formSchema, SignUpFormType } from '@/features/auth/schemas/formSchema'
 
 type SignUpFormPropsType = {
   callbackOnSubmit?: () => void
@@ -45,12 +27,24 @@ const SignUpForm = (props: SignUpFormPropsType) => {
 
   const form = useForm<SignUpFormType>({
     resolver: zodResolver(formSchema),
-    mode: 'onChange',
-    reValidateMode: 'onChange',
-    shouldFocusError: true,
+    mode: 'onBlur', // 	validation strategy before submitting
+    reValidateMode: 'onBlur', // validation strategy after submitting
+    shouldFocusError: true, // focus first field with an error if the form that fails validation ()
   })
 
-  async function onSubmit(values: SignUpFormType) {
+  const isSubmitting = form.formState.isSubmitting
+
+  const handleChange = (
+    e: React.FormEvent<HTMLElement>,
+    onChange: (...event: unknown[]) => void,
+  ) => {
+    onChange(e)
+    if (e.target instanceof HTMLInputElement) {
+      form.clearErrors(e.target.name as keyof SignUpFormType)
+    }
+  }
+
+  const onSubmit = async (values: SignUpFormType) => {
     try {
       const { data } = await createUser({
         variables: {
@@ -88,6 +82,7 @@ const SignUpForm = (props: SignUpFormPropsType) => {
         aria-label="signup form"
         onSubmit={form.handleSubmit(onSubmit)}
         className="space-y-8"
+        noValidate
       >
         <FormField
           control={form.control}
@@ -96,10 +91,15 @@ const SignUpForm = (props: SignUpFormPropsType) => {
             return (
               <FormItem>
                 <FormLabel>Email</FormLabel>
-                <FormControl>
+                <FormControl
+                  onChange={(e) => {
+                    handleChange(e, field.onChange)
+                  }}
+                >
                   <Input
                     type="email"
                     placeholder="Enter your email"
+                    disabled={isSubmitting}
                     {...field}
                   />
                 </FormControl>
@@ -115,8 +115,16 @@ const SignUpForm = (props: SignUpFormPropsType) => {
             return (
               <FormItem>
                 <FormLabel>Username</FormLabel>
-                <FormControl>
-                  <Input placeholder="Enter your username" {...field} />
+                <FormControl
+                  onChange={(e) => {
+                    handleChange(e, field.onChange)
+                  }}
+                >
+                  <Input
+                    placeholder="Enter your username"
+                    disabled={isSubmitting}
+                    {...field}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -126,13 +134,20 @@ const SignUpForm = (props: SignUpFormPropsType) => {
         <FormField
           control={form.control}
           name="password"
-          render={({ field }) => {
+          render={({ field: { onChange, ...restField } }) => {
             return (
               <FormItem>
-                <FormLabel>Password</FormLabel>
-                <FormControl>
-                  <PasswordVisibiltyInput field={field} name="Password" />
-                </FormControl>
+                <FormLabel>
+                  Password
+                  <PasswordTooltip />
+                </FormLabel>
+                <PasswordVisibiltyInput
+                  onChange={(e) => {
+                    handleChange(e, onChange)
+                  }}
+                  disabled={isSubmitting}
+                  field={restField}
+                />
                 <FormMessage />
               </FormItem>
             )
@@ -141,16 +156,17 @@ const SignUpForm = (props: SignUpFormPropsType) => {
         <FormField
           control={form.control}
           name="confirmPassword"
-          render={({ field }) => {
+          render={({ field: { onChange, ...restField } }) => {
             return (
               <FormItem>
                 <FormLabel>Confirm password</FormLabel>
-                <FormControl>
-                  <PasswordVisibiltyInput
-                    field={field}
-                    name="Confirm password"
-                  />
-                </FormControl>
+                <PasswordVisibiltyInput
+                  onChange={(e) => {
+                    handleChange(e, onChange)
+                  }}
+                  disabled={isSubmitting}
+                  field={restField}
+                />
                 <FormMessage />
               </FormItem>
             )
@@ -161,8 +177,9 @@ const SignUpForm = (props: SignUpFormPropsType) => {
           id="signup-submit"
           className="w-full"
           type="submit"
+          disabled={isSubmitting}
         >
-          Sign up
+          {isSubmitting ? <Spinner show size="small" /> : 'Sign Up'}
         </Button>
       </form>
     </Form>
