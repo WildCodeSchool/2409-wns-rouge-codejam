@@ -1,7 +1,5 @@
-// import { Info } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import { z } from 'zod'
 import { useMutation } from '@apollo/client'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { CREATE_USER } from '@/shared/api/createUser'
@@ -16,27 +14,9 @@ import {
 } from '@/shared/components/ui/form'
 import { Input } from '@/shared/components/ui/input'
 import { Spinner } from '@/shared/components/ui/spinner'
+import PasswordTooltip from '@/features/auth/components/PasswordTooltip'
 import PasswordVisibiltyInput from '@/features/auth/components/PasswordVisibiltyInput'
-
-const formSchema = z
-  .object({
-    email: z.string().email('Must be an email'),
-    username: z.string().min(2).max(50),
-    password: z
-      .string()
-      .min(16, 'Must contain at least 16 character(s)')
-      .regex(/[A-Z]/, 'Must contain at least an uppercase letter')
-      .regex(/[a-z]/, 'Must contain at least an lowercase letter')
-      .regex(/[0-9]/, 'Must contain at least a number')
-      .regex(/[^A-Za-z0-9]/, 'Must contain at least a special character'),
-    confirmPassword: z.string(),
-  })
-  .refine((data) => data.password === data.confirmPassword, {
-    message: "Passwords don't match",
-    path: ['confirmPassword'],
-  })
-
-export type SignUpFormType = z.infer<typeof formSchema>
+import { formSchema, SignUpFormType } from '@/features/auth/schemas/formSchema'
 
 type SignUpFormPropsType = {
   callbackOnSubmit?: () => void
@@ -66,30 +46,27 @@ const SignUpForm = (props: SignUpFormPropsType) => {
 
   const onSubmit = async (values: SignUpFormType) => {
     try {
-      console.log('validating...')
-      await new Promise((resolve) => setTimeout(resolve, 4000))
-      console.log('submitting...')
-      // const { data } = await createUser({
-      //   variables: {
-      //     data: {
-      //       username: values.username,
-      //       email: values.email,
-      //       password: values.password,
-      //     },
-      //   },
-      // })
+      const { data } = await createUser({
+        variables: {
+          data: {
+            username: values.username,
+            email: values.email,
+            password: values.password,
+          },
+        },
+      })
 
-      // if (data?.createUser) {
-      //   toast.success(`Welcome ${data.createUser.username ?? 'Codejamer'}`, {
-      //     description: 'Successful registration',
-      //   })
+      if (data?.createUser) {
+        toast.success(`Welcome ${data.createUser.username ?? 'Codejamer'}`, {
+          description: 'Successful registration',
+        })
 
-      //   if (props.callbackOnSubmit) {
-      //     props.callbackOnSubmit()
-      //   }
-      // } else {
-      //   throw new Error('User creation failed unexpectedly')
-      // }
+        if (props.callbackOnSubmit) {
+          props.callbackOnSubmit()
+        }
+      } else {
+        throw new Error('User creation failed unexpectedly')
+      }
     } catch (err) {
       console.error('Catch :', err)
 
@@ -162,7 +139,7 @@ const SignUpForm = (props: SignUpFormPropsType) => {
               <FormItem>
                 <FormLabel>
                   Password
-                  {/* <Info aria-hidden="true" role="img" size={15} /> */}
+                  <PasswordTooltip />
                 </FormLabel>
                 <PasswordVisibiltyInput
                   onChange={(e) => {
