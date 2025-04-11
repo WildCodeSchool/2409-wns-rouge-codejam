@@ -25,30 +25,76 @@ jobs:
             frontend:
               - 'frontend/**'
 
-  test-frontend:
+  code-quality-frontend:
     needs: changes
     if: ${{ needs.changes.outputs.frontend == 'true' }}
     runs-on: ubuntu-latest
+    env:
+      directory: frontend
     steps:
-      # Retrieve code from the repository (mandatory prior to using the custom local action)
+      # Retrieve code from the repository
       - name: Check out code
         uses: actions/checkout@v4
-      # Re-use custom action to install pnpm and checkout code
-      - uses: ./.github/actions/test-common-steps
+      # Custom action to setup environment
+      - uses: ./.github/actions/common-steps
         with:
-          directory: "frontend"
-          script: "test"
+          directory: $directory
+      # Ensure code is properly formatted
+      - name: Format code
+        run: cd $directory && pnpm run format:ci
+      # Ensure code has no static errors
+      - name: Lint code
+        run: cd $directory && pnpm run lint
 
-  test-backend:
+  code-quality-backend:
     needs: changes
     if: ${{ needs.changes.outputs.backend == 'true' }}
     runs-on: ubuntu-latest
     steps:
-      # Retrieve code from the repository (mandatory prior to using the custom local action)
+      # Retrieve code from the repository
       - name: Check out code
         uses: actions/checkout@v4
-      # Re-use custom action to install pnpm and checkout code
-      - uses: ./.github/actions/test-common-steps
+      # Custom action to setup environment
+      - uses: ./.github/actions/common-steps
         with:
-          directory: "backend"
-          script: "test:db"
+          directory: backend
+      # Ensure code is properly formatted
+      - name: Format code
+        run: cd backend && pnpm run format:ci
+      # Ensure code has no static errors
+      - name: Lint code
+        run: cd backend && pnpm run lint
+        
+  test-frontend:
+    needs: code-quality-frontend
+    runs-on: ubuntu-latest
+    env:
+      directory: frontend
+    steps:
+      # Retrieve code from the repository
+      - name: Check out code
+        uses: actions/checkout@v4
+     # Custom action to setup environment
+      - uses: ./.github/actions/common-steps
+        with:
+          directory: $directory
+      # Ensure tests pass
+      - name: Run tests
+        run: cd $directory && pnpm run test
+  
+  test-backend:
+    needs: code-quality-backend
+    runs-on: ubuntu-latest
+    env:
+      directory: backend
+    steps:
+      # Retrieve code from the repository
+      - name: Check out code
+        uses: actions/checkout@v4
+      # Custom action to setup environment
+      - uses: ./.github/actions/common-steps
+        with:
+          directory: $directory
+      # Ensure tests pass
+      - name: Run tests
+        run: cd $directory && pnpm run test:db

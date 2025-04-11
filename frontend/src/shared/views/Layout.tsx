@@ -4,7 +4,7 @@ import { Toaster } from '../components/ui/sonner'
 
 const Layout = () => {
   return (
-    <div className="p-4 h-dvh grid grid-rows-[auto_1fr] gap-1">
+    <div className="grid h-dvh grid-rows-[auto_1fr] gap-1 p-4">
       <NavBar />
       <main>
         <Outlet />

@@ -13,7 +13,8 @@
     "dev-gen": "concurrently \"npx graphql-codegen --watch \" \"npx vite --host\"",
     "format": "prettier --write .",
     "lint": "eslint .",
-    "format:lint": "pnpm run format && pnpm run lint"
+    "format:lint": "pnpm run format && pnpm run lint",
+    "format:ci": "prettier . --check"
   },
   "dependencies": {
     "@apollo/client": "^3.11.10",
