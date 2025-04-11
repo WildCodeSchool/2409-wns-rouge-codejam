@@ -1,0 +1,17 @@
+name: "Setup environment"
+description: "Common setup steps"
+inputs:
+  directory:
+    description: "Name of the directory"
+    required: true
+runs:
+  using: "composite"
+  steps:
+    # Install pnpm as package manager
+    - name: Install pnpm
+      shell: bash
+      run: npm install -g pnpm@latest-10
+    # Go to directory and install dependencies
+    - name: Go to ${{ inputs.directory }} and install dependencies
+      shell: bash
+      run: cd ${{ inputs.directory }} && pnpm install
