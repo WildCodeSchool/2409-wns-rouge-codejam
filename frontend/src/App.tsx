@@ -13,8 +13,6 @@ const client = new ApolloClient({
     },
   },
 })
-// TODO: Delete this
-// Test CD
 
 const App = () => {
   return (
