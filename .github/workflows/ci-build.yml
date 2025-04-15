@@ -4,8 +4,6 @@ on:
   push:
     tags:
       - v*
-    branches:
-      - main
 
 jobs:
   build-frontend:
@@ -13,6 +11,7 @@ jobs:
     # - the commit is on the main branch
     # - the commit is tagged starting with v
     runs-on: ubuntu-latest
+    if: ${{ github.ref_name == 'main' }}
     steps:
       # Retrieve code from the repository (mandatory prior to using the custom local action)
       - name: Check out code
@@ -26,7 +25,11 @@ jobs:
           tags: ${{vars.DOCKERHUB_REPO_FRONTEND}}:${{ github.ref_name }}, ${{vars.DOCKERHUB_REPO_FRONTEND}}:latest
 
   build-backend:
+    # Run job only if:
+    # - the commit is on the main branch
+    # - the commit is tagged starting with v
     runs-on: ubuntu-latest
+    if: ${{ github.ref_name == 'main' }}
     steps:
       # Retrieve code from the repository (mandatory prior to using the custom local action)
       - name: Check out code
