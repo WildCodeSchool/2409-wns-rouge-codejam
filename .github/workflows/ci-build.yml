@@ -4,7 +4,7 @@ on:
   push:
     tags:
       - v*
-    branch:
+    branches:
       - main
 
 jobs:
@@ -20,10 +20,10 @@ jobs:
       # Custom action to login to Docker Hub, build and push the Docker image
       - uses: ./.github/actions/build-common-steps
         with:
-          directory: "frontend"
+          directory: 'frontend'
           docker-username: ${{ vars.DOCKERHUB_USERNAME }}
           docker-token: ${{ secrets.DOCKERHUB_TOKEN }}
-          docker-repository: ${{ vars.DOCKERHUB_REPO_FRONTEND }}
+          tags: ${{vars.DOCKERHUB_REPO_FRONTEND}}:${{ github.ref_name }}, ${{vars.DOCKERHUB_REPO_FRONTEND}}:latest
 
   build-backend:
     runs-on: ubuntu-latest
@@ -34,7 +34,7 @@ jobs:
       # Custom action to login to Docker Hub, build and push the Docker image
       - uses: ./.github/actions/build-common-steps
         with:
-          directory: "frontend"
+          directory: 'backend'
           docker-username: ${{ vars.DOCKERHUB_USERNAME }}
           docker-token: ${{ secrets.DOCKERHUB_TOKEN }}
-          docker-repository: ${{ vars.DOCKERHUB_REPO_BACKEND }}
+          tags: ${{vars.DOCKERHUB_REPO_BACKEND }}:${{ github.ref_name }}, ${{vars.DOCKERHUB_REPO_BACKEND}}:latest

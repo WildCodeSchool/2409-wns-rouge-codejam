@@ -1,20 +1,20 @@
-name: "Build and Push Docker Image"
-description: "Common setup steps for building and pushing Docker images"
+name: 'Build and Push Docker Image'
+description: 'Common setup steps for building and pushing Docker images'
 inputs:
   directory:
-    description: "Name of the directory"
+    description: 'Name of the directory'
     required: true
   docker-username:
-    description: "Docker username"
+    description: 'Docker username'
     required: true
   docker-token:
-    description: "Docker personnal access token"
+    description: 'Docker personnal access token'
     required: true
-  docker-repository:
-    description: "Name of Dockerhub repository"
+  tags:
+    description: 'List of image tags'
     required: true
 runs:
-  using: "composite"
+  using: 'composite'
   steps:
     # Enable multi-platform builds within Docker workflows by installing QEMU static binaries
     - name: Set up QEMU
@@ -33,5 +33,5 @@ runs:
       uses: docker/build-push-action@v6
       with:
         push: true
-        context: "{{defaultContext}}:${{ inputs.directory }}"
-        tags: ${{ inputs.docker-repository }}:${{ github.ref_name }}, ${{ inputs.docker-repository }}:latest
+        context: '{{defaultContext}}:${{ inputs.directory }}'
+        tags: ${{ inputs.tags }}

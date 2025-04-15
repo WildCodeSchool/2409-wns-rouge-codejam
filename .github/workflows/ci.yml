@@ -64,7 +64,7 @@ jobs:
       # Ensure code has no static errors
       - name: Lint code
         run: cd backend && pnpm run lint
-        
+
   test-frontend:
     needs: code-quality-frontend
     runs-on: ubuntu-latest
@@ -74,14 +74,14 @@ jobs:
       # Retrieve code from the repository
       - name: Check out code
         uses: actions/checkout@v4
-     # Custom action to setup environment
+      # Custom action to setup environment
       - uses: ./.github/actions/common-steps
         with:
           directory: $directory
       # Ensure tests pass
       - name: Run tests
         run: cd $directory && pnpm run test
-  
+
   test-backend:
     needs: code-quality-backend
     runs-on: ubuntu-latest
@@ -98,3 +98,41 @@ jobs:
       # Ensure tests pass
       - name: Run tests
         run: cd $directory && pnpm run test:db
+
+  build-frontend:
+    # Run job only if:
+    # - the commit is on the dev branch
+    # - the related testing branch has passed
+    needs: test-frontend
+    if: ${{ github.ref_name == 'dev' }}
+    runs-on: ubuntu-latest
+    steps:
+      # Retrieve code from the repository (mandatory prior to using the custom local action)
+      - name: Check out code
+        uses: actions/checkout@v4
+      # Custom action to login to Docker Hub, build and push the Docker image
+      - uses: ./.github/actions/build-common-steps
+        with:
+          directory: 'frontend'
+          docker-username: ${{ vars.DOCKERHUB_USERNAME }}
+          docker-token: ${{ secrets.DOCKERHUB_TOKEN }}
+          tags: ${{ vars.DOCKERHUB_REPO_FRONTEND }}:dev-latest
+
+  build-backend:
+    # Run job only if:
+    # - the commit is on the dev branch
+    # - the related testing branch has passed
+    needs: test-backend
+    if: ${{ github.ref_name == 'dev' }}
+    runs-on: ubuntu-latest
+    steps:
+      # Retrieve code from the repository (mandatory prior to using the custom local action)
+      - name: Check out code
+        uses: actions/checkout@v4
+      # Custom action to login to Docker Hub, build and push the Docker image
+      - uses: ./.github/actions/build-common-steps
+        with:
+          directory: 'frontend'
+          docker-username: ${{ vars.DOCKERHUB_USERNAME }}
+          docker-token: ${{ secrets.DOCKERHUB_TOKEN }}
+          tags: ${{ vars.DOCKERHUB_REPO_BACKEND }}:dev-latest
