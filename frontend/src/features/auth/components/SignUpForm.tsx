@@ -99,6 +99,7 @@ const SignUpForm = (props: SignUpFormPropsType) => {
                   <Input
                     type="email"
                     placeholder="Enter your email"
+                    autoComplete="email"
                     disabled={isSubmitting}
                     {...field}
                   />
@@ -122,6 +123,7 @@ const SignUpForm = (props: SignUpFormPropsType) => {
                 >
                   <Input
                     placeholder="Enter your username"
+                    autoComplete="username"
                     disabled={isSubmitting}
                     {...field}
                   />
@@ -145,6 +147,7 @@ const SignUpForm = (props: SignUpFormPropsType) => {
                   onChange={(e) => {
                     handleChange(e, onChange)
                   }}
+                  autocomplete="new-password"
                   disabled={isSubmitting}
                   field={restField}
                 />
@@ -164,6 +167,7 @@ const SignUpForm = (props: SignUpFormPropsType) => {
                   onChange={(e) => {
                     handleChange(e, onChange)
                   }}
+                  autocomplete="new-password"
                   disabled={isSubmitting}
                   field={restField}
                 />
