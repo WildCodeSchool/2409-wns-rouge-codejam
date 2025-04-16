@@ -1,0 +1,46 @@
+services:
+  db:
+    container_name: codejam-db
+    image: postgres
+    ports:
+      - 5432:5432
+    volumes:
+      - dbdata:/var/lib/postgresql/data
+    env_file:
+      - database.env
+
+  backend:
+    image: codejam2025proton/backend:latest
+    environment:
+      - NODE_ENV=production
+    env_file:
+      - database.env
+      - backend.env
+    depends_on:
+      db:
+        condition: service_started
+
+  frontend:
+    # platform: linux/amd64
+    image: codejam2025proton/frontend:latest
+    command: sh -c "pnpm run dev"
+    environment:
+      - GRAPHQL_SCHEMA_URL=http://backend:3000
+      - NODE_ENV=production
+    depends_on:
+      backend:
+        condition: service_started
+
+  nginx:
+    image: nginx
+    volumes:
+      - ./nginx:/etc/nginx
+    ports:
+      - 8080:80
+    depends_on:
+      - backend
+      - frontend
+
+volumes:
+  dbdata:
+    driver: local
