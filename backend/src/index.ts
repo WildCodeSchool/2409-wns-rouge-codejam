@@ -19,6 +19,3 @@ async function initialize() {
 }
 
 initialize()
-
-// TODO: to delete
-// Dummy modification
