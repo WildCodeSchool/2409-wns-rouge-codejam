@@ -10,8 +10,8 @@ jobs:
     # Run job only if:
     # - the commit is on the main branch
     # - the commit is tagged starting with v
-    runs-on: ubuntu-latest
     if: startsWith(github.ref_name, 'v')
+    runs-on: ubuntu-latest
     steps:
       # Retrieve code from the repository (mandatory prior to using the custom local action)
       - name: Check out code
@@ -22,14 +22,14 @@ jobs:
           directory: 'frontend'
           docker-username: ${{ vars.DOCKERHUB_USERNAME }}
           docker-token: ${{ secrets.DOCKERHUB_TOKEN }}
-          tags: ${{vars.DOCKERHUB_REPO_FRONTEND}}:${{ github.ref_name }}, ${{vars.DOCKERHUB_REPO_FRONTEND}}:latest
+          docker-repository: ${{ vars.DOCKERHUB_REPO_FRONTEND }}
 
   build-backend:
     # Run job only if:
     # - the commit is on the main branch
     # - the commit is tagged starting with v
-    runs-on: ubuntu-latest
     if: startsWith(github.ref_name, 'v')
+    runs-on: ubuntu-latest
     steps:
       # Retrieve code from the repository (mandatory prior to using the custom local action)
       - name: Check out code
@@ -37,7 +37,7 @@ jobs:
       # Custom action to login to Docker Hub, build and push the Docker image
       - uses: ./.github/actions/build-common-steps
         with:
-          directory: 'backend'
+          directory: 'frontend'
           docker-username: ${{ vars.DOCKERHUB_USERNAME }}
           docker-token: ${{ secrets.DOCKERHUB_TOKEN }}
-          tags: ${{vars.DOCKERHUB_REPO_BACKEND }}:${{ github.ref_name }}, ${{vars.DOCKERHUB_REPO_BACKEND}}:latest
+          docker-repository: ${{ vars.DOCKERHUB_REPO_BACKEND }}

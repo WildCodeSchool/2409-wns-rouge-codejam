@@ -5,10 +5,10 @@ on: push
 jobs:
   # Job to run change detection: enable conditional execution of workflow steps and jobs, based on the files modified by pull request, on a feature branch, or by the recently pushed commits
   changes:
-    runs-on: ubuntu-latest
     # Avoid running the job when a tag is pushed
     if: ${{ !startsWith(github.ref, 'refs/tags/') }}
     # Set job outputs to values from filter step
+    runs-on: ubuntu-latest
     outputs:
       backend: ${{ steps.filter.outputs.backend }}
       frontend: ${{ steps.filter.outputs.frontend }}
@@ -98,41 +98,3 @@ jobs:
       # Ensure tests pass
       - name: Run tests
         run: cd $directory && pnpm run test:db
-
-  build-frontend:
-    # Run job only if:
-    # - the commit is on the dev branch
-    # - the related testing branch has passed
-    needs: test-frontend
-    if: ${{ github.ref_name == 'dev' }}
-    runs-on: ubuntu-latest
-    steps:
-      # Retrieve code from the repository (mandatory prior to using the custom local action)
-      - name: Check out code
-        uses: actions/checkout@v4
-      # Custom action to login to Docker Hub, build and push the Docker image
-      - uses: ./.github/actions/build-common-steps
-        with:
-          directory: 'frontend'
-          docker-username: ${{ vars.DOCKERHUB_USERNAME }}
-          docker-token: ${{ secrets.DOCKERHUB_TOKEN }}
-          tags: ${{ vars.DOCKERHUB_REPO_FRONTEND }}:dev-latest
-
-  build-backend:
-    # Run job only if:
-    # - the commit is on the dev branch
-    # - the related testing branch has passed
-    needs: test-backend
-    if: ${{ github.ref_name == 'dev' }}
-    runs-on: ubuntu-latest
-    steps:
-      # Retrieve code from the repository (mandatory prior to using the custom local action)
-      - name: Check out code
-        uses: actions/checkout@v4
-      # Custom action to login to Docker Hub, build and push the Docker image
-      - uses: ./.github/actions/build-common-steps
-        with:
-          directory: 'frontend'
-          docker-username: ${{ vars.DOCKERHUB_USERNAME }}
-          docker-token: ${{ secrets.DOCKERHUB_TOKEN }}
-          tags: ${{ vars.DOCKERHUB_REPO_BACKEND }}:dev-latest
