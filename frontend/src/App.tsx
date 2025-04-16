@@ -30,6 +30,3 @@ const App = () => {
 }
 
 export default App
-
-// TODO: to delete
-// Dummy modification
