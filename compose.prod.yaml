@@ -10,6 +10,7 @@ services:
       - database.env
 
   backend:
+    platform: linux/amd64
     image: codejam2025proton/backend:latest
     environment:
       - NODE_ENV=production
@@ -21,7 +22,7 @@ services:
         condition: service_started
 
   frontend:
-    # platform: linux/amd64
+    platform: linux/amd64
     image: codejam2025proton/frontend:latest
     command: sh -c "pnpm run dev"
     environment:
