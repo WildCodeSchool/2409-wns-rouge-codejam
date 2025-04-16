@@ -5,10 +5,10 @@ on: push
 jobs:
   # Job to run change detection: enable conditional execution of workflow steps and jobs, based on the files modified by pull request, on a feature branch, or by the recently pushed commits
   changes:
-    runs-on: ubuntu-latest
     # Avoid running the job when a tag is pushed
     if: ${{ !startsWith(github.ref, 'refs/tags/') }}
     # Set job outputs to values from filter step
+    runs-on: ubuntu-latest
     outputs:
       backend: ${{ steps.filter.outputs.backend }}
       frontend: ${{ steps.filter.outputs.frontend }}
@@ -64,7 +64,7 @@ jobs:
       # Ensure code has no static errors
       - name: Lint code
         run: cd backend && pnpm run lint
-        
+
   test-frontend:
     needs: code-quality-frontend
     runs-on: ubuntu-latest
@@ -74,14 +74,14 @@ jobs:
       # Retrieve code from the repository
       - name: Check out code
         uses: actions/checkout@v4
-     # Custom action to setup environment
+      # Custom action to setup environment
       - uses: ./.github/actions/common-steps
         with:
           directory: $directory
       # Ensure tests pass
       - name: Run tests
         run: cd $directory && pnpm run test
-  
+
   test-backend:
     needs: code-quality-backend
     runs-on: ubuntu-latest
