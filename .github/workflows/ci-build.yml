@@ -2,6 +2,8 @@ name: ci-build
 
 on:
   push:
+    tags:
+      - v*
     branches:
       - main
 
@@ -22,7 +24,7 @@ jobs:
           directory: 'frontend'
           docker-username: ${{ vars.DOCKERHUB_USERNAME }}
           docker-token: ${{ secrets.DOCKERHUB_TOKEN }}
-          tags: ${{vars.DOCKERHUB_REPO_FRONTEND}}:${{ github.ref_name }}, ${{vars.DOCKERHUB_REPO_FRONTEND}}:latest
+          docker-repository: ${{ vars.DOCKERHUB_REPO_FRONTEND }}
 
   build-backend:
     # Run job only if:
@@ -37,7 +39,7 @@ jobs:
       # Custom action to login to Docker Hub, build and push the Docker image
       - uses: ./.github/actions/build-common-steps
         with:
-          directory: 'backend'
+          directory: 'frontend'
           docker-username: ${{ vars.DOCKERHUB_USERNAME }}
           docker-token: ${{ secrets.DOCKERHUB_TOKEN }}
-          tags: ${{vars.DOCKERHUB_REPO_BACKEND }}:${{ github.ref_name }}, ${{vars.DOCKERHUB_REPO_BACKEND}}:latest
+          docker-repository: ${{ vars.DOCKERHUB_REPO_BACKEND }}
