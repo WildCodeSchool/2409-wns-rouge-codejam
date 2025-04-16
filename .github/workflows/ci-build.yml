@@ -2,15 +2,13 @@ name: ci-build
 
 on:
   push:
-    branches:
-      - main
+    tags:
+      - v*
 
 jobs:
   build-frontend:
     # Run job only if:
-    # - the commit is on the main branch
     # - the commit is tagged starting with v
-    if: startsWith(github.ref_name, 'v')
     runs-on: ubuntu-latest
     steps:
       # Retrieve code from the repository (mandatory prior to using the custom local action)
@@ -26,9 +24,7 @@ jobs:
 
   build-backend:
     # Run job only if:
-    # - the commit is on the main branch
     # - the commit is tagged starting with v
-    if: startsWith(github.ref_name, 'v')
     runs-on: ubuntu-latest
     steps:
       # Retrieve code from the repository (mandatory prior to using the custom local action)
