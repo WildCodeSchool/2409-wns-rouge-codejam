@@ -33,7 +33,7 @@ jobs:
       # Custom action to login to Docker Hub, build and push the Docker image
       - uses: ./.github/actions/build-common-steps
         with:
-          directory: 'frontend'
+          directory: 'backend'
           docker-username: ${{ vars.DOCKERHUB_USERNAME }}
           docker-token: ${{ secrets.DOCKERHUB_TOKEN }}
           docker-repository: ${{ vars.DOCKERHUB_REPO_BACKEND }}
