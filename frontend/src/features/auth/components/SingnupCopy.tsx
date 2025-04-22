@@ -17,6 +17,7 @@ import { Spinner } from '@/shared/components/ui/spinner'
 import PasswordTooltip from '@/features/auth/components/PasswordTooltip'
 import PasswordVisibiltyInput from '@/features/auth/components/PasswordVisibiltyInput'
 import { formSchema, SignUpFormType } from '@/features/auth/schemas/formSchema'
+import { useState } from 'react'
 
 type SignUpFormPropsType = {
   callbackOnSubmit?: () => void
@@ -24,6 +25,7 @@ type SignUpFormPropsType = {
 
 const SignUpForm = (props: SignUpFormPropsType) => {
   const [createUser] = useMutation(CREATE_USER)
+  const [subtmitError, setSubmitError] = useState('')
 
   const form = useForm<SignUpFormType>({
     resolver: zodResolver(formSchema),
@@ -33,8 +35,9 @@ const SignUpForm = (props: SignUpFormPropsType) => {
   })
 
   const isSubmitting = form.formState.isSubmitting
-  const isSubmittingError = Object.keys(form.formState.errors)
-  console.log(isSubmittingError)
+  const isFieldError = Object.values(form.formState.errors).findIndex(
+    (e) => e.message && e.message.length > 0,
+  )
 
   const handleChange = (
     e: React.FormEvent<HTMLElement>,
@@ -43,6 +46,7 @@ const SignUpForm = (props: SignUpFormPropsType) => {
     onChange(e)
     if (e.target instanceof HTMLInputElement) {
       form.clearErrors(e.target.name as keyof SignUpFormType)
+      setSubmitError('')
     }
   }
 
@@ -66,29 +70,14 @@ const SignUpForm = (props: SignUpFormPropsType) => {
         if (props.callbackOnSubmit) {
           props.callbackOnSubmit()
         }
+      } else {
+        setSubmitError('User with this email or this username already exists')
       }
     } catch (err) {
-      if (
-        err instanceof Error &&
-        err.message.includes('User with this email and name exists already')
-      ) {
-        form.setError('email', { message: err.message })
-        form.setError('username', { message: err.message })
-      } else if (
-        err instanceof Error &&
-        err.message.includes('User with this email exists already')
-      ) {
-        form.setError('email', { message: err.message })
-      } else if (
-        err instanceof Error &&
-        err.message.includes('User with this username exists already')
-      ) {
-        form.setError('username', { message: err.message })
-      } else {
-        toast.error(`Error while creating your account`, {
-          description: err instanceof Error ? err.message : JSON.stringify(err),
-        })
-      }
+      console.error('Catch :', err)
+      toast.error(`Error while creating your account`, {
+        description: err instanceof Error ? err.message : JSON.stringify(err),
+      })
     }
   }
 
@@ -192,12 +181,17 @@ const SignUpForm = (props: SignUpFormPropsType) => {
             )
           }}
         />
+        {subtmitError && (
+          <p className="text-center text-red-700">{subtmitError}</p>
+        )}
         <Button
           data-testid="submit-signup"
           id="signup-submit"
           className="w-full"
           type="submit"
-          disabled={isSubmitting || isSubmittingError.length > 0}
+          disabled={
+            isFieldError === 0 || isSubmitting || subtmitError.length > 0
+          }
         >
           {isSubmitting ? <Spinner show size="small" /> : 'Sign Up'}
         </Button>
