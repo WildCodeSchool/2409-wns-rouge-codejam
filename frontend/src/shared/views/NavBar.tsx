@@ -39,7 +39,12 @@ const NavBar = () => {
             onOpenChange={closeModal}
           >
             {isSignIn ? (
-              <SignInForm />
+              <SignInForm
+                onSignUp={() => {
+                  setIsSignIn(false)
+                }}
+                callbackOnSubmit={closeModal}
+              />
             ) : (
               <SignUpForm callbackOnSubmit={closeModal} />
             )}
