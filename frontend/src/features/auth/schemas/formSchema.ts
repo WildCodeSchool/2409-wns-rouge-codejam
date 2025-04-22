@@ -8,9 +8,13 @@ export const PASSWORD_REQUIREMENT = {
   special: 'Must contain at least a special character',
 }
 
-export const formSchema = z
-  .object({
-    email: z.string().email('Must be an email'),
+export const signInFormSchema = z.object({
+  email: z.string().email('Must be an email'),
+  password: z.string().min(1),
+})
+
+export const signUpFormSchema = signInFormSchema
+  .extend({
     username: z.string().min(2).max(50),
     password: z
       .string()
@@ -26,4 +30,6 @@ export const formSchema = z
     path: ['confirmPassword'],
   })
 
-export type SignUpFormType = z.infer<typeof formSchema>
+export type SignInFormType = z.infer<typeof signInFormSchema>
+
+export type SignUpFormType = z.infer<typeof signUpFormSchema>

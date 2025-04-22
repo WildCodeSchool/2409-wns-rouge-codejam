@@ -16,7 +16,10 @@ import { Input } from '@/shared/components/ui/input'
 import { Spinner } from '@/shared/components/ui/spinner'
 import PasswordTooltip from '@/features/auth/components/PasswordTooltip'
 import PasswordVisibiltyInput from '@/features/auth/components/PasswordVisibiltyInput'
-import { formSchema, SignUpFormType } from '@/features/auth/schemas/formSchema'
+import {
+  signUpFormSchema,
+  SignUpFormType,
+} from '@/features/auth/schemas/formSchema'
 
 type SignUpFormPropsType = {
   callbackOnSubmit?: () => void
@@ -26,7 +29,7 @@ const SignUpForm = (props: SignUpFormPropsType) => {
   const [createUser] = useMutation(CREATE_USER)
 
   const form = useForm<SignUpFormType>({
-    resolver: zodResolver(formSchema),
+    resolver: zodResolver(signUpFormSchema),
     mode: 'onBlur', // 	validation strategy before submitting
     reValidateMode: 'onBlur', // validation strategy after submitting
     shouldFocusError: true, // focus first field with an error if the form that fails validation ()
