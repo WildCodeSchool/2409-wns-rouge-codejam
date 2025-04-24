@@ -22,6 +22,7 @@ import {
 } from '@/features/auth/schemas/formSchema'
 
 type SignUpFormPropsType = {
+  onSignIn: () => void
   callbackOnSubmit?: () => void
 }
 
@@ -70,8 +71,8 @@ const SignUpForm = (props: SignUpFormPropsType) => {
       } else {
         throw new Error('User creation failed unexpectedly')
       }
-    } catch (err) {
-      console.error('Catch :', err)
+    } catch (err: unknown) {
+      console.error(err)
 
       toast.error(`Error while creating your account`, {
         description: err instanceof Error ? err.message : JSON.stringify(err),
@@ -189,6 +190,19 @@ const SignUpForm = (props: SignUpFormPropsType) => {
           {isSubmitting ? <Spinner show size="small" /> : 'Sign Up'}
         </Button>
       </form>
+
+      <div className="text-muted-foreground flex items-center justify-center gap-2 text-sm">
+        Already have an account?
+        <Button
+          variant="link"
+          size="sm"
+          className="p-1"
+          disabled={isSubmitting}
+          onClick={props.onSignIn}
+        >
+          Sign In
+        </Button>
+      </div>
     </Form>
   )
 }

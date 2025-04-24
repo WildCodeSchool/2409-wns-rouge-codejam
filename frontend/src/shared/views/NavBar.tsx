@@ -46,7 +46,12 @@ const NavBar = () => {
                 callbackOnSubmit={closeModal}
               />
             ) : (
-              <SignUpForm callbackOnSubmit={closeModal} />
+              <SignUpForm
+                onSignIn={() => {
+                  setIsSignIn(true)
+                }}
+                callbackOnSubmit={closeModal}
+              />
             )}
           </Modal>
         )}
