@@ -34,7 +34,6 @@ const SignUpForm = (props: SignUpFormPropsType) => {
 
   const isSubmitting = form.formState.isSubmitting
   const isSubmittingError = Object.keys(form.formState.errors)
-  console.log(isSubmittingError)
 
   const handleChange = (
     e: React.FormEvent<HTMLElement>,
