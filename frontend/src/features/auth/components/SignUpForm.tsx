@@ -30,6 +30,12 @@ const SignUpForm = (props: SignUpFormPropsType) => {
   const [createUser] = useMutation(CREATE_USER)
 
   const form = useForm<SignUpFormType>({
+    defaultValues: {
+      email: '',
+      username: '',
+      password: '',
+      confirmPassword: '',
+    }, // required for controlled inputs
     resolver: zodResolver(signUpFormSchema),
     mode: 'onBlur', // 	validation strategy before submitting
     reValidateMode: 'onBlur', // validation strategy after submitting

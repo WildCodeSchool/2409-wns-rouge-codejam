@@ -31,6 +31,10 @@ const SignInForm = (props: SignInFormPropsType) => {
   const [login] = useMutation(LOGIN)
 
   const form = useForm<SignInFormType>({
+    defaultValues: {
+      email: '',
+      password: '',
+    }, // required for controlled inputs
     resolver: zodResolver(signInFormSchema),
     mode: 'onBlur', //  validation strategy before submitting
     reValidateMode: 'onBlur', // validation strategy after submitting
@@ -135,7 +139,7 @@ const SignInForm = (props: SignInFormPropsType) => {
                   onChange={(e) => {
                     handleChange(e, onChange)
                   }}
-                  autocomplete="current-password"
+                  autoComplete="current-password"
                   disabled={isSubmitting}
                   field={restField}
                 />
