@@ -1,6 +1,7 @@
 import { useMutation, useSuspenseQuery } from '@apollo/client'
 import { useState } from 'react'
 import { toast } from 'sonner'
+import UserInfo from '@/features/auth/components/UserInfo'
 import SignInForm from '@/features/auth/components/SignInForm'
 import SignUpForm from '@/features/auth/components/SignUpForm'
 import { LOGOUT } from '@/shared/api/logout'
@@ -13,7 +14,7 @@ export default function NavActions() {
   const { data: { whoAmI: user } = {} } = useSuspenseQuery(WHO_AM_I)
   const [logout] = useMutation(LOGOUT)
 
-  const isUserLoggedIn = user !== null
+  const isUserLoggedIn = user !== null && user !== undefined
   const showModal = isSignIn !== undefined
 
   const closeModal = () => {
@@ -32,7 +33,7 @@ export default function NavActions() {
         if (errors) console.error('Failed to sign out:', errors)
         throw new Error('Failed to sign out!')
       }
-      
+
       toast.success('Successful logout', {
         description: '👋 Hope to see you soon!',
       })
@@ -45,7 +46,7 @@ export default function NavActions() {
     <div className="flex flex-row items-center gap-4">
       {isUserLoggedIn ? (
         <>
-          <div>{user?.username ?? 'codejamer'}</div>
+          <UserInfo user={user} />
           <Button onClick={handleLogout}>Sign Out</Button>
         </>
       ) : (
