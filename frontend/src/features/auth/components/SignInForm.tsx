@@ -78,7 +78,7 @@ const SignInForm = (props: SignInFormPropsType) => {
       }
 
       toast.success('Successful login', {
-        description: `👋 Welcome back ${data.login.username ?? 'Codejamer'}`,
+        description: `Welcome back ${data.login.username ?? 'Codejamer'}!`,
       })
       if (props.callbackOnSubmit) {
         form.reset()

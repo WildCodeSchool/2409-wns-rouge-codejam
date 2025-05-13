@@ -1,6 +1,6 @@
 import { Outlet } from 'react-router-dom'
 import NavBar from './NavBar'
-import { Toaster } from '../components/ui/sonner'
+import { Toaster } from './ui/sonner'
 
 const Layout = () => {
   return (
