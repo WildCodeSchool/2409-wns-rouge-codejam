@@ -274,7 +274,7 @@ export async function UsersResolverTest(testArgs: TestArgs) {
       // Check API response.
       assert(response.body.kind === 'single')
       const { data, errors } = response.body.singleResult
-      expect(errors).toBeUndefined()
+      expect(errors).toBeDefined()
       expect(data).toBeDefined()
       assert(data !== undefined && data !== null)
       expect(data.createUser).toBeNull()
@@ -295,7 +295,7 @@ export async function UsersResolverTest(testArgs: TestArgs) {
       // Check API response.
       assert(response.body.kind === 'single')
       const { data, errors } = response.body.singleResult
-      expect(errors).toBeUndefined()
+      expect(errors).toBeDefined()
       expect(data).toBeDefined()
       assert(data !== undefined && data !== null)
       expect(data.createUser).toBeNull()

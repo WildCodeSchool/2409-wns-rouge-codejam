@@ -28,32 +28,31 @@ export class UsersResolver {
   ): Promise<User | null> {
     try {
       // Verify if user already exists (email and username should both be unique)
-      const userInDB = await User.findOne({
-        where: [{ email: data.email }, { username: data.username }],
+      const existingUserByEmail = await User.findOne({
+        where: { email: data.email },
+      })
+      const existingUserByUsername = await User.findOne({
+        where: { username: data.username },
       })
 
-      if (
-        userInDB?.email === data.email &&
-        userInDB?.username === data.username
-      ) {
-        throw new Error('User with this email and name exists already')
-      } else if (userInDB?.email === data.email) {
+      if (existingUserByEmail && existingUserByUsername) {
+        throw new Error('User with this email and username exists already')
+      } else if (existingUserByEmail) {
         throw new Error('User with this email exists already')
-      } else if (userInDB?.username === data.username) {
+      } else if (existingUserByUsername) {
         throw new Error('User with this username exists already')
-      } else {
-        const newUser = new User()
-        const hashedPassword = await argon2.hash(data.password)
-
-        Object.assign(newUser, {
-          ...data,
-          hashedPassword,
-          password: null, // remove clear password
-        })
-        // Save and return the saved user directly
-        const savedUser = await User.save(newUser)
-        return savedUser
       }
+      const newUser = new User()
+      const hashedPassword = await argon2.hash(data.password)
+
+      Object.assign(newUser, {
+        ...data,
+        hashedPassword,
+        password: null, // remove clear password
+      })
+
+      const savedUser = await User.save(newUser)
+      return savedUser
     } catch (err) {
       throw new Error((err as Error).message)
     }
