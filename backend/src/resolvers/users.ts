@@ -36,11 +36,13 @@ export class UsersResolver {
       })
 
       if (existingUserByEmail && existingUserByUsername) {
-        throw new Error('User with this email and username exists already')
+        throw new Error(
+          'A user with this email and this username already exists',
+        )
       } else if (existingUserByEmail) {
-        throw new Error('User with this email exists already')
+        throw new Error('A user with this email already exists')
       } else if (existingUserByUsername) {
-        throw new Error('User with this username exists already')
+        throw new Error('A user with username already exists')
       }
       const newUser = new User()
       const hashedPassword = await argon2.hash(data.password)

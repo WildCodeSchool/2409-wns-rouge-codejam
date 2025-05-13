@@ -68,17 +68,13 @@ const SignUpForm = (props: SignUpFormPropsType) => {
         }
       }
     } catch (err) {
-      if (
-        err instanceof Error &&
-        err.message.includes('email') &&
-        err.message.includes('username')
-      ) {
-        form.setError('email', { message: err.message })
-        form.setError('username', { message: err.message })
-      } else if (err instanceof Error && err.message.includes('email')) {
-        form.setError('email', { message: err.message })
-      } else if (err instanceof Error && err.message.includes('username')) {
-        form.setError('username', { message: err.message })
+      if (err instanceof Error) {
+        if (err.message.includes('email')) {
+          form.setError('email', { message: err.message })
+        }
+        if (err.message.includes('username')) {
+          form.setError('username', { message: err.message })
+        }
       } else {
         toast.error(`Error while creating your account`, {
           description: err instanceof Error ? err.message : JSON.stringify(err),
