@@ -38,6 +38,9 @@ export default function UserInfo({ user }: UserInfoProps) {
       })
     } catch (error: unknown) {
       console.error(error)
+      toast.error('Failed to logout', {
+        description: 'Oops! Something went wrong.',
+      })
     }
   }
 
