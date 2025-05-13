@@ -33,7 +33,6 @@ export default function NavActions() {
             Sign In
           </Button>
           <Button
-            variant="outline"
             onClick={() => {
               setIsSignIn(false)
             }}
