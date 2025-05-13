@@ -73,10 +73,14 @@ const SignUpForm = (props: SignUpFormPropsType) => {
     } catch (err) {
       if (err instanceof Error) {
         if (err.message.includes('email')) {
-          form.setError('email', { message: err.message })
+          form.setError('email', {
+            message: 'This email already exists',
+          })
         }
         if (err.message.includes('username')) {
-          form.setError('username', { message: err.message })
+          form.setError('username', {
+            message: 'This username already exists',
+          })
         }
       } else {
         toast.error(`Error while creating your account`, {
