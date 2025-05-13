@@ -1,4 +1,4 @@
-import SignUpDialog from '@/features/auth/components/SignUpDialog'
+import { MockedProvider, MockedResponse } from '@apollo/client/testing'
 import {
   fireEvent,
   render,
@@ -6,10 +6,13 @@ import {
   waitForElementToBeRemoved,
 } from '@testing-library/react'
 import { userEvent } from '@testing-library/user-event'
+import { useState } from 'react'
 import { describe, expect, it, vi } from 'vitest'
-import { MockedProvider, MockedResponse } from '@apollo/client/testing'
+import SignUpForm from '@/features/auth/components/SignUpForm'
 import { CREATE_USER } from '@/shared/api/createUser'
 import { CreateUserMutation, UserCreateInput } from '@/shared/gql/graphql'
+import { Button } from '@/shared/components/ui/button'
+import Modal from '@/shared/components/Modal'
 import { Toaster } from '@/shared/components/ui/sonner'
 
 const mocks: MockedResponse<CreateUserMutation, { data: UserCreateInput }> = {
@@ -35,10 +38,29 @@ const mocks: MockedResponse<CreateUserMutation, { data: UserCreateInput }> = {
 }
 
 function MockedSignupDialog() {
+  const [showModal, setShowModal] = useState(false)
+  const closeModal = () => {
+    setShowModal(false)
+  }
   return (
     <div>
       <MockedProvider addTypename={false} mocks={[mocks]}>
-        <SignUpDialog />
+        <div className="flex flex-row items-center gap-4">
+          <Button
+            data-testid="navbar-signup"
+            onClick={() => {
+              setShowModal(true)
+            }}
+          >
+            Sign Up
+          </Button>
+
+          {showModal && (
+            <Modal open title="Sign Up" onOpenChange={setShowModal}>
+              <SignUpForm onSignIn={() => null} callbackOnSubmit={closeModal} />
+            </Modal>
+          )}
+        </div>
       </MockedProvider>
       <Toaster />
     </div>
