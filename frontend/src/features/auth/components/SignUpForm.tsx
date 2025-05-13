@@ -33,6 +33,7 @@ const SignUpForm = (props: SignUpFormPropsType) => {
   })
 
   const isSubmitting = form.formState.isSubmitting
+  const isSubmittingError = Object.keys(form.formState.errors)
 
   const handleChange = (
     e: React.FormEvent<HTMLElement>,
@@ -64,15 +65,20 @@ const SignUpForm = (props: SignUpFormPropsType) => {
         if (props.callbackOnSubmit) {
           props.callbackOnSubmit()
         }
-      } else {
-        throw new Error('User creation failed unexpectedly')
       }
     } catch (err) {
-      console.error('Catch :', err)
-
-      toast.error(`Error while creating your account`, {
-        description: err instanceof Error ? err.message : JSON.stringify(err),
-      })
+      if (err instanceof Error) {
+        if (err.message.includes('email')) {
+          form.setError('email', { message: err.message })
+        }
+        if (err.message.includes('username')) {
+          form.setError('username', { message: err.message })
+        }
+      } else {
+        toast.error(`Error while creating your account`, {
+          description: err instanceof Error ? err.message : JSON.stringify(err),
+        })
+      }
     }
   }
 
@@ -186,7 +192,7 @@ const SignUpForm = (props: SignUpFormPropsType) => {
           id="signup-submit"
           className="w-full"
           type="submit"
-          disabled={isSubmitting}
+          disabled={isSubmitting || isSubmittingError.length > 0}
         >
           {isSubmitting ? <Spinner show size="small" /> : 'Sign Up'}
         </Button>
