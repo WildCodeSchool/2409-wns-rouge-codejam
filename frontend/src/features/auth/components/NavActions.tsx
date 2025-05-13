@@ -45,7 +45,7 @@ export default function NavActions() {
       {showModal && (
         <Modal
           open
-          title={isSignIn ? 'Sign In' : 'SignUp'}
+          title={isSignIn ? 'Sign In' : 'Sign Up'}
           onOpenChange={closeModal}
         >
           {isSignIn ? (
