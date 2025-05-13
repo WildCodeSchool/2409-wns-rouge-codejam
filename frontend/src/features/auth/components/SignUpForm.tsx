@@ -79,6 +79,7 @@ const SignUpForm = (props: SignUpFormPropsType) => {
   return (
     <Form {...form}>
       <form
+        data-testid="signup-form"
         aria-label="signup form"
         onSubmit={form.handleSubmit(onSubmit)}
         className="space-y-8"
@@ -97,6 +98,7 @@ const SignUpForm = (props: SignUpFormPropsType) => {
                   }}
                 >
                   <Input
+                    data-testid="email-input"
                     type="email"
                     placeholder="Enter your email"
                     autoComplete="email"
@@ -122,6 +124,7 @@ const SignUpForm = (props: SignUpFormPropsType) => {
                   }}
                 >
                   <Input
+                    data-testid="username-input"
                     placeholder="Enter your username"
                     autoComplete="username"
                     disabled={isSubmitting}
@@ -147,9 +150,10 @@ const SignUpForm = (props: SignUpFormPropsType) => {
                   onChange={(e) => {
                     handleChange(e, onChange)
                   }}
-                  autocomplete="new-password"
+                  autoComplete="new-password"
                   disabled={isSubmitting}
                   field={restField}
+                  data-testid="password-input"
                 />
                 <FormMessage />
               </FormItem>
@@ -167,8 +171,9 @@ const SignUpForm = (props: SignUpFormPropsType) => {
                   onChange={(e) => {
                     handleChange(e, onChange)
                   }}
-                  autocomplete="new-password"
+                  autoComplete="new-password"
                   disabled={isSubmitting}
+                  data-testid="confirm-password-input"
                   field={restField}
                 />
                 <FormMessage />

@@ -16,7 +16,9 @@ const SignUpDialog = () => {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline">Sign Up</Button>
+        <Button data-testid="navbar-signup" variant="outline">
+          Sign Up
+        </Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>

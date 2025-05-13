@@ -6,10 +6,8 @@ import { Button } from '@/shared/components/ui/button'
 import { FormControl } from '@/shared/components/ui/form'
 import { Input } from '@/shared/components/ui/input'
 
-type PasswordVisibiltyInputProps = {
+type PasswordVisibiltyInputProps = React.ComponentProps<'input'> & {
   onChange?: (e: React.FormEvent<HTMLElement>) => void
-  disabled?: boolean
-  autocomplete?: React.HTMLInputAutoCompleteAttribute
   field?: Omit<
     ControllerRenderProps<SignUpFormType, keyof SignUpFormType>,
     'onChange'
@@ -18,21 +16,18 @@ type PasswordVisibiltyInputProps = {
 
 const PasswordVisibiltyInput = ({
   onChange,
-  disabled,
-  autocomplete,
   field,
+  ...restProps
 }: PasswordVisibiltyInputProps) => {
   const [isVisible, setIsVisible] = useState<boolean>(false)
   return (
     <div className="relative">
       <FormControl onChange={onChange}>
         <Input
-          data-testid="custom-password-field"
           className="w-full"
           type={isVisible ? 'text' : 'password'}
-          disabled={disabled}
-          autoComplete={autocomplete}
           {...field}
+          {...restProps}
         />
       </FormControl>
       <Button

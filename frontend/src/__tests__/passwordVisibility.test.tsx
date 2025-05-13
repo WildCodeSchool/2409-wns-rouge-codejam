@@ -5,7 +5,9 @@ import { renderWithReactHookForm } from '@/__tests__/utils/renderWithReactHookFo
 
 describe('Password visibility input', () => {
   it('should switch the visibilty of the password when we click on the eye', () => {
-    renderWithReactHookForm(<PasswordVisibiltyInput />)
+    renderWithReactHookForm(
+      <PasswordVisibiltyInput data-testid="custom-password-field" />,
+    )
     const button = screen.getByRole('button', { name: 'Show password' })
     const input = screen.getByTestId('custom-password-field')
     expect(input).toHaveAttribute('type', 'password')
