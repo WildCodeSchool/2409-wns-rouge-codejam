@@ -33,6 +33,7 @@ export default function NavActions() {
             Sign In
           </Button>
           <Button
+            data-testid="navbar-signup"
             onClick={() => {
               setIsSignIn(false)
             }}

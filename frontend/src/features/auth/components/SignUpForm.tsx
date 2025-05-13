@@ -37,6 +37,7 @@ const SignUpForm = (props: SignUpFormPropsType) => {
   })
 
   const isSubmitting = form.formState.isSubmitting
+  const isSubmittingError = Object.keys(form.formState.errors)
 
   const handleChange = (
     e: React.FormEvent<HTMLElement>,
@@ -68,21 +69,27 @@ const SignUpForm = (props: SignUpFormPropsType) => {
         if (props.callbackOnSubmit) {
           props.callbackOnSubmit()
         }
-      } else {
-        throw new Error('User creation failed unexpectedly')
       }
-    } catch (err: unknown) {
-      console.error(err)
-
-      toast.error(`Error while creating your account`, {
-        description: err instanceof Error ? err.message : JSON.stringify(err),
-      })
+    } catch (err) {
+      if (err instanceof Error) {
+        if (err.message.includes('email')) {
+          form.setError('email', { message: err.message })
+        }
+        if (err.message.includes('username')) {
+          form.setError('username', { message: err.message })
+        }
+      } else {
+        toast.error(`Error while creating your account`, {
+          description: err instanceof Error ? err.message : JSON.stringify(err),
+        })
+      }
     }
   }
 
   return (
     <Form {...form}>
       <form
+        data-testid="signup-form"
         aria-label="signup form"
         onSubmit={form.handleSubmit(onSubmit)}
         className="space-y-8"
@@ -101,6 +108,7 @@ const SignUpForm = (props: SignUpFormPropsType) => {
                   }}
                 >
                   <Input
+                    data-testid="email-input"
                     type="email"
                     placeholder="Enter your email"
                     autoComplete="email"
@@ -126,6 +134,7 @@ const SignUpForm = (props: SignUpFormPropsType) => {
                   }}
                 >
                   <Input
+                    data-testid="username-input"
                     placeholder="Enter your username"
                     autoComplete="username"
                     disabled={isSubmitting}
@@ -151,9 +160,10 @@ const SignUpForm = (props: SignUpFormPropsType) => {
                   onChange={(e) => {
                     handleChange(e, onChange)
                   }}
-                  autocomplete="new-password"
+                  autoComplete="new-password"
                   disabled={isSubmitting}
                   field={restField}
+                  data-testid="password-input"
                 />
                 <FormMessage />
               </FormItem>
@@ -171,8 +181,9 @@ const SignUpForm = (props: SignUpFormPropsType) => {
                   onChange={(e) => {
                     handleChange(e, onChange)
                   }}
-                  autocomplete="new-password"
+                  autoComplete="new-password"
                   disabled={isSubmitting}
+                  data-testid="confirm-password-input"
                   field={restField}
                 />
                 <FormMessage />
@@ -185,7 +196,7 @@ const SignUpForm = (props: SignUpFormPropsType) => {
           id="signup-submit"
           className="w-full"
           type="submit"
-          disabled={isSubmitting}
+          disabled={isSubmitting || isSubmittingError.length > 0}
         >
           {isSubmitting ? <Spinner show size="small" /> : 'Sign Up'}
         </Button>
