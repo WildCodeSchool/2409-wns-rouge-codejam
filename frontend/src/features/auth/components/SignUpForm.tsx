@@ -16,9 +16,13 @@ import { Input } from '@/shared/components/ui/input'
 import { Spinner } from '@/shared/components/ui/spinner'
 import PasswordTooltip from '@/features/auth/components/PasswordTooltip'
 import PasswordVisibiltyInput from '@/features/auth/components/PasswordVisibiltyInput'
-import { formSchema, SignUpFormType } from '@/features/auth/schemas/formSchema'
+import {
+  signUpFormSchema,
+  SignUpFormType,
+} from '@/features/auth/schemas/formSchema'
 
 type SignUpFormPropsType = {
+  onSignIn: () => void
   callbackOnSubmit?: () => void
 }
 
@@ -26,7 +30,13 @@ const SignUpForm = (props: SignUpFormPropsType) => {
   const [createUser] = useMutation(CREATE_USER)
 
   const form = useForm<SignUpFormType>({
-    resolver: zodResolver(formSchema),
+    defaultValues: {
+      email: '',
+      username: '',
+      password: '',
+      confirmPassword: '',
+    }, // required for controlled inputs
+    resolver: zodResolver(signUpFormSchema),
     mode: 'onBlur', // 	validation strategy before submitting
     reValidateMode: 'onBlur', // validation strategy after submitting
     shouldFocusError: true, // focus first field with an error if the form that fails validation ()
@@ -69,10 +79,14 @@ const SignUpForm = (props: SignUpFormPropsType) => {
     } catch (err) {
       if (err instanceof Error) {
         if (err.message.includes('email')) {
-          form.setError('email', { message: err.message })
+          form.setError('email', {
+            message: 'This email already exists',
+          })
         }
         if (err.message.includes('username')) {
-          form.setError('username', { message: err.message })
+          form.setError('username', {
+            message: 'This username already exists',
+          })
         }
       } else {
         toast.error(`Error while creating your account`, {
@@ -197,6 +211,19 @@ const SignUpForm = (props: SignUpFormPropsType) => {
           {isSubmitting ? <Spinner show size="small" /> : 'Sign Up'}
         </Button>
       </form>
+
+      <div className="text-muted-foreground flex items-center justify-center gap-2 text-sm">
+        Already have an account?
+        <Button
+          variant="link"
+          size="sm"
+          className="p-1"
+          disabled={isSubmitting}
+          onClick={props.onSignIn}
+        >
+          Sign In
+        </Button>
+      </div>
     </Form>
   )
 }
