@@ -1,17 +1,17 @@
-import express from "express"
-import { ExecuteSchema } from "./schema/executeSchema"
-import { getFileExtension } from "./utils/getFileExtension"
+import express from 'express'
+import { ExecuteSchema } from './schema/executeSchema'
+import { getFileExtension } from './utils/getFileExtension'
 import {
   deleteLogFile,
   executeJSInDockerContainer,
   removeDockerContainer,
   runDockerContainer,
-} from "./utils/docker"
-import { validateData } from "./utils/validate"
+} from './utils/docker'
+import { validateData } from './utils/validate'
 
 const router = express.Router()
 
-router.post("/api/execute", validateData(ExecuteSchema), async (req, res) => {
+router.post('/execute', validateData(ExecuteSchema), async (req, res) => {
   // !TODO: add execution ID to container name...
   const randomUUID = crypto.randomUUID()
   const containerName = `deno-${randomUUID}`
@@ -49,7 +49,7 @@ router.post("/api/execute", validateData(ExecuteSchema), async (req, res) => {
     //   })
     // }
     const errorMessage =
-      error instanceof Error ? error.message : "An unknown error has occurred"
+      error instanceof Error ? error.message : 'An unknown error has occurred'
     res.status(500).send({
       message: errorMessage,
     })

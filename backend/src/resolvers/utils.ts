@@ -3,6 +3,8 @@ import jwt from 'jsonwebtoken'
 import { ContextType } from '../auth/custom-auth-checker'
 import Cookies from 'cookies'
 import { User } from '../entities/user'
+import axios, { AxiosError } from 'axios'
+import { CodeExecutionRequest, CodeExecutionResponse } from './types'
 
 export const validationError = (errors: ValidationError[]): Error => {
   return new Error(
@@ -42,8 +44,45 @@ export async function getUserFromContext(
   const userId = getUserIdFromToken(token)
 
   const user = await User.findOne({ where: { id: userId } })
-
   if (!user) return null
 
   return user
+}
+
+function isCodeExecutionResponse(res: unknown): res is CodeExecutionResponse {
+  return (
+    typeof res === 'object' &&
+    res !== null &&
+    'status' in res &&
+    'result' in res
+  )
+}
+
+export async function sendCodeToExecute(
+  req: CodeExecutionRequest,
+): Promise<CodeExecutionResponse> {
+  try {
+    const res = await axios.post(
+      `${process.env.CODE_EXECUTION_URL}/execute`,
+      req,
+    )
+
+    if (!isCodeExecutionResponse(res.data)) {
+      throw new Error(
+        `Unexpected Response from code-execution service: ${JSON.stringify(res.data)}`,
+      )
+    }
+
+    return res.data
+  } catch (err) {
+    if (err instanceof AxiosError && err.response?.data) {
+      throw new Error(
+        `Error from code-execution service: ${err.response.data.message} ${JSON.stringify(err.response.data.errors)}`,
+      )
+    } else {
+      throw new Error(
+        `Error from code-execution service: ${JSON.stringify(err)}`,
+      )
+    }
+  }
 }
