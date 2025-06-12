@@ -134,17 +134,16 @@ export class UserLoginInput {
 @InputType()
 export class UserUpdateInput {
   @Field(() => String, { nullable: true })
+  @Length(USERNAME_CONSTRAINTS.minLength, USERNAME_CONSTRAINTS.maxLength)
   username!: string
 
   @Field(() => String, { nullable: true })
+  @IsEmail({}, { message: 'Invalid email address' })
   email!: string
 
   @Field(() => String, { nullable: true })
+  @IsStrongPassword(PASSWORD_CONSTRAINTS, {
+    message: `Please make sure your password meet the strength requirements: between ${PASSWORD_CONSTRAINTS.minLength.toString()} and ${PASSWORD_CONSTRAINTS.maxLength.toString()} long, including at least ${PASSWORD_CONSTRAINTS.minLowercase.toString()} lowercase letter, ${PASSWORD_CONSTRAINTS.minUppercase.toString()} uppercase letter, ${PASSWORD_CONSTRAINTS.minNumbers.toString()} number, and ${PASSWORD_CONSTRAINTS.minSymbols.toString()} symbol.`,
+  })
   password!: string
-}
-
-@InputType()
-export class UserFilterInput {
-  @Field(() => [Number], { nullable: true })
-  ids!: number[]
 }
