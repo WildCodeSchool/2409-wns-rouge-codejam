@@ -24,6 +24,8 @@ jobs:
               - 'backend/**'
             frontend:
               - 'frontend/**'
+            code-execution:
+              - 'code-execution/**'
 
   code-quality-frontend:
     needs: changes
@@ -64,6 +66,27 @@ jobs:
       # Ensure code has no static errors
       - name: Lint code
         run: cd backend && pnpm run lint
+
+  code-quality-code-execution:
+    needs: changes
+    if: ${{ needs.changes.outputs.code-execution == 'true' }}
+    runs-on: ubuntu-latest
+    env:
+      directory: code-execution
+    steps:
+      # Retrieve code from the repository
+      - name: Check out code
+        uses: actions/checkout@v4
+      # Custom action to setup environment
+      - uses: ./.github/actions/common-steps
+        with:
+          directory: $directory
+      # Ensure code is properly formatted
+      - name: Format code
+        run: cd $directory && pnpm run format:ci
+      # Ensure code has no static errors
+      - name: Lint code
+        run: cd $directory && pnpm run lint
 
   test-frontend:
     needs: code-quality-frontend
