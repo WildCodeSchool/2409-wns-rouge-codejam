@@ -34,20 +34,7 @@ router.post('/api/execute', validateData(ExecuteSchema), async (req, res) => {
     res.send(output)
   } catch (error: unknown) {
     // !TODO: handle 'language not supported' error... should not be a 500 error...
-    // !TODO: dead code to be removed...
-    // function isErrorWithStatus(error: unknown): error is ShResult {
-    //   return (
-    //     typeof error === "object" &&
-    //     error !== null &&
-    //     "status" in error &&
-    //     "result" in error
-    //   )
-    // }
-    // if (isErrorWithStatus(error)) {
-    //   return res.status(200).send({
-    //     message: error.result,
-    //   })
-    // }
+
     const errorMessage =
       error instanceof Error ? error.message : 'An unknown error has occurred'
     res.status(500).send({

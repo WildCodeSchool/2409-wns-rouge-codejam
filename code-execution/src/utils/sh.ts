@@ -14,7 +14,6 @@ export function sh(cmd: string, timeoutInMs = 30000): Promise<ShResult> {
     exec(cmd, { timeout: timeoutInMs }, (error, stdout, stderr) => {
       if (stderr) {
         console.log(chalk.red('❌Execution failed!'))
-        // return resolve({
         return reject({
           status: 'error',
           result: formatStdError(stderr),
