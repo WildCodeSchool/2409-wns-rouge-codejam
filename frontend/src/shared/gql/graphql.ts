@@ -20,11 +20,17 @@ export type Scalars = {
 
 export type Mutation = {
   __typename?: 'Mutation';
+  createSnippet?: Maybe<Snippet>;
   createUser?: Maybe<User>;
   deleteUser: Scalars['Boolean']['output'];
   login?: Maybe<User>;
   logout: Scalars['Boolean']['output'];
   updateUser: User;
+};
+
+
+export type MutationCreateSnippetArgs = {
+  data: SnippetCreateInput;
 };
 
 
@@ -50,14 +56,40 @@ export type MutationUpdateUserArgs = {
 
 export type Query = {
   __typename?: 'Query';
+  getSnippet?: Maybe<Snippet>;
   user: User;
   users: Array<User>;
   whoAmI?: Maybe<User>;
 };
 
 
+export type QueryGetSnippetArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
 export type QueryUserArgs = {
   id: Scalars['ID']['input'];
+};
+
+export type Snippet = {
+  __typename?: 'Snippet';
+  code: Scalars['String']['output'];
+  createdAt: Scalars['DateTime']['output'];
+  id: Scalars['ID']['output'];
+  language: Scalars['String']['output'];
+  name: Scalars['String']['output'];
+  slug: Scalars['String']['output'];
+  updatedAt: Scalars['DateTime']['output'];
+  user: User;
+};
+
+export type SnippetCreateInput = {
+  code: Scalars['String']['input'];
+  language: Scalars['String']['input'];
+  name: Scalars['String']['input'];
+  slug: Scalars['String']['input'];
+  userId: Scalars['ID']['input'];
 };
 
 export type User = {
