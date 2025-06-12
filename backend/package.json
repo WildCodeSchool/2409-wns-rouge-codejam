@@ -12,9 +12,9 @@
     "format:ci": "prettier . --check",
     "test": "jest",
     "test:watch": "jest --watchAll",
-    "test:db": "docker rm --force pgtest ; docker run -d -p 5434:5432 --name pgtest -e POSTGRES_PASSWORD=test postgres && POSTGRES_HOST=localhost POSTGRES_PORT=5434 POSTGRES_USER=postgres POSTGRES_PASSWORD=test POSTGRES_DB=postgres JWT_SECRET=secret NODE_ENV=test NODE_OPTIONS=\"$NODE_OPTIONS --experimental-vm-modules\" pnpm test",
-    "init:db": "./database/init_db.sh",
-    "restore:db": "./database/restore_db.sh"
+    "test:db": "./scripts/start_db_container.sh && POSTGRES_HOST=localhost POSTGRES_PORT=5434 POSTGRES_USER=postgres POSTGRES_PASSWORD=test POSTGRES_DB=postgres JWT_SECRET=secret NODE_ENV=test NODE_OPTIONS=\"$NODE_OPTIONS --experimental-vm-modules\" pnpm test && ./scripts/stop_db_container.sh",
+    "init:db": "./scripts/init_db.sh",
+    "restore:db": "./scripts/restore_db.sh"
   },
   "author": "",
   "license": "ISC",
