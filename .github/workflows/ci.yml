@@ -12,6 +12,7 @@ jobs:
     outputs:
       backend: ${{ steps.filter.outputs.backend }}
       frontend: ${{ steps.filter.outputs.frontend }}
+      code-execution: ${{ steps.filter.outputs.code-execution}}
     steps:
       # For pull requests, it's not necessary to checkout the code
       - name: Check out code

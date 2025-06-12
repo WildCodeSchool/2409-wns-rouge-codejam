@@ -145,7 +145,7 @@ export async function runDockerContainer(
   containerName = 'deno',
 ): Promise<void> {
   console.log(chalk.yellow(`Starting container ${containerName}...`))
-  // Running the container in detached mode allows to await for the 'sh', making sure the container is started, and avoid raising an error when stopping the container running the 'sleep infinity' script
+  // Running the container in detached mode allows to await for the `sh`, making sure the container is started, and avoid raising an error when stopping the container running the `sleep infinity` script
   await sh(
     `docker run -d --name ${containerName} denoland/deno:2.3.1 /bin/bash -c 'sleep infinity';`,
   )
