@@ -64,8 +64,8 @@ export type User = {
   __typename?: 'User';
   createdAt: Scalars['DateTime']['output'];
   email: Scalars['String']['output'];
-  hashedPassword: Scalars['String']['output'];
   id: Scalars['ID']['output'];
+  role: UserRole;
   updatedAt: Scalars['DateTime']['output'];
   username?: Maybe<Scalars['String']['output']>;
 };
@@ -80,6 +80,12 @@ export type UserLoginInput = {
   email: Scalars['String']['input'];
   password: Scalars['String']['input'];
 };
+
+/** User possible roles */
+export enum UserRole {
+  Admin = 'ADMIN',
+  User = 'USER'
+}
 
 export type UserUpdateInput = {
   email?: InputMaybe<Scalars['String']['input']>;

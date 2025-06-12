@@ -1,5 +1,11 @@
 import { IsEmail, Length, IsStrongPassword, MaxLength } from 'class-validator'
-import { Field, ID, InputType, ObjectType } from 'type-graphql'
+import {
+  Field,
+  ID,
+  InputType,
+  ObjectType,
+  registerEnumType,
+} from 'type-graphql'
 import { GraphQLDateTime } from 'graphql-scalars'
 import {
   BaseEntity,
@@ -9,6 +15,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm'
+import { UserRole } from '../types'
 
 const USERNAME_CONSTRAINTS = {
   minLength: 2,
@@ -28,6 +35,23 @@ const PASSWORD_CONSTRAINTS = {
   minSymbols: 1,
 }
 
+/*
+  Make TypeGraphQL aware of the enum `UserRole`.
+  
+  To tell TypeGraphQL about our enum, we would ideally mark the enums with the @EnumType() decorator. However, TypeScript decorators only work with classes, so we need to make TypeGraphQL aware of the enums manually by calling the registerEnumType function and providing the enum name for GraphQ.
+
+  See: https://typegraphql.com/docs/enums.html
+*/
+registerEnumType(UserRole, {
+  name: 'UserRole', // Mandatory
+  description: 'User possible roles', // Optional
+})
+
+/**
+ * ----------------------------------------------------------------
+ * User entity definition
+ * ----------------------------------------------------------------
+ */
 @Entity()
 @ObjectType()
 export class User extends BaseEntity {
@@ -52,8 +76,12 @@ export class User extends BaseEntity {
   email!: string
 
   @Column({ type: 'varchar', length: 150 })
-  @Field(() => String)
+  // This field must not be exposed in GraphQL schema! (no @Field decorator)
   hashedPassword!: string
+
+  @Column({ type: 'enum', enum: UserRole, default: UserRole.USER })
+  @Field(() => UserRole)
+  role!: UserRole
 
   @CreateDateColumn()
   @Field(() => GraphQLDateTime)
@@ -64,6 +92,11 @@ export class User extends BaseEntity {
   updatedAt!: Date
 }
 
+/**
+ * ----------------------------------------------------------------
+ * Input types for user operations
+ * ----------------------------------------------------------------
+ */
 @InputType()
 export class UserCreateInput {
   @Field(() => String)
