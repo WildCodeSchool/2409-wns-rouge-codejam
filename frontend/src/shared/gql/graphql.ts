@@ -18,10 +18,24 @@ export type Scalars = {
   DateTime: { input: any; output: any; }
 };
 
+export type Execution = {
+  __typename?: 'Execution';
+  executedAt: Scalars['DateTime']['output'];
+  id: Scalars['ID']['output'];
+  result: Scalars['String']['output'];
+  status: Scalars['String']['output'];
+};
+
+export type ExecutionCreateInput = {
+  language: Scalars['String']['input'];
+  script: Scalars['String']['input'];
+};
+
 export type Mutation = {
   __typename?: 'Mutation';
   createUser?: Maybe<User>;
   deleteUser: Scalars['Boolean']['output'];
+  execute: Execution;
   login?: Maybe<User>;
   logout: Scalars['Boolean']['output'];
   updateUser?: Maybe<User>;
@@ -35,6 +49,11 @@ export type MutationCreateUserArgs = {
 
 export type MutationDeleteUserArgs = {
   id?: InputMaybe<Scalars['ID']['input']>;
+};
+
+
+export type MutationExecuteArgs = {
+  data: ExecutionCreateInput;
 };
 
 

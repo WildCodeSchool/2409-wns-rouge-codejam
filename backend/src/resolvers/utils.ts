@@ -2,6 +2,9 @@ import { ValidationError } from 'class-validator'
 import jwt from 'jsonwebtoken'
 import Cookies from 'cookies'
 import { User } from '../entities/User'
+import axios, { AxiosError } from 'axios'
+import { CodeExecutionRequest, CodeExecutionResponse } from './types'
+import argon2 from 'argon2'
 import { ContextType, UserIDJwtPayload } from '../types'
 
 /**
@@ -66,4 +69,75 @@ export const validationError = (errors: ValidationError[]): Error => {
       return `${property} : ${constraints}`
     })}`,
   )
+}
+
+export async function createUser(
+  username: string,
+  email: string,
+  password: string,
+): Promise<User> {
+  // Verify if user already exists (email and username should both be unique)
+  const existingUserByEmail = await User.findOne({
+    where: { email },
+  })
+  const existingUserByUsername = await User.findOne({
+    where: { username },
+  })
+
+  if (existingUserByEmail && existingUserByUsername) {
+    throw new Error('A user with this email and this username already exists')
+  } else if (existingUserByEmail) {
+    throw new Error('A user with this email already exists')
+  } else if (existingUserByUsername) {
+    throw new Error('A user with username already exists')
+  }
+  const newUser = new User()
+  const hashedPassword = await argon2.hash(password)
+
+  Object.assign(newUser, {
+    username,
+    email,
+    hashedPassword,
+  })
+
+  const savedUser = await User.save(newUser)
+  return savedUser
+}
+
+function isCodeExecutionResponse(res: unknown): res is CodeExecutionResponse {
+  return (
+    typeof res === 'object' &&
+    res !== null &&
+    'status' in res &&
+    'result' in res
+  )
+}
+
+export async function sendCodeToExecute(
+  req: CodeExecutionRequest,
+): Promise<CodeExecutionResponse> {
+  try {
+    const res = await axios.post(
+      `${process.env.CODE_EXECUTION_URL}/execute`,
+      req,
+    )
+
+    if (!isCodeExecutionResponse(res.data)) {
+      throw new Error(
+        `Unexpected Response from code-execution service: ${JSON.stringify(res.data)}`,
+      )
+    }
+
+    return res.data
+  } catch (err) {
+    if (err instanceof AxiosError && err.response?.data) {
+      throw new Error(
+        `Error from code-execution service: ${err.response.data.message} ${JSON.stringify(err.response.data.errors)}`,
+      )
+    } else {
+      throw new Error(
+        `Error from code-execution service: ${JSON.stringify(err)}`,
+      )
+    }
+  }
 }
