@@ -24,7 +24,7 @@ export type Mutation = {
   deleteUser: Scalars['Boolean']['output'];
   login?: Maybe<User>;
   logout: Scalars['Boolean']['output'];
-  updateUser: User;
+  updateUser?: Maybe<User>;
 };
 
 
@@ -34,7 +34,7 @@ export type MutationCreateUserArgs = {
 
 
 export type MutationDeleteUserArgs = {
-  id: Scalars['ID']['input'];
+  id?: InputMaybe<Scalars['ID']['input']>;
 };
 
 
@@ -45,19 +45,19 @@ export type MutationLoginArgs = {
 
 export type MutationUpdateUserArgs = {
   data: UserUpdateInput;
-  id: Scalars['ID']['input'];
+  id?: InputMaybe<Scalars['ID']['input']>;
 };
 
 export type Query = {
   __typename?: 'Query';
-  user: User;
+  user?: Maybe<User>;
   users: Array<User>;
   whoAmI?: Maybe<User>;
 };
 
 
 export type QueryUserArgs = {
-  id: Scalars['ID']['input'];
+  id?: InputMaybe<Scalars['ID']['input']>;
 };
 
 export type User = {

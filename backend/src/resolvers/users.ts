@@ -1,3 +1,6 @@
+import argon2 from 'argon2'
+import Cookies from 'cookies'
+import jwt from 'jsonwebtoken'
 import {
   Arg,
   Authorized,
@@ -7,21 +10,48 @@ import {
   Query,
   Resolver,
 } from 'type-graphql'
+
 import {
   User,
   UserCreateInput,
   UserLoginInput,
   UserUpdateInput,
 } from '../entities/user'
-import { validate } from 'class-validator'
-import { getUserFromContext, validationError } from './utils'
-import jwt from 'jsonwebtoken'
-import argon2 from 'argon2'
-import Cookies from 'cookies'
-import { AuthContextType, ContextType } from '../auth/custom-auth-checker'
+import { AuthContextType, ContextType, UserRole } from '../types'
+import { getUserFromContext } from './utils'
 
 @Resolver()
 export class UsersResolver {
+  @Authorized(UserRole.ADMIN)
+  @Query(() => [User])
+  async users(): Promise<User[]> {
+    const users = await User.find()
+    return users
+  }
+
+  @Authorized(UserRole.ADMIN, UserRole.USER)
+  @Query(() => User, { nullable: true }) // set nullable to true to allow returning null if no user is found, and avoid throwing an error
+  async user(
+    @Ctx() context: AuthContextType,
+    @Arg('id', () => ID, { nullable: true }) id?: number,
+  ): Promise<User | null> {
+    const isAdmin = context.user.role === UserRole.ADMIN
+    if (isAdmin && !id) {
+      throw new Error('You must provide a user ID to retrieve a user')
+    }
+    // If the user is not an admin, only the current authenticated user can access its own data
+    const user = await User.findOne({
+      where: isAdmin ? { id } : { id: context.user.id },
+    })
+    return user
+  }
+
+  @Query(() => User, { nullable: true })
+  async whoAmI(@Ctx() context: ContextType): Promise<User | null> {
+    const me = await getUserFromContext(context)
+    return me
+  }
+
   @Mutation(() => User, { nullable: true })
   async createUser(
     @Arg('data', () => UserCreateInput) data: UserCreateInput,
@@ -53,36 +83,17 @@ export class UsersResolver {
         password: null, // remove clear password
       })
 
-      const savedUser = await User.save(newUser)
-      return savedUser
+      const createdUser = await newUser.save()
+      return createdUser
     } catch (err) {
       throw new Error((err as Error).message)
     }
   }
 
-  @Query(() => [User])
-  async users(): Promise<User[]> {
-    const users = await User.find()
-    return users
-  }
-
-  @Query(() => User)
-  async user(@Arg('id', () => ID) id: number): Promise<User> {
-    const user = await User.findOne({ where: { id } })
-    if (!user) throw new Error('The given user does not exist')
-    return user
-  }
-
-  @Query(() => User, { nullable: true })
-  async whoAmI(@Ctx() context: ContextType): Promise<User | null> {
-    const user = await getUserFromContext(context)
-    return user
-  }
-
   @Mutation(() => User, { nullable: true })
   async login(
-    @Ctx() context: ContextType,
     @Arg('data', () => UserLoginInput) data: UserLoginInput,
+    @Ctx() context: ContextType,
   ): Promise<User | null> {
     try {
       if (context.user) throw new Error('Already logged in')
@@ -114,7 +125,6 @@ export class UsersResolver {
     }
   }
 
-  @Authorized()
   @Mutation(() => Boolean)
   async logout(@Ctx() context: AuthContextType): Promise<boolean> {
     const cookies = new Cookies(context.req, context.res)
@@ -122,35 +132,45 @@ export class UsersResolver {
     return true
   }
 
-  @Authorized()
-  @Mutation(() => User)
+  @Authorized(UserRole.ADMIN, UserRole.USER)
+  @Mutation(() => User, { nullable: true }) // set nullable to true to allow returning null if no user is found, and avoid throwing an error
   async updateUser(
-    @Arg('id', () => ID) id: number,
-    @Arg('data', () => UserUpdateInput) _: UserUpdateInput,
-  ): Promise<User> {
+    @Ctx() context: AuthContextType,
+    @Arg('data', () => UserUpdateInput) data: UserUpdateInput,
+    @Arg('id', () => ID, { nullable: true }) id?: number,
+  ): Promise<User | null> {
+    const isAdmin = context.user.role === UserRole.ADMIN
+    if (isAdmin && !id) {
+      throw new Error('You must provide a user ID to update a user')
+    }
+    // If the user is not an admin, only the authenticated user itself can update its own account
     const user = await User.findOne({
-      where: { id },
+      where: isAdmin ? { id } : { id: context.user.id },
     })
-    if (!user) throw new Error('The given user does not exist')
+    if (!user) return null
 
-    const errors = await validate(user)
-    if (errors.length) throw validationError(errors)
-
-    const updatedUser = await User.save(user)
+    Object.assign(user, data)
+    const updatedUser = await user.save()
     return updatedUser
   }
 
-  @Authorized()
+  @Authorized(UserRole.ADMIN, UserRole.USER)
   @Mutation(() => Boolean)
-  async deleteUser(@Arg('id', () => ID) id: number): Promise<boolean> {
+  async deleteUser(
+    @Ctx() context: AuthContextType,
+    @Arg('id', () => ID, { nullable: true }) id?: number,
+  ): Promise<boolean> {
+    const isAdmin = context.user.role === UserRole.ADMIN
+    if (isAdmin && !id) {
+      throw new Error('You must provide a user ID to delete a user')
+    }
+    // If the user is not an admin, only the authenticated user itself can delete its own account
     const user = await User.findOne({
-      where: {
-        id,
-      },
+      where: isAdmin ? { id } : { id: context.user.id },
     })
-    if (!user) throw new Error('The given user does not exist')
+    if (!user) return false
 
-    const result = await User.remove(user)
-    return result ? true : false
+    const deletedUser = await user.remove()
+    return !!deletedUser
   }
 }

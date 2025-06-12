@@ -37,21 +37,21 @@ const PASSWORD_CONSTRAINTS = {
   minSymbols: 1,
 }
 
-/*
-  Make TypeGraphQL aware of the enum `UserRole`.
-  
-  To tell TypeGraphQL about our enum, we would ideally mark the enums with the @EnumType() decorator. However, TypeScript decorators only work with classes, so we need to make TypeGraphQL aware of the enums manually by calling the registerEnumType function and providing the enum name for GraphQ.
-
-  See: https://typegraphql.com/docs/enums.html
-*/
+/**
+ * Make TypeGraphQL aware of the enum `UserRole`.
+ *
+ * To tell TypeGraphQL about our enum, we would ideally mark the enums with the @EnumType() decorator. However, TypeScript decorators only work with classes, so we need to make TypeGraphQL aware of the enums manually by calling the registerEnumType function and providing the enum name for GraphQ.
+ *
+ * See: https://typegraphql.com/docs/enums.html
+ */
 registerEnumType(UserRole, {
-  name: 'UserRole', // Mandatory
-  description: 'User possible roles', // Optional
+  name: 'UserRole', // mandatory
+  description: 'User possible roles', // optional
 })
 
 /**
  * ----------------------------------------------------------------
- * User entity definition
+ * User entity definition.
  * ----------------------------------------------------------------
  */
 @Entity()
@@ -98,7 +98,8 @@ export class User extends BaseEntity {
 
 /**
  * ----------------------------------------------------------------
- * Input types for user operations
+ * Input types for user operations.
+ * Backend data validation is performed via `class-validator`.
  * ----------------------------------------------------------------
  */
 @InputType()
