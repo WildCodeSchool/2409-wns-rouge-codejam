@@ -5,6 +5,7 @@ import {
   InputType,
   ObjectType,
   registerEnumType,
+  UseMiddleware,
 } from 'type-graphql'
 import { GraphQLDateTime } from 'graphql-scalars'
 import {
@@ -15,6 +16,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm'
+import { IsUser } from '../middlewares/isUser'
 import { UserRole } from '../types'
 
 const USERNAME_CONSTRAINTS = {
@@ -73,6 +75,8 @@ export class User extends BaseEntity {
     unique: true,
   })
   @Field(() => String)
+  // Restrict field access via a middleware. This field should only be accessible to admins or self user.
+  @UseMiddleware(IsUser)
   email!: string
 
   @Column({ type: 'varchar', length: 150 })
