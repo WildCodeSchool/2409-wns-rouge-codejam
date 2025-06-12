@@ -1,8 +1,0 @@
-services:
-  code-execution:
-    container_name: code-execution
-    build: .
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-    ports:
-      - 3000:3000

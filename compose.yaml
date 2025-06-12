@@ -20,6 +20,12 @@ services:
       db:
         condition: service_started
 
+  code-execution:
+    container_name: code-execution
+    build: ./code-execution
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+
   frontend:
     build: ./frontend
     environment:
