@@ -1,7 +1,7 @@
 import { ValidationError } from 'class-validator'
 import jwt from 'jsonwebtoken'
 import Cookies from 'cookies'
-import { User } from '../entities/user'
+import { User } from '../entities/User'
 import { ContextType } from '../types'
 
 /**

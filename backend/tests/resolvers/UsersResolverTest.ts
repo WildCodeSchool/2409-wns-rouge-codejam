@@ -1,7 +1,7 @@
 import { describe, expect, it } from '@jest/globals'
 import { CREATE_USER, LOGIN, WHO_AM_I } from '../api/users'
 import { TestArgs } from '../index.spec'
-import { User, UserCreateInput } from '../../src/entities/user'
+import { User, UserCreateInput } from '../../src/entities/User'
 import { assert } from '../utils/assert'
 
 type CreateUserMutation = {

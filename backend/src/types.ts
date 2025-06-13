@@ -1,5 +1,5 @@
 import { IncomingMessage, ServerResponse } from 'node:http'
-import { User } from './entities/user'
+import { User } from './entities/User'
 
 // Restrict the `user` type to `User` (no `null` nor `undefined` values) to be used with resources protected by the `@Authorized` decorator (check already performed by the `customAuthChecker` function).
 export type AuthContextType = ContextType & {

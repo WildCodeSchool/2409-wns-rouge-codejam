@@ -16,7 +16,7 @@ import {
   UserCreateInput,
   UserLoginInput,
   UserUpdateInput,
-} from '../entities/user'
+} from '../entities/User'
 import { AuthContextType, ContextType, UserRole } from '../types'
 import { getUserFromContext } from './utils'
 

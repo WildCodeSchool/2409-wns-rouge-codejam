@@ -1,5 +1,5 @@
 import { MiddlewareFn } from 'type-graphql'
-import { User } from '../entities/user'
+import { User } from '../entities/User'
 import { AuthContextType, UserRole } from '../types'
 import { getUserFromContext } from '../resolvers/utils'
 
