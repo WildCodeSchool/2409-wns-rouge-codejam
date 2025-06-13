@@ -24,7 +24,7 @@ export type Mutation = {
   deleteUser: Scalars['Boolean']['output'];
   login?: Maybe<User>;
   logout: Scalars['Boolean']['output'];
-  updateUser: User;
+  updateUser?: Maybe<User>;
 };
 
 
@@ -34,7 +34,7 @@ export type MutationCreateUserArgs = {
 
 
 export type MutationDeleteUserArgs = {
-  id: Scalars['ID']['input'];
+  id?: InputMaybe<Scalars['ID']['input']>;
 };
 
 
@@ -45,12 +45,12 @@ export type MutationLoginArgs = {
 
 export type MutationUpdateUserArgs = {
   data: UserUpdateInput;
-  id: Scalars['ID']['input'];
+  id?: InputMaybe<Scalars['ID']['input']>;
 };
 
 export type Query = {
   __typename?: 'Query';
-  user: User;
+  user?: Maybe<User>;
   users: Array<User>;
   whoAmI?: Maybe<User>;
 };
@@ -64,8 +64,8 @@ export type User = {
   __typename?: 'User';
   createdAt: Scalars['DateTime']['output'];
   email: Scalars['String']['output'];
-  hashedPassword: Scalars['String']['output'];
-  id: Scalars['ID']['output'];
+  id: Scalars['String']['output'];
+  role: UserRole;
   updatedAt: Scalars['DateTime']['output'];
   username?: Maybe<Scalars['String']['output']>;
 };
@@ -80,6 +80,12 @@ export type UserLoginInput = {
   email: Scalars['String']['input'];
   password: Scalars['String']['input'];
 };
+
+/** User possible roles */
+export enum UserRole {
+  Admin = 'ADMIN',
+  User = 'USER'
+}
 
 export type UserUpdateInput = {
   email?: InputMaybe<Scalars['String']['input']>;

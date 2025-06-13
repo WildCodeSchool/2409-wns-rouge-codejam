@@ -1,7 +1,7 @@
 import { describe, expect, it } from '@jest/globals'
 import { CREATE_USER, LOGIN, WHO_AM_I } from '../api/users'
 import { TestArgs } from '../index.spec'
-import { User, UserCreateInput } from '../../src/entities/user'
+import { User, UserCreateInput } from '../../src/entities/User'
 import { assert } from '../utils/assert'
 
 type CreateUserMutation = {
@@ -233,7 +233,7 @@ export async function UsersResolverTest(testArgs: TestArgs) {
       expect(errors).toBeUndefined()
       expect(data).toBeDefined()
       assert(data !== undefined && data !== null && data.login !== null)
-      expect(Number(data.login.id)).toBe(testArgs.data.user.id)
+      expect(data.login.id).toBe(testArgs.data.user.id)
     })
   })
 
@@ -258,7 +258,7 @@ export async function UsersResolverTest(testArgs: TestArgs) {
       const { data, errors } = response.body.singleResult
       expect(errors).toBeUndefined()
       assert(data !== undefined && data !== null)
-      expect(Number(data.whoAmI?.id)).toBe(testArgs.data.user.id)
+      expect(data.whoAmI?.id).toBe(testArgs.data.user.id)
     })
 
     it('should fail if email already exist', async () => {
