@@ -1,5 +1,11 @@
 import { IsEmail, Length, IsStrongPassword, MaxLength } from 'class-validator'
-import { Field, ID, InputType, ObjectType } from 'type-graphql'
+import {
+  Field,
+  InputType,
+  ObjectType,
+  registerEnumType,
+  UseMiddleware,
+} from 'type-graphql'
 import { GraphQLDateTime } from 'graphql-scalars'
 import {
   BaseEntity,
@@ -9,6 +15,8 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm'
+import { IsUser } from '../middlewares/isUser'
+import { UserRole } from '../types'
 
 const USERNAME_CONSTRAINTS = {
   minLength: 2,
@@ -28,12 +36,30 @@ const PASSWORD_CONSTRAINTS = {
   minSymbols: 1,
 }
 
+/**
+ * Make TypeGraphQL aware of the enum `UserRole`.
+ *
+ * To tell TypeGraphQL about our enum, we would ideally mark the enums with the @EnumType() decorator. However, TypeScript decorators only work with classes, so we need to make TypeGraphQL aware of the enums manually by calling the registerEnumType function and providing the enum name for GraphQ.
+ *
+ * See: https://typegraphql.com/docs/enums.html
+ */
+registerEnumType(UserRole, {
+  name: 'UserRole', // mandatory
+  description: 'User possible roles', // optional
+})
+
+/**
+ * ----------------------------------------------------------------
+ * User entity definition.
+ * ----------------------------------------------------------------
+ */
 @Entity()
 @ObjectType()
 export class User extends BaseEntity {
-  @PrimaryGeneratedColumn()
-  @Field(() => ID)
-  id!: number
+  // Create a primary column with an automatically generated uuid to make it less predictable.
+  @PrimaryGeneratedColumn('uuid')
+  @Field(() => String)
+  id!: string
 
   @Column({
     type: 'varchar',
@@ -49,11 +75,17 @@ export class User extends BaseEntity {
     unique: true,
   })
   @Field(() => String)
+  // Restrict field access via a middleware. This field should only be accessible to admins or self user.
+  @UseMiddleware(IsUser)
   email!: string
 
   @Column({ type: 'varchar', length: 150 })
-  @Field(() => String)
+  // This field must not be exposed in GraphQL schema! (no @Field decorator)
   hashedPassword!: string
+
+  @Column({ type: 'enum', enum: UserRole, default: UserRole.USER })
+  @Field(() => UserRole)
+  role!: UserRole
 
   @CreateDateColumn()
   @Field(() => GraphQLDateTime)
@@ -64,6 +96,12 @@ export class User extends BaseEntity {
   updatedAt!: Date
 }
 
+/**
+ * ----------------------------------------------------------------
+ * Input types for user operations.
+ * Backend data validation is performed via `class-validator`.
+ * ----------------------------------------------------------------
+ */
 @InputType()
 export class UserCreateInput {
   @Field(() => String)
@@ -96,17 +134,16 @@ export class UserLoginInput {
 @InputType()
 export class UserUpdateInput {
   @Field(() => String, { nullable: true })
+  @Length(USERNAME_CONSTRAINTS.minLength, USERNAME_CONSTRAINTS.maxLength)
   username!: string
 
   @Field(() => String, { nullable: true })
+  @IsEmail({}, { message: 'Invalid email address' })
   email!: string
 
   @Field(() => String, { nullable: true })
+  @IsStrongPassword(PASSWORD_CONSTRAINTS, {
+    message: `Please make sure your password meet the strength requirements: between ${PASSWORD_CONSTRAINTS.minLength.toString()} and ${PASSWORD_CONSTRAINTS.maxLength.toString()} long, including at least ${PASSWORD_CONSTRAINTS.minLowercase.toString()} lowercase letter, ${PASSWORD_CONSTRAINTS.minUppercase.toString()} uppercase letter, ${PASSWORD_CONSTRAINTS.minNumbers.toString()} number, and ${PASSWORD_CONSTRAINTS.minSymbols.toString()} symbol.`,
+  })
   password!: string
-}
-
-@InputType()
-export class UserFilterInput {
-  @Field(() => [Number], { nullable: true })
-  ids!: number[]
 }

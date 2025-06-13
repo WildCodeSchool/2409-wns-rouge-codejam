@@ -42,6 +42,7 @@ or simply press <kbd>Ctrl</kbd>+<kbd>C</kbd> for a graceful stop.
 To run backend unit & integration tests:
 
 ```sh
+cd backend
 pnpm run test:db
 ```
 
@@ -54,42 +55,48 @@ pnpm run test:db
 To run frontend unit & integration tests:
 
 - in _single-run_ mode:
+
   ```sh
+  cd frontend
   pnpm run test
   ```
+
 - in _watch_ mode:
 
   ```sh
+  cd frontend
   pnpm run test:watch
   ```
-
-### 🚧Populate the database with initial data
-
-1. If the application is running, first stop the containers:
-
-```sh
-docker compose down
-```
-
-2. Initialize the database from a SQL dump file:
-
-```sh
-cd ./backend
-pnpm run restore:db
-```
 
 ### 🚧 Reset the database
 
 1. Stop the container (see [step #1](#🚧Populate-the-database-with-initial-data)).
 
-2. Then, manually delete the Docker named volume:
+2. Cleanup unused data (stopper containers, unused networks, dangling (not tagged nor referenced) images, unused images, and build cache), unused volumes (execept names ones) skipping confirmation prompts:
+
+```sh
+docker system prune --volumes -af
+```
+
+3. Then, manually delete the Docker named volume:
 
 ```sh
 docker volume ls
 docker volume rm codejam_dbdata
 ```
 
-3. Initialize the database from a SQL dump file (see [step #2](#🚧Populate-the-database-with-initial-data)).
+4. Initialize the database from a SQL dump file (see [next section](#🚧Populate-the-database-with-initial-data)).
+
+### 🚧 Populate the database with initial data
+
+1. First, make sure the application is up and running (see [Run the application](#Run-the-application)).
+
+2. Initialize the database from a SQL dump file:
+
+```sh
+cd ./backend
+pnpm run seed:db
+```
 
 ## 🚧 Built with 💖 and
 
@@ -111,6 +118,7 @@ docker volume rm codejam_dbdata
 
 ## 🚧 Authors
 
-```
-
-```
+- Audrey ([github](https://github.com/audrey-donjon))
+- Denis ([github](https://github.com/ddZ6ii))
+- Ugo ([github](https://github.com/ugenjoy))
+- Vlad ([github](https://github.com/codeIsHard2023))
