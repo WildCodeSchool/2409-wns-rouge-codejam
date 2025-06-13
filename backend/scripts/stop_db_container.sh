@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Make sure to add permissions to execute this file by running `chmod +x init_db.sh`
+# Make sure to add permissions to execute this file by running `chmod +x stop_db_container.sh`
 
 # Remove the database container after running tests
 echo '🧹 Removing "pgtest" container...'

@@ -95,7 +95,7 @@ docker volume rm codejam_dbdata
 
 ```sh
 cd ./backend
-pnpm run init:db
+pnpm run seed:db
 ```
 
 ## 🚧 Built with 💖 and

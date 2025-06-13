@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Make sure to add permissions to execute this file by running `chmod +x init_db.sh`
+# Make sure to add permissions to execute this file by running `chmod +x start_db_container.sh`
 
 # Start a PostgreSQL container for running tests
 echo '🔎 Checking for existing "pgtest" container...'

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Make sure to add permissions to execute this file by running `chmod +x init_db.sh`
+# Make sure to add permissions to execute this file by running `chmod +x restore_db.sh`
 
 # Restore database in the running container by dropping existing tables and initializing from a SQL dump file
 echo '🔎 Checking for existing "codejam-db" container...'
