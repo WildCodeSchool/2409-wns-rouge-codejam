@@ -57,7 +57,7 @@ export type Query = {
 
 
 export type QueryUserArgs = {
-  id?: InputMaybe<Scalars['ID']['input']>;
+  id: Scalars['ID']['input'];
 };
 
 export type User = {

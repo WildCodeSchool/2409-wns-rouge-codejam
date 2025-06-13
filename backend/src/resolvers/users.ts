@@ -29,19 +29,11 @@ export class UsersResolver {
     return users
   }
 
-  @Authorized(UserRole.ADMIN, UserRole.USER)
+  @Authorized(UserRole.ADMIN)
   @Query(() => User, { nullable: true }) // set nullable to true to allow returning null if no user is found, and avoid throwing an error
-  async user(
-    @Ctx() context: AuthContextType,
-    @Arg('id', () => ID, { nullable: true }) id?: number,
-  ): Promise<User | null> {
-    const isAdmin = context.user.role === UserRole.ADMIN
-    if (isAdmin && !id) {
-      throw new Error('You must provide a user ID to retrieve a user')
-    }
-    // If the user is not an admin, only the current authenticated user can access its own data
+  async user(@Arg('id', () => ID) id: number): Promise<User | null> {
     const user = await User.findOne({
-      where: isAdmin ? { id } : { id: context.user.id },
+      where: { id },
     })
     return user
   }
