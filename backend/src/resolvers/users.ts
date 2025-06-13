@@ -1,15 +1,7 @@
 import argon2 from 'argon2'
 import Cookies from 'cookies'
 import jwt from 'jsonwebtoken'
-import {
-  Arg,
-  Authorized,
-  Ctx,
-  ID,
-  Mutation,
-  Query,
-  Resolver,
-} from 'type-graphql'
+import { Arg, Authorized, Ctx, Mutation, Query, Resolver } from 'type-graphql'
 
 import {
   User,
@@ -31,7 +23,7 @@ export class UsersResolver {
 
   @Authorized(UserRole.ADMIN)
   @Query(() => User, { nullable: true }) // set nullable to true to allow returning null if no user is found, and avoid throwing an error
-  async user(@Arg('id', () => ID) id: number): Promise<User | null> {
+  async user(@Arg('id', () => String) id: string): Promise<User | null> {
     const user = await User.findOne({
       where: { id },
     })
@@ -129,7 +121,7 @@ export class UsersResolver {
   async updateUser(
     @Ctx() context: AuthContextType,
     @Arg('data', () => UserUpdateInput) data: UserUpdateInput,
-    @Arg('id', () => ID, { nullable: true }) id?: number,
+    @Arg('id', () => String, { nullable: true }) id?: string,
   ): Promise<User | null> {
     const isAdmin = context.user.role === UserRole.ADMIN
     if (isAdmin && !id) {
@@ -150,7 +142,7 @@ export class UsersResolver {
   @Mutation(() => Boolean)
   async deleteUser(
     @Ctx() context: AuthContextType,
-    @Arg('id', () => ID, { nullable: true }) id?: number,
+    @Arg('id', () => String, { nullable: true }) id?: string,
   ): Promise<boolean> {
     const isAdmin = context.user.role === UserRole.ADMIN
     if (isAdmin && !id) {

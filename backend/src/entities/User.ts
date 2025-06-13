@@ -1,7 +1,6 @@
 import { IsEmail, Length, IsStrongPassword, MaxLength } from 'class-validator'
 import {
   Field,
-  ID,
   InputType,
   ObjectType,
   registerEnumType,
@@ -57,9 +56,10 @@ registerEnumType(UserRole, {
 @Entity()
 @ObjectType()
 export class User extends BaseEntity {
-  @PrimaryGeneratedColumn()
-  @Field(() => ID)
-  id!: number
+  // Create a primary column with an automatically generated uuid to make it less predictable.
+  @PrimaryGeneratedColumn('uuid')
+  @Field(() => String)
+  id!: string
 
   @Column({
     type: 'varchar',

@@ -2,7 +2,7 @@ import { ValidationError } from 'class-validator'
 import jwt from 'jsonwebtoken'
 import Cookies from 'cookies'
 import { User } from '../entities/User'
-import { ContextType } from '../types'
+import { ContextType, UserIDJwtPayload } from '../types'
 
 /**
  * Extracts the user ID from a JWT token.
@@ -10,8 +10,11 @@ import { ContextType } from '../types'
  * @throws Will throw an error if the token is invalid or expired.
  * @returns The user ID extracted from the token.
  */
-export function getUserIdFromToken(token: string): number {
-  const payload: any = jwt.verify(token, process.env.JWT_SECRET || '')
+export function getUserIdFromToken(token: string): string {
+  const payload = jwt.verify(
+    token,
+    process.env.JWT_SECRET || '',
+  ) as UserIDJwtPayload
   return payload.userId
 }
 

@@ -1,3 +1,4 @@
+import jwt from 'jsonwebtoken'
 import { IncomingMessage, ServerResponse } from 'node:http'
 import { User } from './entities/User'
 
@@ -17,6 +18,10 @@ export type ContextType = {
 
 // Generic type to allow nullable values
 export type Nullable<T> = T | null | undefined
+
+export type UserIDJwtPayload = jwt.JwtPayload & {
+  id: string
+}
 
 export enum UserRole {
   ADMIN = 'admin',
