@@ -1,19 +1,19 @@
-import { Language } from "../types"
+import { Language } from '../types'
 
 export function getFileExtension(language: string): string {
-  let languageExtension = ""
+  let languageExtension = ''
 
   switch (language) {
     case Language.JS: {
-      languageExtension = "js"
+      languageExtension = 'js'
       break
     }
     case Language.TS: {
-      languageExtension = "ts"
+      languageExtension = 'ts'
       break
     }
     default: {
-      throw new Error("Language not supported")
+      throw new Error('Language not supported')
     }
   }
 

@@ -1,7 +1,7 @@
-import chalk from "chalk"
-import express from "express"
-import appRouter from "./router"
-import { prePullDockerImage } from "./utils/docker"
+import chalk from 'chalk'
+import express from 'express'
+import appRouter from './router'
+import { prePullDockerImage } from './utils/docker'
 
 const app = express()
 
@@ -9,22 +9,22 @@ const app = express()
 app.use(express.json())
 
 // Routing
-app.use("/", appRouter)
+app.use('/', appRouter)
 
 async function startServer(): Promise<void> {
   try {
     // Pre-pull the Deno Docker image
-    await prePullDockerImage("denoland/deno:2.3.1")
+    await prePullDockerImage('denoland/deno:2.3.1')
 
     // Start the express server
     app.listen(3000, (error) => {
       if (error) {
-        throw new Error("Error starting server: " + error)
+        throw new Error('Error starting server: ' + error)
       }
-      console.log(chalk.blue("Server is running on http://localhost:3000..."))
+      console.log(chalk.blue('Server is running on http://localhost:3000...'))
     })
   } catch (error: unknown) {
-    console.error(chalk.red("Error starting server:"), error)
+    console.error(chalk.red('Error starting server:'), error)
   }
 }
 
