@@ -9,7 +9,7 @@ import { ShResult } from '../types'
  * @param timeoutInMs timeout in milliseconds
  * @returns
  */
-export function sh(cmd: string, timeoutInMs = 10000): Promise<ShResult> {
+export function sh(cmd: string, timeoutInMs = 30000): Promise<ShResult> {
   return new Promise((resolve, reject) => {
     exec(cmd, { timeout: timeoutInMs }, (error, stdout, stderr) => {
       const cleanStderr = stderr.trim()

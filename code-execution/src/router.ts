@@ -12,7 +12,6 @@ import { validateData } from './utils/validate'
 const router = express.Router()
 
 router.post('/api/execute', validateData(ExecuteSchema), async (req, res) => {
-  // !TODO: add execution ID to container name...
   const randomUUID = crypto.randomUUID()
   const containerName = `deno-${randomUUID}`
   const logFileName = `logs-${randomUUID}.txt`

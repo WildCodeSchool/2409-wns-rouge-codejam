@@ -63,20 +63,9 @@ export async function executeJSInDockerContainer(
     fs.rmSync(filePath, { force: true });
   }
   console.log(chalk.green("✅Script file created!"));
-
-  // !TODO: vérifier si le script peut agir sur la machine hote...
-  /* 
-    Run script in Deno container and log output to a temporary file. 
-    This allows to retrieve script output data even if the script times out.
-  */
   console.log(chalk.yellow("Executing script..."));
-  // !TODO: dead code to be removed...
-  // const output = await sh(
-  //   `docker exec ${containerName} sh -c "deno ${dockerFilePath} >> ${dockerLogFilePath}"`
-  // )
+  
   let output: ShResult;
-
-  // !TODO: refactor using centralized error handling... (Should we consider an user error as a server error ?)
   try {
     output = await sh(
       `docker exec ${containerName} sh -c "deno ${dockerFilePath} >> ${dockerLogFilePath}"`
@@ -89,7 +78,7 @@ export async function executeJSInDockerContainer(
     }
   }
   console.log(chalk.green("✅Script executed!"));
-
+  
   // Copy log file from container to host
   console.log(chalk.yellow("Copying log file..."));
   await sh(`docker cp ${containerName}:${dockerLogFilePath} ${logFilePath}`);

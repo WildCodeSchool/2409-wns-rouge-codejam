@@ -9,18 +9,12 @@ export function formatStdError(error: string): string[] {
   const cleanError = error.replace(ansiRegex, "").trim();
   const lines = cleanError.split("\n");
 
-  // "Check file: ..." is a log of deno check operation
-  return lines[0].includes("Check file") ? lines.slice(1, lines.length) : lines;
+  /* If it's a Deno error, skip the first two lines (usually contain file path and error indicator)
+  and return the actual error message lines */
+  if (lines[0].includes("error: ")) {
+    return lines.slice(2).filter(line => line.trim() !== "");
+  }
+  
+  // For other types of errors, return all non-empty lines
+  return lines.filter(line => line.trim() !== "");
 }
-// export function formatStdError(error: string): string {
-//   const lines = error.split("\n");
-//   const pattern = new RegExp(/\b\w*Error:/);
-//   for (const line of lines) {
-//     const startIndex = line.search(pattern);
-//     if (startIndex !== -1) {
-//       return line.slice(startIndex);
-//     }
-//   }
-//   console.log(error);
-//   return "";
-// }
