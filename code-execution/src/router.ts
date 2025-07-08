@@ -12,6 +12,7 @@ import { validateData } from './utils/validate'
 const router = express.Router()
 
 router.post('/api/execute', validateData(ExecuteSchema), async (req, res) => {
+  // !TODO: add execution ID to container name...
   const randomUUID = crypto.randomUUID()
   const containerName = `deno-${randomUUID}`
   const logFileName = `logs-${randomUUID}.txt`
@@ -32,6 +33,8 @@ router.post('/api/execute', validateData(ExecuteSchema), async (req, res) => {
     )
     res.send(output)
   } catch (error: unknown) {
+    // !TODO: handle 'language not supported' error... should not be a 500 error...
+
     const errorMessage =
       error instanceof Error ? error.message : 'An unknown error has occurred'
     res.status(500).send({

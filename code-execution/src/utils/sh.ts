@@ -12,8 +12,13 @@ import { ShResult } from '../types'
 export function sh(cmd: string, timeoutInMs = 30000): Promise<ShResult> {
   return new Promise((resolve, reject) => {
     exec(cmd, { timeout: timeoutInMs }, (error, stdout, stderr) => {
-      const cleanStderr = stderr.trim()
-
+      if (stderr) {
+        console.log(chalk.red('❌Execution failed!'))
+        return reject({
+          status: 'error',
+          result: formatStdError(stderr),
+        })
+      }
       if (error) {
         if (error.killed) {
           console.log(chalk.red('⌛️Execution timeout!'))
@@ -22,20 +27,10 @@ export function sh(cmd: string, timeoutInMs = 30000): Promise<ShResult> {
             result: stdout,
           })
         }
-        // Always reject on real execution errors (e.g. type errors)
-        return reject({
-          status: 'error',
-          result: formatStdError(cleanStderr || error.message),
-        })
+        console.log(chalk.red('❌Execution failed!'))
+        return reject(new Error(JSON.stringify(error)))
       }
-
-      // Only log stderr if needed (for debugging), but don’t reject on it
-      if (cleanStderr && !/^Check file:\/\//.test(cleanStderr)) {
-        console.warn('⚠️ Non-critical stderr:', cleanStderr)
-      }
-
-      // Return successful result even if benign stderr exists
-      return resolve({
+      resolve({
         status: 'success',
         result: stdout,
       })
