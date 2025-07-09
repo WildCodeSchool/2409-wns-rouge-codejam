@@ -11,6 +11,7 @@ export function validateData(schema: ZodSchema) {
     } catch (error: unknown) {
       console.log(chalk.red('❌Invalid request data!'))
       if (error instanceof ZodError) {
+        console.log(chalk.red('❌Invalid request data!', error))
         return res.status(400).json({
           message: 'Invalid request body',
           errors: error.flatten().fieldErrors,
