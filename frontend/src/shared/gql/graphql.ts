@@ -18,13 +18,21 @@ export type Scalars = {
   DateTime: { input: any; output: any; }
 };
 
+/** Supported programming languages */
+export enum Language {
+  Javascript = 'JAVASCRIPT',
+  Typescript = 'TYPESCRIPT'
+}
+
 export type Mutation = {
   __typename?: 'Mutation';
   createSnippet?: Maybe<Snippet>;
   createUser?: Maybe<User>;
+  deleteSnippet: Scalars['Boolean']['output'];
   deleteUser: Scalars['Boolean']['output'];
   login?: Maybe<User>;
   logout: Scalars['Boolean']['output'];
+  updateSnippet: Snippet;
   updateUser: User;
 };
 
@@ -39,6 +47,11 @@ export type MutationCreateUserArgs = {
 };
 
 
+export type MutationDeleteSnippetArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
 export type MutationDeleteUserArgs = {
   id: Scalars['ID']['input'];
 };
@@ -49,6 +62,12 @@ export type MutationLoginArgs = {
 };
 
 
+export type MutationUpdateSnippetArgs = {
+  data: SnippetUpdateInput;
+  id: Scalars['ID']['input'];
+};
+
+
 export type MutationUpdateUserArgs = {
   data: UserUpdateInput;
   id: Scalars['ID']['input'];
@@ -56,6 +75,7 @@ export type MutationUpdateUserArgs = {
 
 export type Query = {
   __typename?: 'Query';
+  getAllSnippets: Array<Snippet>;
   getSnippet?: Maybe<Snippet>;
   user: User;
   users: Array<User>;
@@ -77,7 +97,7 @@ export type Snippet = {
   code: Scalars['String']['output'];
   createdAt: Scalars['DateTime']['output'];
   id: Scalars['ID']['output'];
-  language: Scalars['String']['output'];
+  language: Language;
   name: Scalars['String']['output'];
   slug: Scalars['String']['output'];
   updatedAt: Scalars['DateTime']['output'];
@@ -90,6 +110,13 @@ export type SnippetCreateInput = {
   name: Scalars['String']['input'];
   slug: Scalars['String']['input'];
   userId: Scalars['ID']['input'];
+};
+
+export type SnippetUpdateInput = {
+  code: Scalars['String']['input'];
+  language: Scalars['String']['input'];
+  name: Scalars['String']['input'];
+  slug: Scalars['String']['input'];
 };
 
 export type User = {

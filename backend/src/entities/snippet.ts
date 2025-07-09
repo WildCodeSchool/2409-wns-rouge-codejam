@@ -5,25 +5,53 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   ManyToOne,
-  Unique,
   BaseEntity,
+  BeforeInsert,
+  BeforeUpdate,
+  Not,
 } from 'typeorm'
 
+import slugify from 'slugify'
+
 import { User } from './user'
-import { Field, ID, InputType, ObjectType } from 'type-graphql'
+//TODO : import { Language } from '../types'
+import {
+  Field,
+  ID,
+  InputType,
+  ObjectType,
+  registerEnumType,
+} from 'type-graphql'
 import { GraphQLDateTime } from 'graphql-scalars'
-import { IsNotEmpty, Length, MaxLength } from 'class-validator'
+import {
+  IsNotEmpty,
+  Length,
+  MaxLength,
+  IsEnum,
+  IsOptional,
+} from 'class-validator'
+
+export enum Language {
+  JAVASCRIPT = 'javascript',
+  TYPESCRIPT = 'typescript',
+}
+
+registerEnumType(Language, {
+  name: 'Language',
+  description: 'Supported programming languages',
+})
+
+export const SNIPPET_NAME_LEN = { min: 1, max: 60 }
+export const SNIPPET_SLUG_LEN = 100
 
 @Entity()
 @ObjectType()
-@Unique(['slug'])
-// garantit qu’un slug ne peut exister qu’une fois (permettra plus tard de retrouver un snippet par URL)
 export class Snippet extends BaseEntity {
   @PrimaryGeneratedColumn()
   @Field(() => ID)
   id!: number
 
-  @Column('varchar', { length: 60 })
+  @Column('varchar', { length: SNIPPET_NAME_LEN.max })
   @Field(() => String)
   name!: string
 
@@ -31,34 +59,56 @@ export class Snippet extends BaseEntity {
   @Field(() => String)
   code!: string
 
-  @Column('varchar', { length: 100 })
+  @Column('varchar', { length: SNIPPET_SLUG_LEN, unique: true })
   @Field(() => String)
+  @MaxLength(SNIPPET_SLUG_LEN)
   slug!: string
 
-  @Column('varchar', { length: 20 })
-  @Field(() => String)
+  @Column({ type: 'enum', enum: Language, default: Language.TYPESCRIPT })
+  @Field(() => Language)
   language!: string
 
-  @CreateDateColumn({ name: 'created_at' })
+  @CreateDateColumn()
   @Field(() => GraphQLDateTime)
   createdAt!: Date
 
-  @UpdateDateColumn({ name: 'updated_at' })
+  @UpdateDateColumn()
   @Field(() => GraphQLDateTime)
   updatedAt!: Date
 
-  // TODO: Ajouter la relation inverse lorsque User.snippets sera disponible
-  @ManyToOne(() => User, { nullable: false })
-  //chaque snippet appartient à un user
+  @ManyToOne(() => User)
   @Field(() => User)
   user!: User
+
+  @BeforeInsert()
+  @BeforeUpdate()
+  async ensureUniqueSlug() {
+    // slug base
+    const base = slugify(this.name, { lower: true, strict: true })
+    let candidate = base
+    let i = 1
+
+    // whil slug exists, increment the candidate
+    while (
+      await Snippet.findOne({
+        where: {
+          slug: candidate,
+          id: this.id ? Not(this.id) : undefined, // exclude current snippet if updating
+        },
+      })
+    ) {
+      candidate = `${base}-${i++}`
+    }
+
+    this.slug = candidate
+  }
 }
 
 // Input type for creating a new snippet
 @InputType()
 export class SnippetCreateInput {
   @Field(() => String)
-  @Length(1, 60)
+  @Length(SNIPPET_NAME_LEN.min, SNIPPET_NAME_LEN.max)
   name!: string
 
   @Field(() => String)
@@ -66,12 +116,8 @@ export class SnippetCreateInput {
   code!: string
 
   @Field(() => String)
-  @MaxLength(100)
-  slug!: string
-
-  @Field(() => String)
-  @Length(1, 20)
-  language!: string
+  @IsEnum(Language)
+  language!: Language
 
   @Field(() => ID)
   userId!: number
@@ -81,19 +127,16 @@ export class SnippetCreateInput {
 @InputType()
 export class SnippetUpdateInput {
   @Field(() => String, { nullable: true })
-  @Length(1, 60, { message: 'Name must be between 1 and 60 characters long.' })
+  @IsOptional()
+  @Length(SNIPPET_NAME_LEN.min, SNIPPET_NAME_LEN.max)
   name?: string
 
   @Field(() => String, { nullable: true })
+  @IsOptional()
+  @IsNotEmpty()
   code?: string
 
-  @Field(() => String, { nullable: true })
-  @MaxLength(100, { message: 'Slug must be at most 100 characters long.' })
-  slug?: string
-
-  @Field(() => String, { nullable: true })
-  @Length(1, 20, {
-    message: 'Language must be between 1 and 20 characters long.',
-  })
-  language?: string
+  @Field(() => Language, { nullable: true })
+  @IsEnum(Language)
+  language?: Language
 }
