@@ -1,0 +1,9 @@
+dist
+node_modules
+public/*
+!public/styles
+!public/scripts
+screenshots
+.vercel
+.vscode
+pnpm-lock.yaml

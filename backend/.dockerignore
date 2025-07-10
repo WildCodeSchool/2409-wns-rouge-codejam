@@ -13,3 +13,6 @@
 
 **/*.md
 **/*.txt
+
+# Exclude shell scripts from the build context
+**/scripts
