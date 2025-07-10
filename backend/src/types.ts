@@ -27,3 +27,8 @@ export enum UserRole {
   ADMIN = 'admin',
   USER = 'user',
 }
+
+export enum Language {
+  TYPESCRIPT = 'typescript',
+  JAVASCRIPT = 'javascript',
+}
