@@ -2,6 +2,6 @@ import { z } from 'zod'
 import { Language } from '../types'
 
 export const ExecuteSchema = z.object({
-  script: z.string().trim().min(1, 'Script is required'),
+  code: z.string().trim().min(1, 'Code is required'),
   language: z.nativeEnum(Language),
 })

@@ -6,7 +6,7 @@ import { ExecutionStatus, isErrorWithStatus, ShResult } from '../types'
 import {
   DOCKER_DIR,
   DOCKER_LOG_FILEPATH,
-  DOCKER_SCRIPT_FILEPATH,
+  DOCKER_CODE_FILEPATH,
   HOST_DIR,
 } from '../config'
 
@@ -52,7 +52,7 @@ export async function copyFileToDockerContainer(
 
     // Copy the temporary file to the container
     const copyResult = await sh(
-      `docker cp ${filePath} ${containerName}:${DOCKER_SCRIPT_FILEPATH}`,
+      `docker cp ${filePath} ${containerName}:${DOCKER_CODE_FILEPATH}`,
     )
 
     if (copyResult.status !== ExecutionStatus.SUCCESS) {
@@ -108,7 +108,7 @@ export async function executeJSFileInDockerContainer(
 ): Promise<ShResult> {
   console.log(chalk.yellow('Executing script...'))
   const output = await sh(
-    `docker exec ${containerName} sh -c "deno ${DOCKER_SCRIPT_FILEPATH} >> ${DOCKER_LOG_FILEPATH}"`,
+    `docker exec ${containerName} sh -c "deno ${DOCKER_CODE_FILEPATH} >> ${DOCKER_LOG_FILEPATH}"`,
   )
 
   return output

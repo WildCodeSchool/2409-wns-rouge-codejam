@@ -68,6 +68,7 @@ export class User extends BaseEntity {
     type: 'varchar',
     unique: true,
     length: USERNAME_CONSTRAINTS.maxLength,
+    nullable: true,
   })
   @Field(() => String, { nullable: true })
   username!: string
@@ -76,19 +77,24 @@ export class User extends BaseEntity {
     type: 'varchar',
     length: EMAIL_CONSTRAINTS.maxLength,
     unique: true,
+    nullable: true,
   })
-  @Field(() => String)
+  @Field(() => String, { nullable: true })
   // Restrict field access via a middleware. This field should only be accessible to admins or self user.
   @UseMiddleware(IsUser)
   email!: string
 
-  @Column({ type: 'varchar', length: 150 })
+  @Column({ type: 'varchar', length: 150, nullable: true })
   // This field must not be exposed in GraphQL schema! (no @Field decorator)
   hashedPassword!: string
 
-  @Column({ type: 'enum', enum: UserRole, default: UserRole.USER })
+  @Column({ type: 'enum', enum: UserRole, default: UserRole.GUEST })
   @Field(() => UserRole)
   role!: UserRole
+
+  @Column({ type: 'boolean', default: false })
+  @Field(() => Boolean)
+  isLocked!: boolean
 
   @CreateDateColumn()
   @Field(() => GraphQLDateTime)

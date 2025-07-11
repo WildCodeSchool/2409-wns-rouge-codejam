@@ -1,11 +1,22 @@
 import { ValidationError } from 'class-validator'
 import jwt from 'jsonwebtoken'
 import Cookies from 'cookies'
-import { User, UserCreateInput } from '../entities/User'
+import { User } from '../entities/User'
 import axios, { AxiosError } from 'axios'
-import { CodeExecutionRequest, CodeExecutionResponse } from './types'
-import argon2 from 'argon2'
-import { ContextType, UserIDJwtPayload } from '../types'
+import {
+  CodeExecutionRequest,
+  CodeExecutionResponse,
+  ContextType,
+  Language,
+  UserIDJwtPayload,
+} from '../types'
+import { Execution } from '../entities/Execution'
+import { MoreThan } from 'typeorm'
+import {
+  Snippet,
+  SnippetCreateInput,
+  SnippetUpdateInput,
+} from '../entities/Snippet'
 
 /**
  * Extracts the user ID from a JWT token.
@@ -71,37 +82,90 @@ export const validationError = (errors: ValidationError[]): Error => {
   )
 }
 
-export async function createUser({
-  username,
-  email,
-  password,
-}: UserCreateInput): Promise<User> {
-  // Verify if user already exists (email and username should both be unique)
-  const existingUserByEmail = await User.findOne({
-    where: { email },
-  })
-  const existingUserByUsername = await User.findOne({
-    where: { username },
-  })
-
-  if (existingUserByEmail && existingUserByUsername) {
-    throw new Error('A user with this email and this username already exists')
-  } else if (existingUserByEmail) {
-    throw new Error('A user with this email already exists')
-  } else if (existingUserByUsername) {
-    throw new Error('A user with username already exists')
-  }
+export async function createGuestUser(): Promise<User> {
   const newUser = new User()
-  const hashedPassword = await argon2.hash(password)
-
-  Object.assign(newUser, {
-    username,
-    email,
-    hashedPassword,
-  })
-
   const savedUser = await User.save(newUser)
   return savedUser
+}
+
+export async function lockUser(user: User): Promise<void> {
+  Object.assign(user, { isLocked: true })
+  await User.save(user)
+}
+
+export async function unlockUser(user: User): Promise<void> {
+  Object.assign(user, { isLocked: false })
+  await User.save(user)
+}
+
+export async function createSnippet(
+  snippet: SnippetCreateInput,
+  user: User,
+): Promise<Snippet> {
+  const newSnippet = new Snippet()
+  Object.assign(newSnippet, snippet, { user })
+  return await Snippet.save(newSnippet)
+}
+
+export async function updateSnippet(
+  snippet: Snippet,
+  updatedContent: SnippetUpdateInput,
+): Promise<Snippet> {
+  Object.assign(snippet, updatedContent)
+  return await Snippet.save(snippet)
+}
+
+export async function getSnippet(
+  snippetId: string,
+  userId: string,
+): Promise<Snippet | null> {
+  return Snippet.findOne({
+    where: {
+      id: snippetId,
+      user: {
+        id: userId,
+      },
+    },
+  })
+}
+
+export async function getFirstSnippet(userId: string): Promise<Snippet | null> {
+  return Snippet.findOne({
+    where: {
+      user: {
+        id: userId,
+      },
+    },
+  })
+}
+
+export async function getUserExecutionCount(userId: string): Promise<number> {
+  const dateLimit = new Date(Date.now() - 24 * 60 * 60 * 1000)
+
+  const executions = await Execution.find({
+    where: {
+      snippet: {
+        user: {
+          id: userId,
+        },
+      },
+      executedAt: MoreThan(dateLimit),
+    },
+  })
+
+  console.log('EXECUTIONS       :', executions)
+
+  return executions.length
+}
+
+export function createCookieWithJwt(userId: string, context: ContextType) {
+  const token = jwt.sign({ userId }, process.env.JWT_SECRET || '', {
+    expiresIn: '24h',
+  })
+  new Cookies(context.req, context.res).set('access_token', token, {
+    httpOnly: true,
+    secure: false,
+  })
 }
 
 function isCodeExecutionResponse(res: unknown): res is CodeExecutionResponse {

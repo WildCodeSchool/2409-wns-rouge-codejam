@@ -22,16 +22,16 @@ export async function execute(req: Request, res: Response): Promise<void> {
   const logFilePath = path.join(HOST_DIR, logFileName)
 
   try {
-    const script = req.body.script
+    const code = req.body.code
     const language = req.body.language
-    const fileName = `script-${randomUUID}.${getFileExtension(language)}`
+    const fileName = `code-${randomUUID}.${getFileExtension(language)}`
     const filePath = path.join(HOST_DIR, fileName)
 
     await runDockerContainer(containerName)
 
-    // Create a temporary file to store the script and copy it to the container
-    console.log(chalk.yellow('Creating script file...'))
-    fs.writeFileSync(filePath, script)
+    // Create a temporary file to store the code and copy it to the container
+    console.log(chalk.yellow('Creating code file...'))
+    fs.writeFileSync(filePath, code)
 
     await copyFileToDockerContainer(fileName, containerName)
 

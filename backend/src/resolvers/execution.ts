@@ -1,64 +1,88 @@
 import { Arg, Ctx, ID, Mutation, Resolver } from 'type-graphql'
-import { Execution, ExecutionCreateInput } from '../entities/Execution'
-import { createUser, sendCodeToExecute } from './utils'
-import requestIp from 'request-ip'
-import { ContextType } from '../types'
-import { User } from '../entities/User'
-import { Snippet } from '../entities/Snippet'
-// import { ContextType } from '../auth/custom-auth-checker'
+import { Execution } from '../entities/Execution'
+import {
+  createCookieWithJwt,
+  createGuestUser,
+  createSnippet,
+  getFirstSnippet,
+  getSnippet,
+  getUserExecutionCount,
+  getUserFromContext,
+  lockUser,
+  sendCodeToExecute,
+  unlockUser,
+  updateSnippet,
+} from './utils'
+import { ContextType, UserRole } from '../types'
+import { SnippetCreateInput } from '../entities/Snippet'
+
+const EXECUTION_LIMIT = 50
 
 @Resolver()
 export class ExecutionResolver {
-  @Mutation(() => Execution)
+  @Mutation(() => Execution, { nullable: true })
   async execute(
     @Ctx() context: ContextType,
-    @Arg('data', () => ExecutionCreateInput) data: ExecutionCreateInput,
+    @Arg('data', () => SnippetCreateInput) data: SnippetCreateInput,
     @Arg('snippetId', () => ID, { nullable: true }) snippetId?: string,
-  ): Promise<Execution> {
+  ): Promise<Execution | null> {
     try {
-      // If user does not exist and ip address does not correspond to an existing user, create one
-      const clientIp = requestIp.getClientIp(context.req)
+      // !TODO: Changer l'ordre d'execution des requêtes... Et enlever le champs isLocked dans la table User
 
-      console.log('Ip Address', clientIp)
+      let currentUser = await getUserFromContext(context)
 
-      if (!context.user) {
-        const newGuestUser: Partial<User> = {}
+      if (!currentUser) {
+        const newGuestUser = await createGuestUser()
+        createCookieWithJwt(newGuestUser.id, context)
+
+        currentUser = newGuestUser
       } else {
         // If user exist, check if the execution number related to the user is less than 50 for this day
+        const currentExecutionCount = await getUserExecutionCount(
+          currentUser.id,
+        )
+
+        if (currentExecutionCount >= EXECUTION_LIMIT) {
+          throw new Error('Execution limit exceeded')
+        }
       }
 
-      // const user = User.findOne({where: })
+      if (currentUser.isLocked) {
+        throw new Error('You must wait for the previous execution')
+      } else {
+        lockUser(currentUser)
+      }
 
-      // Create or modify the Snippet
-      const snippet = await Snippet.findOne({
-        where: { id: snippetId },
-      })
+      let snippet
 
-      // // If snippet does not exists and user connected, create a new one
-      // if (!snippet) {
-      //   const newSnippet = new Snippet()
+      if (currentUser.role === UserRole.GUEST) {
+        snippet = await getFirstSnippet(currentUser.id)
+      } else {
+        if (snippetId) {
+          snippet = await getSnippet(snippetId, currentUser.id)
+        }
+      }
 
-      //   Object.assign(newSnippet, {
-      //     name: 'name',
-      //     code: data.script,
-      //     language: data.language,
-      //     userId: context.user.id,
-      //   })
-
-      //   const savedSnippet = await Snippet.save(newSnippet)
-      // }
+      if (!snippet) {
+        snippet = await createSnippet(data, currentUser)
+      } else {
+        snippet = await updateSnippet(snippet, data)
+      }
 
       const executionResponse = await sendCodeToExecute(data)
       const newExecution = new Execution()
 
       Object.assign(newExecution, {
         ...executionResponse,
-        // Snippet
+        snippet,
       })
 
       const savedExecution = await Execution.save(newExecution)
+      unlockUser(currentUser)
       return savedExecution
     } catch (err) {
+      let currentUser = await getUserFromContext(context)
+      if (currentUser) unlockUser(currentUser)
       throw new Error(err instanceof Error ? err.message : JSON.stringify(err))
     }
   }

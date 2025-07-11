@@ -67,7 +67,7 @@ export class Snippet extends BaseEntity {
   user!: User
 
   @OneToMany(() => Execution, (executions) => executions.snippet)
-  @Field(() => [Execution])
+  @Field(() => [Execution], { nullable: true })
   executions!: Execution[]
 
   @BeforeInsert()

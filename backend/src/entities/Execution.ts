@@ -8,11 +8,11 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm'
-import { Length } from 'class-validator'
+import { IsOptional, Length } from 'class-validator'
 import { ExecutionStatus, Language } from '../types'
-import { Snippet } from './Snippet'
+import { Snippet, SNIPPET_NAME_LEN } from './Snippet'
 
-const SCRIPT_CONSTRAINTS = {
+const CODE_CONSTRAINTS = {
   minLength: 2,
   maxLength: 10000,
 }
@@ -61,14 +61,4 @@ export class Execution extends BaseEntity {
   @ManyToOne(() => Snippet, (Snippet) => Snippet.executions)
   @Field(() => Snippet)
   snippet!: Snippet
-}
-
-@InputType()
-export class ExecutionCreateInput {
-  @Length(SCRIPT_CONSTRAINTS.minLength, SCRIPT_CONSTRAINTS.maxLength)
-  @Field(() => String)
-  script!: string
-
-  @Field(() => Language)
-  language!: Language
 }
