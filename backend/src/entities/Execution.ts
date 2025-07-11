@@ -5,10 +5,12 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm'
 import { Length } from 'class-validator'
 import { ExecutionStatus, Language } from '../types'
+import { Snippet } from './Snippet'
 
 const SCRIPT_CONSTRAINTS = {
   minLength: 2,
@@ -56,9 +58,9 @@ export class Execution extends BaseEntity {
   @Field(() => GraphQLDateTime)
   executedAt!: Date
 
-  // @ManyToOne(() => Snippet, (Snippet) => Snippet.executions)
-  // @Field(() => Snippet)
-  // snippet!: Snippet
+  @ManyToOne(() => Snippet, (Snippet) => Snippet.executions)
+  @Field(() => Snippet)
+  snippet!: Snippet
 }
 
 @InputType()
