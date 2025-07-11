@@ -8,9 +8,7 @@ import {
   getSnippet,
   getUserExecutionCount,
   getUserFromContext,
-  lockUser,
   sendCodeToExecute,
-  unlockUser,
   updateSnippet,
 } from './utils'
 import { ContextType, UserRole } from '../types'
@@ -27,9 +25,8 @@ export class ExecutionResolver {
     @Arg('snippetId', () => ID, { nullable: true }) snippetId?: string,
   ): Promise<Execution | null> {
     try {
-      // !TODO: Changer l'ordre d'execution des requêtes... Et enlever le champs isLocked dans la table User
-
       let currentUser = await getUserFromContext(context)
+      let snippet
 
       if (!currentUser) {
         const newGuestUser = await createGuestUser()
@@ -46,14 +43,6 @@ export class ExecutionResolver {
           throw new Error('Execution limit exceeded')
         }
       }
-
-      if (currentUser.isLocked) {
-        throw new Error('You must wait for the previous execution')
-      } else {
-        lockUser(currentUser)
-      }
-
-      let snippet
 
       /*
         If the user is a guest, then he only has one snippet, 
@@ -76,20 +65,24 @@ export class ExecutionResolver {
         snippet = await updateSnippet(snippet, data)
       }
 
-      const executionResponse = await sendCodeToExecute(data)
+      // Create snippet before execution to ensure executions count to be up to date
+      // !TODO: change to a SQL transaction
       const newExecution = new Execution()
-
       Object.assign(newExecution, {
+        snippet,
+      })
+      const execution = await Execution.save(newExecution)
+
+      const executionResponse = await sendCodeToExecute(data)
+
+      Object.assign(execution, {
         ...executionResponse,
         snippet,
       })
 
-      const savedExecution = await Execution.save(newExecution)
-      unlockUser(currentUser)
+      const savedExecution = await Execution.save(execution)
       return savedExecution
     } catch (err) {
-      let currentUser = await getUserFromContext(context)
-      if (currentUser) unlockUser(currentUser)
       throw new Error(err instanceof Error ? err.message : JSON.stringify(err))
     }
   }

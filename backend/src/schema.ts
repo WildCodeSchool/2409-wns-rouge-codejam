@@ -1,8 +1,8 @@
 import { buildSchema } from 'type-graphql'
-import { UsersResolver } from './resolvers/users'
-import { SnippetsResolver } from './resolvers/snippets'
 import { customAuthChecker } from './auth/customAuthChecker'
-import { ExecutionResolver } from './resolvers/execution'
+import { UsersResolver } from './resolvers/UsersResolver'
+import { ExecutionResolver } from './resolvers/ExecutionResolver'
+import { SnippetsResolver } from './resolvers/SnippetsResolver'
 
 /**
  *  Builds the GraphQL schema using TypeGraphQL.

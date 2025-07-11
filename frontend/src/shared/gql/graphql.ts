@@ -36,12 +36,8 @@ export type Execution = {
   executedAt: Scalars['DateTime']['output']
   id: Scalars['String']['output']
   result: Scalars['String']['output']
+  snippet: Snippet
   status: ExecutionStatus
-}
-
-export type ExecutionCreateInput = {
-  language: Language
-  script: Scalars['String']['input']
 }
 
 /** Execution possible status */
@@ -50,7 +46,7 @@ export enum ExecutionStatus {
   Success = 'SUCCESS',
 }
 
-/** Execution possible language */
+/** Supported programming languages */
 export enum Language {
   Javascript = 'JAVASCRIPT',
   Typescript = 'TYPESCRIPT',
@@ -58,12 +54,19 @@ export enum Language {
 
 export type Mutation = {
   __typename?: 'Mutation'
+  createSnippet: Snippet
   createUser?: Maybe<User>
+  deleteSnippet: Scalars['Boolean']['output']
   deleteUser: Scalars['Boolean']['output']
-  execute: Execution
+  execute?: Maybe<Execution>
   login?: Maybe<User>
   logout: Scalars['Boolean']['output']
+  updateSnippet: Snippet
   updateUser?: Maybe<User>
+}
+
+export type MutationCreateSnippetArgs = {
+  data: SnippetCreateInput
 }
 
 export type MutationCreateUserArgs = {
@@ -75,11 +78,11 @@ export type MutationDeleteSnippetArgs = {
 }
 
 export type MutationDeleteUserArgs = {
-  id?: InputMaybe<Scalars['String']['input']>
+  id?: InputMaybe<Scalars['ID']['input']>
 }
 
 export type MutationExecuteArgs = {
-  data: ExecutionCreateInput
+  data: SnippetCreateInput
   snippetId?: InputMaybe<Scalars['ID']['input']>
 }
 
@@ -94,11 +97,13 @@ export type MutationUpdateSnippetArgs = {
 
 export type MutationUpdateUserArgs = {
   data: UserUpdateInput
-  id?: InputMaybe<Scalars['String']['input']>
+  id?: InputMaybe<Scalars['ID']['input']>
 }
 
 export type Query = {
   __typename?: 'Query'
+  getAllSnippets: Array<Snippet>
+  getSnippet?: Maybe<Snippet>
   user?: Maybe<User>
   users: Array<User>
   whoAmI?: Maybe<User>
@@ -109,15 +114,41 @@ export type QueryGetSnippetArgs = {
 }
 
 export type QueryUserArgs = {
-  id: Scalars['String']['input']
+  id: Scalars['ID']['input']
+}
+
+export type Snippet = {
+  __typename?: 'Snippet'
+  code: Scalars['String']['output']
+  createdAt: Scalars['DateTime']['output']
+  executions?: Maybe<Array<Execution>>
+  id: Scalars['ID']['output']
+  language: Language
+  name: Scalars['String']['output']
+  slug: Scalars['String']['output']
+  updatedAt: Scalars['DateTime']['output']
+  user: User
+}
+
+export type SnippetCreateInput = {
+  code: Scalars['String']['input']
+  language: Scalars['String']['input']
+  name: Scalars['String']['input']
+}
+
+export type SnippetUpdateInput = {
+  code?: InputMaybe<Scalars['String']['input']>
+  language?: InputMaybe<Language>
+  name?: InputMaybe<Scalars['String']['input']>
 }
 
 export type User = {
   __typename?: 'User'
   createdAt: Scalars['DateTime']['output']
-  email: Scalars['String']['output']
-  id: Scalars['String']['output']
+  email?: Maybe<Scalars['String']['output']>
+  id: Scalars['ID']['output']
   role: UserRole
+  snippets: Array<Snippet>
   updatedAt: Scalars['DateTime']['output']
   username?: Maybe<Scalars['String']['output']>
 }
@@ -136,6 +167,7 @@ export type UserLoginInput = {
 /** User possible roles */
 export enum UserRole {
   Admin = 'ADMIN',
+  Guest = 'GUEST',
   User = 'USER',
 }
 
@@ -153,7 +185,7 @@ export type CreateUserMutation = {
   __typename?: 'Mutation'
   createUser?: {
     __typename?: 'User'
-    email: string
+    email?: string | null
     username?: string | null
     id: string
   } | null
@@ -180,7 +212,7 @@ export type WhoAmIQuery = {
     __typename?: 'User'
     id: string
     username?: string | null
-    email: string
+    email?: string | null
   } | null
 }
 

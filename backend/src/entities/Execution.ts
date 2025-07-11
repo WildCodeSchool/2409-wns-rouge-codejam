@@ -1,4 +1,4 @@
-import { Field, InputType, ObjectType, registerEnumType } from 'type-graphql'
+import { Field, ObjectType, registerEnumType } from 'type-graphql'
 import { GraphQLDateTime } from 'graphql-scalars'
 import {
   BaseEntity,
@@ -8,14 +8,8 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm'
-import { IsOptional, Length } from 'class-validator'
-import { ExecutionStatus, Language } from '../types'
-import { Snippet, SNIPPET_NAME_LEN } from './Snippet'
-
-const CODE_CONSTRAINTS = {
-  minLength: 2,
-  maxLength: 10000,
-}
+import { ExecutionStatus } from '../types'
+import { Snippet } from './Snippet'
 
 /**
  * Make TypeGraphQL aware of the enum `ExecutionStatus`.
@@ -27,11 +21,6 @@ const CODE_CONSTRAINTS = {
 registerEnumType(ExecutionStatus, {
   name: 'ExecutionStatus', // mandatory
   description: 'Execution possible status', // optional
-})
-
-registerEnumType(Language, {
-  name: 'Language', // mandatory
-  description: 'Execution possible language', // optional
 })
 
 /**
@@ -46,11 +35,11 @@ export class Execution extends BaseEntity {
   @Field(() => String)
   id!: string
 
-  @Column({ type: 'enum', enum: ExecutionStatus })
+  @Column({ type: 'enum', enum: ExecutionStatus, nullable: true })
   @Field(() => ExecutionStatus)
   status!: ExecutionStatus
 
-  @Column({ type: 'text' })
+  @Column({ type: 'text', nullable: true })
   @Field(() => String)
   result!: string
 

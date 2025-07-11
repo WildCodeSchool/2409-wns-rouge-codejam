@@ -64,6 +64,7 @@ export class User extends BaseEntity {
   @Field(() => ID)
   id!: string
 
+  // We need to set this field nullable to create a guest
   @Column({
     type: 'varchar',
     unique: true,
@@ -73,6 +74,7 @@ export class User extends BaseEntity {
   @Field(() => String, { nullable: true })
   username!: string
 
+  // We need to set this field nullable to create a guest
   @Column({
     type: 'varchar',
     length: EMAIL_CONSTRAINTS.maxLength,
@@ -84,6 +86,7 @@ export class User extends BaseEntity {
   @UseMiddleware(IsUser)
   email!: string
 
+  // We need to set this field nullable to create a guest
   @Column({ type: 'varchar', length: 150, nullable: true })
   // This field must not be exposed in GraphQL schema! (no @Field decorator)
   hashedPassword!: string
@@ -91,10 +94,6 @@ export class User extends BaseEntity {
   @Column({ type: 'enum', enum: UserRole, default: UserRole.GUEST })
   @Field(() => UserRole)
   role!: UserRole
-
-  @Column({ type: 'boolean', default: false })
-  @Field(() => Boolean)
-  isLocked!: boolean
 
   @CreateDateColumn()
   @Field(() => GraphQLDateTime)

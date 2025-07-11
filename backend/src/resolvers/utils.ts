@@ -89,25 +89,6 @@ export async function createGuestUser(): Promise<User> {
 }
 
 /**
- * Function to lock the given user and so prevent him from executing script
- * @param user - The user to lock
- * @returns The created user
- */
-export async function lockUser(user: User): Promise<void> {
-  Object.assign(user, { isLocked: true })
-  await User.save(user)
-}
-
-/**
- * Function to unlock a locked user, so he can execute code again
- * @param user - The user to unlock
- */
-export async function unlockUser(user: User): Promise<void> {
-  Object.assign(user, { isLocked: false })
-  await User.save(user)
-}
-
-/**
  * Function to create a snippet
  * @param data - The data with the code, name & language.
  * @param user - The user to associate with the snippet
@@ -174,14 +155,14 @@ export async function getFirstSnippet(userId: string): Promise<Snippet | null> {
 /**
  * Function to get the count of executions made by a user within the last given hours.
  * @param userId - The user id
- * @param timeLimit - The time limit in hours
+ * @param timeLimitInHours - The time limit in hours
  * @returns The number of executions
  */
 export async function getUserExecutionCount(
   userId: string,
-  timeLimit = 24,
+  timeLimitInHours = 24,
 ): Promise<number> {
-  const dateTime = new Date(Date.now() - timeLimit * 60 * 60 * 1000)
+  const dateTime = new Date(Date.now() - timeLimitInHours * 60 * 60 * 1000)
   const executions = await Execution.find({
     where: {
       snippet: {

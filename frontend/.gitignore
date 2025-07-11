@@ -32,4 +32,4 @@ dist-ssr
 *.sw?
 
 # Graphql-codegen generated files
-src/shared/gql
+# src/shared/gql

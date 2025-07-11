@@ -17,8 +17,8 @@ export function sh(cmd: string, timeoutInMs = 30000): Promise<ShResult> {
         return reject({
           status: ExecutionStatus.ERROR,
           // Does not work :
-          // result: formatStdError(stderr),
-          result: stderr,
+          result: formatStdError(stderr),
+          // result: stderr,
         })
       }
       if (error) {
