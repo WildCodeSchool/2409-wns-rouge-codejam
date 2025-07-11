@@ -55,6 +55,12 @@ export class ExecutionResolver {
 
       let snippet
 
+      /*
+        If the user is a guest, then he only has one snippet, 
+        so we just need to retrieve the first associated snippet from the database.
+        If the user is an authenticated user and a snippetId has been provided, 
+        then we can retrieve the associated snippet.
+      */
       if (currentUser.role === UserRole.GUEST) {
         snippet = await getFirstSnippet(currentUser.id)
       } else {
@@ -63,6 +69,7 @@ export class ExecutionResolver {
         }
       }
 
+      // Create a snippet if the execution is not yet associated with an existing one
       if (!snippet) {
         snippet = await createSnippet(data, currentUser)
       } else {
