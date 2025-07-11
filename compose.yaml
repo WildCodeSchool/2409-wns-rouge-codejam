@@ -21,10 +21,13 @@ services:
         condition: service_started
 
   code-execution:
-    container_name: code-execution
+    container_name: codejam-code-execution
     build: ./code-execution
     volumes:
+      - ./code-execution/src:/app/src/
       - /var/run/docker.sock:/var/run/docker.sock
+    env_file:
+      - codeExecution.env
 
   frontend:
     build: ./frontend

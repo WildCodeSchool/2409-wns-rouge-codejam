@@ -23,7 +23,27 @@ export type UserIDJwtPayload = jwt.JwtPayload & {
   id: string
 }
 
+export type CodeExecutionResponse = {
+  status: ExecutionStatus
+  result: string
+}
+
+export type CodeExecutionRequest = {
+  script: string
+  language: Language
+}
+
 export enum UserRole {
   ADMIN = 'admin',
   USER = 'user',
+}
+
+export enum ExecutionStatus {
+  SUCCESS = 'success',
+  ERROR = 'error',
+}
+
+export enum Language {
+  JAVASCRIPT = 'javascript',
+  TYPESCRIPT = 'typescript',
 }

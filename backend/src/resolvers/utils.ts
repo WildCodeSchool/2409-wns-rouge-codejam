@@ -1,7 +1,7 @@
 import { ValidationError } from 'class-validator'
 import jwt from 'jsonwebtoken'
 import Cookies from 'cookies'
-import { User } from '../entities/User'
+import { User, UserCreateInput } from '../entities/User'
 import axios, { AxiosError } from 'axios'
 import { CodeExecutionRequest, CodeExecutionResponse } from './types'
 import argon2 from 'argon2'
@@ -71,11 +71,11 @@ export const validationError = (errors: ValidationError[]): Error => {
   )
 }
 
-export async function createUser(
-  username: string,
-  email: string,
-  password: string,
-): Promise<User> {
+export async function createUser({
+  username,
+  email,
+  password,
+}: UserCreateInput): Promise<User> {
   // Verify if user already exists (email and username should both be unique)
   const existingUserByEmail = await User.findOne({
     where: { email },

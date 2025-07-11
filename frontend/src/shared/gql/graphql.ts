@@ -21,15 +21,27 @@ export type Scalars = {
 export type Execution = {
   __typename?: 'Execution';
   executedAt: Scalars['DateTime']['output'];
-  id: Scalars['ID']['output'];
+  id: Scalars['String']['output'];
   result: Scalars['String']['output'];
-  status: Scalars['String']['output'];
+  status: ExecutionStatus;
 };
 
 export type ExecutionCreateInput = {
-  language: Scalars['String']['input'];
+  language: Language;
   script: Scalars['String']['input'];
 };
+
+/** Execution possible status */
+export enum ExecutionStatus {
+  Error = 'ERROR',
+  Success = 'SUCCESS'
+}
+
+/** Execution possible language */
+export enum Language {
+  Javascript = 'JAVASCRIPT',
+  Typescript = 'TYPESCRIPT'
+}
 
 export type Mutation = {
   __typename?: 'Mutation';
@@ -48,12 +60,13 @@ export type MutationCreateUserArgs = {
 
 
 export type MutationDeleteUserArgs = {
-  id?: InputMaybe<Scalars['ID']['input']>;
+  id?: InputMaybe<Scalars['String']['input']>;
 };
 
 
 export type MutationExecuteArgs = {
   data: ExecutionCreateInput;
+  snippetId?: InputMaybe<Scalars['ID']['input']>;
 };
 
 
@@ -64,7 +77,7 @@ export type MutationLoginArgs = {
 
 export type MutationUpdateUserArgs = {
   data: UserUpdateInput;
-  id?: InputMaybe<Scalars['ID']['input']>;
+  id?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type Query = {
@@ -76,7 +89,7 @@ export type Query = {
 
 
 export type QueryUserArgs = {
-  id: Scalars['ID']['input'];
+  id: Scalars['String']['input'];
 };
 
 export type User = {
