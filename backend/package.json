@@ -28,6 +28,7 @@
     "jsonwebtoken": "^9.0.2",
     "pg": "^8.13.1",
     "reflect-metadata": "^0.2.2",
+    "slugify": "^1.6.6",
     "tsx": "^4.19.3",
     "type-graphql": "^2.0.0-rc.2",
     "typeorm": "^0.3.20"

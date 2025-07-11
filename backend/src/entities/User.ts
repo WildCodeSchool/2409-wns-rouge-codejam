@@ -1,6 +1,7 @@
 import { IsEmail, Length, IsStrongPassword, MaxLength } from 'class-validator'
 import {
   Field,
+  ID,
   InputType,
   ObjectType,
   registerEnumType,
@@ -12,11 +13,13 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm'
 import { IsUser } from '../middlewares/isUser'
 import { UserRole } from '../types'
+import { Snippet } from './Snippet'
 
 const USERNAME_CONSTRAINTS = {
   minLength: 2,
@@ -58,7 +61,7 @@ registerEnumType(UserRole, {
 export class User extends BaseEntity {
   // Create a primary column with an automatically generated uuid to make it less predictable.
   @PrimaryGeneratedColumn('uuid')
-  @Field(() => String)
+  @Field(() => ID)
   id!: string
 
   @Column({
@@ -94,6 +97,10 @@ export class User extends BaseEntity {
   @UpdateDateColumn()
   @Field(() => GraphQLDateTime)
   updatedAt!: Date
+
+  @OneToMany(() => Snippet, (snippet) => snippet.user)
+  @Field(() => [Snippet])
+  snippets!: Snippet[]
 }
 
 /**
