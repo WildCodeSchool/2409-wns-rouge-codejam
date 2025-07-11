@@ -1,30 +1,30 @@
-import express from "express"
-import appRouter from "./router"
-import { prePullDockerImage } from "./utils/docker"
+import express from 'express'
+import appRouter from './router'
+import { prePullDockerImage } from './utils/docker'
 
 const app = express()
-const PORT = process.env.PORT || 3000
+const PORT = process.env.PORT || '3000'
 
 // Application-level middleware
 app.use(express.json())
 
 // Routing
-app.use("/", appRouter)
+app.use('/', appRouter)
 
 async function startServer(): Promise<void> {
   try {
     // Pre-pull the Deno Docker image
-    await prePullDockerImage("denoland/deno:2.3.1")
+    await prePullDockerImage('denoland/deno:2.3.1')
 
     // Start the express server
-    app.listen(PORT, (error) => {
+    app.listen(Number(PORT), (error: unknown) => {
       if (error) {
-        throw new Error("Error starting server: " + error)
+        throw new Error('Error starting server: ' + error)
       }
       console.log(`Server is running on http://localhost:${PORT}...`)
     })
   } catch (error: unknown) {
-    console.error("Error starting server:", error)
+    console.error('Error starting server:', error)
   }
 }
 

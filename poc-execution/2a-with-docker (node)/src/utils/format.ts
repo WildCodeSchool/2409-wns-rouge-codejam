@@ -4,7 +4,7 @@
  * @returns
  */
 export function formatStdError(error: string): string {
-  const lines = error.split("\n")
+  const lines = error.split('\n')
   const pattern = new RegExp(/\b\w*Error:/)
   for (const line of lines) {
     const startIndex = line.search(pattern)
@@ -12,5 +12,5 @@ export function formatStdError(error: string): string {
       return line.slice(startIndex)
     }
   }
-  return ""
+  return ''
 }

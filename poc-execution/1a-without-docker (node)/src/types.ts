@@ -1,4 +1,4 @@
 export type ShResult = {
-  status: "success" | "error"
+  status: 'success' | 'error'
   result: string
 }

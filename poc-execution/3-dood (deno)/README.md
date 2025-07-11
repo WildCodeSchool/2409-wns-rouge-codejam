@@ -59,6 +59,5 @@ Example of body request:
 > **Cons**:
 >
 > - direct access to the host Docker engine! The command `docker rm -f $(docker ps -aq)` can remove all the containers from the host!
->
 > - breaks FS sharing (bind-mounting) capabilities -- containerized apps and Docker engine operate in different contexts
 >   **insecure option** for shared/public environments!

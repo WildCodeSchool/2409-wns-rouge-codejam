@@ -1,8 +1,8 @@
-import express from "express"
-import path from "node:path"
+import express from 'express'
+import path from 'node:path'
 
-import { ExecuteSchema } from "./schema/executeSchema"
-import { ShResult } from "./types"
+import { ExecuteSchema } from './schema/executeSchema'
+import { ShResult } from './types'
 import {
   copyFileFromContainer,
   copyFileToContainer,
@@ -12,15 +12,15 @@ import {
   removeDockerContainer,
   runDockerContainer,
   writeCodeToFile,
-} from "./utils/docker"
-import { getFileExtension } from "./utils/getFileExtension"
-import { validateData } from "./utils/validate"
+} from './utils/docker'
+import { getFileExtension } from './utils/getFileExtension'
+import { validateData } from './utils/validate'
 
 const router = express.Router()
 
-router.post("/api/execute", validateData(ExecuteSchema), async (req, res) => {
-  const HOST_DIR = "./src/"
-  const DOCKER_DIR = "/tmp/"
+router.post('/api/execute', validateData(ExecuteSchema), async (req, res) => {
+  const HOST_DIR = './src/'
+  const DOCKER_DIR = '/tmp/'
 
   const { code, language } = req.body
 
@@ -53,14 +53,14 @@ router.post("/api/execute", validateData(ExecuteSchema), async (req, res) => {
     const output: ShResult = await executeJSInDockerContainer(
       containerName,
       dockerFilePath,
-      dockerLogFilePath
+      dockerLogFilePath,
     )
 
     // Copy log file from container to host
     await copyFileFromContainer(
       containerName,
       dockerLogFilePath,
-      hostLogFilePath
+      hostLogFilePath,
     )
     // Read execution result from log file and prepare a response object
     const response = makeResponseFromLogFile(output, hostLogFilePath)
@@ -83,7 +83,7 @@ router.post("/api/execute", validateData(ExecuteSchema), async (req, res) => {
     //   })
     // }
     const errorMessage =
-      error instanceof Error ? error.message : "An unknown error has occurred"
+      error instanceof Error ? error.message : 'An unknown error has occurred'
     res.status(500).send({
       message: errorMessage,
     })

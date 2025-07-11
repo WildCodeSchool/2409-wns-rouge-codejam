@@ -1,28 +1,25 @@
-import express from "express"
-import * as fs from "node:fs"
-import { sh } from "./utils/sh"
+import express from 'express'
+import * as fs from 'node:fs'
+import { sh } from './utils/sh'
 
 const app = express()
-const FILENAME = "script.js"
-const FILE_PATH = "./src/" + FILENAME
+const FILENAME = 'script.js'
+const FILE_PATH = './src/' + FILENAME
+const PORT = process.env.PORT || '3000'
 
 app.use(express.json())
 
-app.get("/api", (_req, res) => {
-  res.send("Hello World")
-})
-
-app.post("/api/execute", async (req, res) => {
+app.post('/api/execute', async (req, res) => {
   try {
     if (!req.body?.script) {
-      throw new Error("Script is required")
+      throw new Error('Script is required')
     }
     const script = req.body.script
 
     // Créer et écrire le script dans le fichier temporaire
-    console.log("Creating script file...")
-    fs.writeFileSync("./src/script.js", script)
-    console.log("✅Script file created!")
+    console.log('Creating script file...')
+    fs.writeFileSync('./src/script.js', script)
+    console.log('✅Script file created!')
 
     // Exécuter le script
     const output = await sh(`deno ${FILE_PATH}`)
@@ -31,23 +28,23 @@ app.post("/api/execute", async (req, res) => {
     res.send(output)
   } catch (error: unknown) {
     let errorMessage =
-      error instanceof Error ? error.message : "An unknown error has occurred"
+      error instanceof Error ? error.message : 'An unknown error has occurred'
     res.status(500).send({
       message: errorMessage,
     })
   } finally {
     // Supprimer le fichier temporaire
     if (fs.existsSync(FILE_PATH)) {
-      console.log("Deleting script file...")
+      console.log('Deleting script file...')
       fs.rmSync(FILE_PATH, { force: true })
-      console.log("✅Script file deleted!")
+      console.log('✅Script file deleted!')
     }
   }
 })
 
-app.listen(3000, (error) => {
+app.listen(Number(PORT), (error: unknown) => {
   if (error) {
-    console.error("Error starting server:", error)
+    console.error('Error starting server:', error)
   }
-  console.log("Server is running on http://localhost:3000...")
+  console.log(`Server is running on http://localhost:${PORT}...`)
 })

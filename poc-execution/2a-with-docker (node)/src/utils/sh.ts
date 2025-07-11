@@ -1,6 +1,6 @@
-import { exec } from "node:child_process"
-import { formatStdError } from "./format"
-import { ShResult } from "../types"
+import { exec } from 'node:child_process'
+import { formatStdError } from './format'
+import { ShResult } from '../types'
 
 /**
  * Execute a shell command and return the result
@@ -13,25 +13,25 @@ export function sh(cmd: string, timeoutInMs = 2000): Promise<ShResult> {
     exec(cmd, { timeout: timeoutInMs }, (error, stdout, stderr) => {
       // !TODO: understand what kind of error is triggered (docker command vs execution error)...
       if (stderr) {
-        console.log("❌Execution failed!")
+        console.log('❌Execution failed!')
         return reject({
-          status: "error",
+          status: 'error',
           result: formatStdError(stderr),
         })
       }
       if (error) {
         if (error.killed) {
-          console.log("⌛️Execution timeout!")
+          console.log('⌛️Execution timeout!')
           return resolve({
-            status: "timeout",
+            status: 'timeout',
             result: stdout,
           })
         }
-        console.log("❌Execution failed!")
+        console.log('❌Execution failed!')
         return reject(new Error(JSON.stringify(error)))
       }
       resolve({
-        status: "success",
+        status: 'success',
         result: stdout,
       })
     })
