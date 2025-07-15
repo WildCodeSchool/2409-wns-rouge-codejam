@@ -6,7 +6,7 @@ const NavBar = () => {
   return (
     <header className="flex flex-row items-center justify-between border-b pb-4">
       <h1 className="text-xl font-bold">CodeJam</h1>
-      <Suspense fallback={<Spinner className="min-h-9" />}>
+      <Suspense fallback={<Spinner className="min-h-8" />}>
         <NavActions />
       </Suspense>
     </header>
