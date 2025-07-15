@@ -26,7 +26,7 @@ VOLUME /var/run/docker.sock
 # Indicate the port on which the application will listen for requests.
 # Informative purpose only!
 # Rhe actual port mapping is done at runtime using either the `-p 3000:3000` flag with the `docker run` command, or the `ports` section in a Docker Compose file.
-EXPOSE 3000
+EXPOSE 3001
 
 # Define the default command to run when the container starts (run application's development server).
 CMD ["pnpm", "dev"]

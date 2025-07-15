@@ -4,13 +4,15 @@ import { ApolloServer } from '@apollo/server'
 import { startStandaloneServer } from '@apollo/server/standalone'
 import { getSchema } from './schema'
 
+const port = process.env.PORT || 3000
+
 async function initialize(): Promise<void> {
   await dataSource.initialize()
   const schema = await getSchema()
   const server = new ApolloServer({ schema })
 
   const { url } = await startStandaloneServer(server, {
-    listen: { port: 3000 },
+    listen: { port: Number(port) },
     /**
      * Provide context to share data between resolvers.
      * The context function is called for each request.

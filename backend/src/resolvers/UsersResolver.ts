@@ -1,6 +1,5 @@
 import argon2 from 'argon2'
 import Cookies from 'cookies'
-import jwt from 'jsonwebtoken'
 import {
   Arg,
   Authorized,
@@ -18,7 +17,7 @@ import {
   UserUpdateInput,
 } from '../entities/User'
 import { AuthContextType, ContextType, UserRole } from '../types'
-import { getUserFromContext } from './utils'
+import { createCookieWithJwt, getUserFromContext } from './utils'
 
 @Resolver()
 export class UsersResolver {
@@ -71,6 +70,7 @@ export class UsersResolver {
 
       Object.assign(newUser, {
         ...data,
+        role: UserRole.USER,
         hashedPassword,
         password: null, // remove clear password
       })
@@ -99,17 +99,7 @@ export class UsersResolver {
       if (!valid) return null
 
       if (process.env.NODE_ENV !== 'test') {
-        const token = jwt.sign(
-          { userId: user.id },
-          process.env.JWT_SECRET || '',
-          {
-            expiresIn: '24h',
-          },
-        )
-        new Cookies(context.req, context.res).set('access_token', token, {
-          httpOnly: true,
-          secure: false,
-        })
+        createCookieWithJwt(user.id, context)
       }
       return user
     } catch (err) {
