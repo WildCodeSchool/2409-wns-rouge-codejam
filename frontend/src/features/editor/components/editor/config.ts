@@ -11,6 +11,12 @@ export const baseEditorOptions: monaco.editor.IStandaloneEditorConstructionOptio
     fontSize: 14,
     lineNumbers: 'on',
     minimap: { enabled: false },
+    lineDecorationsWidth: 0, // disable line decorations width to avoid extra space on the left
+    lineNumbersMinChars: 3, // minimum number of characters to reserve for line numbers
+    tabSize: 2, // set tab size to 2 spaces
+    wrappingStrategy: 'advanced', // use advanced wrapping strategy for better performance
+    wordWrap: 'on', // enable word wrapping
+    wrappingIndent: 'indent', // indent wrapped lines
 
     // acceptSuggestionOnCommitCharacter: true, // default to `true`
     // acceptSuggestionOnEnter: 'on', // default to `on`

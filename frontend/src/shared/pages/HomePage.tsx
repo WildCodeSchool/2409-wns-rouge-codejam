@@ -12,7 +12,7 @@ export default function HomePage() {
   return (
     <Suspense fallback={<Spinner />}>
       <ResizablePanelGroup direction="horizontal" className="h-full">
-        <ResizablePanel defaultSize={60} minSize={25} maxSize={75}>
+        <ResizablePanel defaultSize={50} minSize={25} maxSize={75}>
           <div className="flex h-full">
             <Editor
               defaultLanguage="javascript"
@@ -24,9 +24,9 @@ export default function HomePage() {
 
         <ResizableHandle withHandle />
 
-        <ResizablePanel defaultSize={40} maxSize={75} minSize={25}>
+        <ResizablePanel defaultSize={50} maxSize={75} minSize={25}>
           <div className="flex h-full">
-            <Output value="Output will be displayed here" />
+            <Output value='Click "Run code" to visualize the output here...' />
           </div>
         </ResizablePanel>
       </ResizablePanelGroup>
