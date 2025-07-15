@@ -1,3 +1,39 @@
+/*_____________ CUSTOM FONTS _______________ */
+/* Load the variable font */
+@font-face {
+  /* Use VF to make it distinguishable from static fonts */
+  font-family: 'Fira Code VF';
+  src:
+    local('Fira Code'),
+    /* Main modern font format */
+      url('../public/assets/fonts/FiraCode-VariableFont_wght.woff2')
+      format('woff2-variations'),
+    /* Fallback font format */
+      url('../public/assets/fonts/FiraCode-VariableFont_wght.woff')
+      format('woff-variations'),
+    url('../public/assets/fonts/FiraCode-VariableFont_wght.ttf')
+      format('truetype-variations');
+  font-style: normal;
+  /* Allowable range for the weight of the variable font */
+  font-weight: 400 400;
+  /* Displaying text quickly is a top priority, but ensure the custom web-font is used */
+  font-display: swap;
+}
+
+/* Load the static fonts as a fallback */
+@font-face {
+  font-family: 'Fira Code';
+  src:
+    local('Fira Code'),
+    url('../public/assets/fonts/static/FiraCode-Regular.woff2') format('woff2'),
+    url('../public/assets/fonts/static/FiraCode-Regular.woff') format('woff'),
+    url('../public/assets/fonts/static/FiraCode-Regular.ttf') format('truetype');
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+/*__________________________________________ */
+
 @import 'tailwindcss';
 
 @plugin 'tailwindcss-animate';
@@ -115,6 +151,8 @@
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-link: var(--link);
+
+  --font-editor: 'Fira Code VF', 'Fira Code', monospace;
 }
 
 @layer base {
