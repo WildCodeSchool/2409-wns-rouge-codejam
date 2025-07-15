@@ -1,10 +1,16 @@
 export enum Language {
-  JS = 'javascript',
-  TS = 'typescript',
+  JAVASCRIPT = 'javascript',
+  TYPESCRIPT = 'typescript',
+}
+
+export enum ExecutionStatus {
+  SUCCESS = 'success',
+  ERROR = 'error',
+  TIMEOUT = 'error',
 }
 
 export type ShResult = {
-  status: 'success' | 'error' | 'timeout'
+  status: ExecutionStatus
   result: string
 }
 

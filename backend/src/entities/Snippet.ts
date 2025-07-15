@@ -8,6 +8,7 @@ import {
   BaseEntity,
   BeforeInsert,
   BeforeUpdate,
+  OneToMany,
 } from 'typeorm'
 import slugify from 'slugify'
 import { User } from './User'
@@ -21,6 +22,7 @@ import {
 import { GraphQLDateTime } from 'graphql-scalars'
 import { IsNotEmpty, Length, IsEnum, IsOptional } from 'class-validator'
 import { Language } from '../types'
+import { Execution } from './Execution'
 
 registerEnumType(Language, {
   name: 'Language',
@@ -63,6 +65,10 @@ export class Snippet extends BaseEntity {
   @ManyToOne(() => User, (user) => user.snippets)
   @Field(() => User)
   user!: User
+
+  @OneToMany(() => Execution, (executions) => executions.snippet)
+  @Field(() => [Execution], { nullable: true })
+  executions!: Execution[]
 
   @BeforeInsert()
   @BeforeUpdate()

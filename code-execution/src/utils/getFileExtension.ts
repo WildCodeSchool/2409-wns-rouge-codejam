@@ -4,11 +4,11 @@ export function getFileExtension(language: string): string {
   let languageExtension = ''
 
   switch (language) {
-    case Language.JS: {
+    case Language.JAVASCRIPT: {
       languageExtension = 'js'
       break
     }
-    case Language.TS: {
+    case Language.TYPESCRIPT: {
       languageExtension = 'ts'
       break
     }

@@ -40,7 +40,7 @@ Example of body request:
 
 ```json
 {
-  "script": "console.log('hello!')",
+  "code": "console.log('hello!')",
   "language": "typescript"
 }
 ```

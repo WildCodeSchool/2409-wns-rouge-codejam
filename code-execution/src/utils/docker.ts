@@ -2,10 +2,13 @@ import chalk from 'chalk'
 import * as fs from 'node:fs'
 import path from 'node:path'
 import { sh } from './sh'
-import { isErrorWithStatus, ShResult } from '../types'
-
-const HOST_DIR = './src/'
-const DOCKER_DIR = '/tmp/'
+import { ExecutionStatus, isErrorWithStatus, ShResult } from '../types'
+import {
+  DOCKER_DIR,
+  DOCKER_LOG_FILEPATH,
+  DOCKER_CODE_FILEPATH,
+  HOST_DIR,
+} from '../config'
 
 /**
  * Check if a Docker container is started
@@ -35,70 +38,80 @@ export async function deleteLogFile(logFileName: string): Promise<void> {
 }
 
 /**
- * Execute JS code in a Docker container
- * @param script the JS code to be executed
+ * Copy the file to be executed to a docker container
+ * @param fileName the name of the file to be copied
  * @param containerName the name of the Docker container
- * @param fileName the name of the script file to be created in the container
- * @param logFileName the name of the log file to be created in the container
  * @returns
  */
-export async function executeJSInDockerContainer(
-  script: string,
-  containerName: string,
+export async function copyFileToDockerContainer(
   fileName: string,
-  logFileName: string,
-): Promise<ShResult> {
-  const filePath = path.join(HOST_DIR, fileName)
-  const logFilePath = path.join(HOST_DIR, logFileName)
-  const dockerFilePath = path.join(DOCKER_DIR, fileName)
-  const dockerLogFilePath = path.join(DOCKER_DIR, logFileName)
-
-  // Create a temporary file to store the script and copy it to the container
-  console.log(chalk.yellow('Creating script file...'))
-  fs.writeFileSync(HOST_DIR + fileName, script)
-  await sh(`docker cp ${filePath} ${containerName}:${dockerFilePath}`)
-
-  // Remove temp file from host
-  if (fs.existsSync(filePath)) {
-    fs.rmSync(filePath, { force: true })
-  }
-  console.log(chalk.green('✅Script file created!'))
-
-  // !TODO: vérifier si le script peut agir sur la machine hote...
-  /* 
-    Run script in Deno container and log output to a temporary file. 
-    This allows to retrieve script output data even if the script times out.
-  */
-  console.log(chalk.yellow('Executing script...'))
-
-  let output: ShResult
-
-  // !TODO: refactor using centralized error handling... (Should we consider an user error as a server error ?)
+  containerName: string,
+): Promise<void> {
   try {
-    output = await sh(
-      `docker exec ${containerName} sh -c "deno ${dockerFilePath} >> ${dockerLogFilePath}"`,
+    const filePath = path.join(HOST_DIR, fileName)
+
+    // Copy the temporary file to the container
+    const copyResult = await sh(
+      `docker cp ${filePath} ${containerName}:${DOCKER_CODE_FILEPATH}`,
     )
+
+    if (copyResult.status !== ExecutionStatus.SUCCESS) {
+      throw new Error('An error has occured while copying the script file.')
+    }
+
+    console.log(chalk.green('✅Script file created!'))
   } catch (err) {
-    if (isErrorWithStatus(err)) {
-      return err
-    } else {
+    if (err instanceof Error) {
       throw err
     }
+    throw new Error('An unknown error has occured.')
   }
-  console.log(chalk.green('✅Script executed!'))
+}
 
-  // Copy log file from container to host
-  console.log(chalk.yellow('Copying log file...'))
-  await sh(`docker cp ${containerName}:${dockerLogFilePath} ${logFilePath}`)
-  console.log(chalk.green('✅Log file copied!'))
+/**
+ * Copy the execution log file from a docker container to the host
+ * @param logFilePath the destination path (on the host)
+ * @param containerName the name of the Docker container
+ * @returns
+ */
+export async function copyFileFromDockerContainer(
+  logFilePath: string,
+  containerName: string,
+): Promise<void> {
+  try {
+    // Copy log file from container to host
+    console.log(chalk.yellow('Copying log file...'))
+    const copyResult = await sh(
+      `docker cp ${containerName}:${DOCKER_LOG_FILEPATH} ${logFilePath}`,
+    )
 
-  // Read execution result from log file
-  const outputData = fs.readFileSync(logFilePath, 'utf-8')
+    if (copyResult.status !== ExecutionStatus.SUCCESS) {
+      throw new Error('An error has occured while copying the log file.')
+    }
 
-  return {
-    status: output.status,
-    result: outputData,
+    console.log(chalk.green('✅Log file copied!'))
+  } catch (err) {
+    if (err instanceof Error) {
+      throw err
+    }
+    throw new Error('An unknown error has occured.')
   }
+}
+
+/**
+ * Execute JS file in a Docker container
+ * @param containerName the name of the Docker container
+ * @returns
+ */
+export async function executeJSFileInDockerContainer(
+  containerName: string,
+): Promise<ShResult> {
+  console.log(chalk.yellow('Executing script...'))
+  const output = await sh(
+    `docker exec ${containerName} sh -c "deno ${DOCKER_CODE_FILEPATH} >> ${DOCKER_LOG_FILEPATH}"`,
+  )
+
+  return output
 }
 
 /**
