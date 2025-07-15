@@ -1,10 +1,6 @@
 import { Arg, Authorized, ID, Mutation, Query, Resolver } from 'type-graphql'
 
-import {
-  Plan,
-  PlanCreateInput,
-  PlanUpdateInput,
-} from '../entities/Plan'
+import { Plan, PlanCreateInput, PlanUpdateInput } from '../entities/Plan'
 import { UserRole } from '../types'
 
 @Resolver(Plan)
@@ -87,4 +83,4 @@ export class PlansResolver {
       throw new Error((err as Error).message)
     }
   }
-} 
+}

@@ -18,6 +18,9 @@ import {
 } from '../entities/User'
 import { AuthContextType, ContextType, UserRole } from '../types'
 import { createCookieWithJwt, getUserFromContext } from './utils'
+import { UserSubscription } from '../entities/UserSubscription'
+import { Plan } from '../entities/Plan'
+import { Not } from 'typeorm'
 
 @Resolver()
 export class UsersResolver {
@@ -76,6 +79,24 @@ export class UsersResolver {
       })
 
       const createdUser = await newUser.save()
+
+      // Dynamically assign a default plan to the user
+      const defaultPlan = await Plan.findOne({
+        where: {
+          isDefault: true,
+          name: Not('guest'),
+        },
+      })
+      const newUserSubscription = new UserSubscription()
+      Object.assign(newUserSubscription, {
+        user: createdUser,
+        plan: defaultPlan,
+        subscribedAt: new Date(),
+        isActive: true,
+      })
+
+      await newUserSubscription.save()
+
       return createdUser
     } catch (err) {
       throw new Error((err as Error).message)

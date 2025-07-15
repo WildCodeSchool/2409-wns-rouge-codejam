@@ -1,9 +1,4 @@
-import {
-  Field,
-  InputType,
-  ObjectType,
-  ID,
-} from 'type-graphql'
+import { Field, InputType, ObjectType, ID } from 'type-graphql'
 import { GraphQLDateTime } from 'graphql-scalars'
 import {
   BaseEntity,
@@ -14,7 +9,6 @@ import {
 } from 'typeorm'
 import { User } from './User'
 import { Plan } from './Plan'
-
 
 @Entity()
 @ObjectType()
@@ -48,7 +42,6 @@ export class UserSubscription extends BaseEntity {
   plan!: Plan
 }
 
-
 @InputType()
 export class UserSubscriptionCreateInput {
   @Field(() => String)
@@ -56,25 +49,13 @@ export class UserSubscriptionCreateInput {
 
   @Field(() => ID)
   planId!: string
-
-  @Field(() => GraphQLDateTime, { nullable: true })
-  subscribedAt?: Date
-
-  @Field(() => GraphQLDateTime, { nullable: true })
-  expiresAt?: Date
-
-  @Field(() => Boolean, { nullable: true })
-  isActive?: boolean
 }
 
 @InputType()
 export class UserSubscriptionUpdateInput {
-  @Field(() => GraphQLDateTime, { nullable: true })
-  unsubscribedAt?: Date
-
-  @Field(() => Boolean, { nullable: true })
-  isActive?: boolean
+  @Field(() => ID)
+  id!: string
 
   @Field(() => GraphQLDateTime, { nullable: true })
   expiresAt?: Date
-} 
+}

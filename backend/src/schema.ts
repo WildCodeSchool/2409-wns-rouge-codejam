@@ -11,7 +11,13 @@ import { UserSubscriptionsResolver } from './resolvers/UserSubscriptionsResolver
  */
 export function getSchema() {
   return buildSchema({
-    resolvers: [UsersResolver,ExecutionResolver, SnippetsResolver, PlansResolver, UserSubscriptionsResolver],
+    resolvers: [
+      UsersResolver,
+      ExecutionResolver,
+      SnippetsResolver,
+      PlansResolver,
+      UserSubscriptionsResolver,
+    ],
     validate: true, // enable 'class-validator' integration: automatically validate all input arguments
     authChecker: customAuthChecker, // register the authorization checker function (💡 can be set to `null` to temporarily silence auth guards)
   })

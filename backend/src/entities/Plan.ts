@@ -1,11 +1,5 @@
 import { Length, Min, Max } from 'class-validator'
-import {
-  Field,
-  InputType,
-  ObjectType,
-  ID,
-  Int,
-} from 'type-graphql'
+import { Field, InputType, ObjectType, ID, Int } from 'type-graphql'
 import { GraphQLDateTime } from 'graphql-scalars'
 import {
   BaseEntity,
@@ -29,7 +23,7 @@ const PRICE_CONSTRAINTS = {
 
 const EXECUTION_LIMIT_CONSTRAINTS = {
   min: 0,
-  max: 100,
+  max: 999999,
 }
 
 @Entity()
@@ -67,7 +61,6 @@ export class Plan extends BaseEntity {
   @Field(() => [UserSubscription])
   subscriptions!: UserSubscription[]
 }
-
 
 @InputType()
 export class PlanCreateInput {

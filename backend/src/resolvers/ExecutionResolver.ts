@@ -30,6 +30,7 @@ export class ExecutionResolver {
 
       if (!currentUser) {
         const newGuestUser = await createGuestUser()
+        // TODO: add default plan to the guest user
         createCookieWithJwt(newGuestUser.id, context)
 
         currentUser = newGuestUser
