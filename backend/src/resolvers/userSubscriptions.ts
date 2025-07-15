@@ -1,4 +1,4 @@
-import { Arg, Authorized, Ctx, Int, Mutation, Query, Resolver } from 'type-graphql'
+import { Arg, Authorized, Ctx, ID, Mutation, Query, Resolver } from 'type-graphql'
 
 import {
   UserSubscription,
@@ -31,7 +31,7 @@ export class UserSubscriptionsResolver {
     }
 
     const subscriptions = await UserSubscription.find({
-      where: { userId: user.id },
+      where: { user: { id: user.id } },
       relations: ['plan'],
       order: { subscribedAt: 'DESC' },
     })
@@ -48,7 +48,7 @@ export class UserSubscriptionsResolver {
 
     const subscription = await UserSubscription.findOne({
       where: { 
-        userId: user.id, 
+        user: { id: user.id }, 
         isActive: true 
       },
       relations: ['plan'],
@@ -59,7 +59,7 @@ export class UserSubscriptionsResolver {
 
   @Authorized(UserRole.ADMIN)
   @Query(() => UserSubscription, { nullable: true })
-  async userSubscription(@Arg('id', () => Int) id: number): Promise<UserSubscription | null> {
+  async userSubscription(@Arg('id', () => ID) id: string): Promise<UserSubscription | null> {
     const subscription = await UserSubscription.findOne({
       where: { id },
       relations: ['user', 'plan'],
@@ -99,7 +99,7 @@ export class UserSubscriptionsResolver {
       // Check if user already has an active subscription
       const existingSubscription = await UserSubscription.findOne({
         where: { 
-          userId: data.userId, 
+          user: { id: data.userId }, 
           isActive: true 
         },
       })
@@ -132,7 +132,7 @@ export class UserSubscriptionsResolver {
   @Authorized(UserRole.ADMIN, UserRole.USER)
   @Mutation(() => UserSubscription, { nullable: true })
   async updateUserSubscription(
-    @Arg('id', () => Int) id: number,
+    @Arg('id', () => ID) id: string,
     @Arg('data', () => UserSubscriptionUpdateInput) data: UserSubscriptionUpdateInput,
     @Ctx() context: AuthContextType,
   ): Promise<UserSubscription | null> {
@@ -152,7 +152,7 @@ export class UserSubscriptionsResolver {
       }
 
       // If not admin, user can only update their own subscriptions
-      if (currentUser.role !== UserRole.ADMIN && subscription.userId !== currentUser.id) {
+      if (currentUser.role !== UserRole.ADMIN && subscription.user.id !== currentUser.id) {
         throw new Error('You can only update your own subscriptions')
       }
 
@@ -174,7 +174,7 @@ export class UserSubscriptionsResolver {
   @Authorized(UserRole.ADMIN, UserRole.USER)
   @Mutation(() => Boolean)
   async cancelSubscription(
-    @Arg('id', () => Int) id: number,
+    @Arg('id', () => ID) id: string,
     @Ctx() context: AuthContextType,
   ): Promise<boolean> {
     try {
@@ -192,7 +192,7 @@ export class UserSubscriptionsResolver {
       }
 
       // If not admin, user can only cancel their own subscriptions
-      if (currentUser.role !== UserRole.ADMIN && subscription.userId !== currentUser.id) {
+      if (currentUser.role !== UserRole.ADMIN && subscription.user.id !== currentUser.id) {
         throw new Error('You can only cancel your own subscriptions')
       }
 
@@ -208,11 +208,12 @@ export class UserSubscriptionsResolver {
 
   @Authorized(UserRole.ADMIN)
   @Mutation(() => Boolean)
-  async deleteUserSubscription(@Arg('id', () => Int) id: number): Promise<boolean> {
+  async deleteUserSubscription(@Arg('id', () => ID) id: string): Promise<boolean> {
     try {
       const subscription = await UserSubscription.findOne({
         where: { id },
       })
+      
       if (!subscription) {
         throw new Error('Subscription not found')
       }
