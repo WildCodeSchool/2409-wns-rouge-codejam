@@ -2,60 +2,50 @@ import {
   Field,
   InputType,
   ObjectType,
-  Int,
+  ID,
 } from 'type-graphql'
 import { GraphQLDateTime } from 'graphql-scalars'
 import {
   BaseEntity,
   Column,
   Entity,
-  JoinColumn,
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm'
 import { User } from './User'
+import { Plan } from './Plan'
 
 
-@Entity({ name: 'user_subscription' })
+@Entity()
 @ObjectType()
 export class UserSubscription extends BaseEntity {
-  @PrimaryGeneratedColumn()
-  @Field(() => Int)
-  id!: number
+  @PrimaryGeneratedColumn('uuid')
+  @Field(() => ID)
+  id!: string
 
-  @Column({ type: 'timestamp', name: 'subscribed_at' })
+  @Column({ type: 'timestamp' })
   @Field(() => GraphQLDateTime)
   subscribedAt!: Date
 
-  @Column({ type: 'timestamp', name: 'unsubscribed_at', nullable: true })
+  @Column({ type: 'timestamp', nullable: true })
   @Field(() => GraphQLDateTime, { nullable: true })
   unsubscribedAt?: Date
 
-  @Column({ type: 'boolean', name: 'is_active', default: true })
+  @Column({ type: 'boolean', default: true })
   @Field(() => Boolean)
   isActive!: boolean
 
-  @Column({ type: 'timestamp', name: 'expires_at', nullable: true })
+  @Column({ type: 'timestamp', nullable: true })
   @Field(() => GraphQLDateTime, { nullable: true })
   expiresAt?: Date
 
-  // Foreign key columns
-  @Column({ type: 'uuid', name: 'user_id' })
-  userId!: string
-
-  @Column({ type: 'int', name: 'plan_id' })
-  planId!: number
-
-  // Relations
-  @ManyToOne(() => User, { eager: true })
-  @JoinColumn({ name: 'user_id' })
+  @ManyToOne(() => User, (user) => user.subscriptions)
   @Field(() => User)
   user!: User
 
-  @ManyToOne('Plan', 'subscriptions', { eager: true })
-  @JoinColumn({ name: 'plan_id' })
-  @Field(() => String, { description: 'Plan associated with this subscription' })
-  plan!: any
+  @ManyToOne(() => Plan, (plan) => plan.subscriptions)
+  @Field(() => Plan)
+  plan!: Plan
 }
 
 
@@ -64,8 +54,8 @@ export class UserSubscriptionCreateInput {
   @Field(() => String)
   userId!: string
 
-  @Field(() => Int)
-  planId!: number
+  @Field(() => ID)
+  planId!: string
 
   @Field(() => GraphQLDateTime, { nullable: true })
   subscribedAt?: Date

@@ -3,6 +3,7 @@ import {
   Field,
   InputType,
   ObjectType,
+  ID,
   Int,
 } from 'type-graphql'
 import { GraphQLDateTime } from 'graphql-scalars'
@@ -14,6 +15,8 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm'
+import { UserSubscription } from './UserSubscription'
+
 const PLAN_NAME_CONSTRAINTS = {
   minLength: 1,
   maxLength: 60,
@@ -26,19 +29,20 @@ const PRICE_CONSTRAINTS = {
 
 const EXECUTION_LIMIT_CONSTRAINTS = {
   min: 0,
-  max: 32767, // SMALLINT max value
+  max: 100,
 }
 
 @Entity()
 @ObjectType()
 export class Plan extends BaseEntity {
-  @PrimaryGeneratedColumn()
-  @Field(() => Int)
-  id!: number
+  @PrimaryGeneratedColumn('uuid')
+  @Field(() => ID)
+  id!: string
 
   @Column({
     type: 'varchar',
     length: PLAN_NAME_CONSTRAINTS.maxLength,
+    unique: true,
   })
   @Field(() => String)
   name!: string
@@ -59,10 +63,9 @@ export class Plan extends BaseEntity {
   @Field(() => GraphQLDateTime)
   createdAt!: Date
 
-  // Relations
-  @OneToMany('UserSubscription', 'plan')
-  @Field(() => [String], { description: 'Subscriptions associated with this plan', nullable: true })
-  subscriptions!: any[]
+  @OneToMany(() => UserSubscription, (subscription) => subscription.plan)
+  @Field(() => [UserSubscription])
+  subscriptions!: UserSubscription[]
 }
 
 

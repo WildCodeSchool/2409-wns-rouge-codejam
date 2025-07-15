@@ -1,36 +1,20 @@
-import { Arg, Authorized, Ctx, Int, Mutation, Query, Resolver } from 'type-graphql'
+import { Arg, Authorized, ID, Mutation, Query, Resolver } from 'type-graphql'
 
 import {
   Plan,
   PlanCreateInput,
   PlanUpdateInput,
 } from '../entities/Plan'
-import { AuthContextType, UserRole } from '../types'
+import { UserRole } from '../types'
 
 @Resolver(Plan)
 export class PlansResolver {
   @Query(() => [Plan])
   async plans(): Promise<Plan[]> {
     const plans = await Plan.find({
-      order: { createdAt: 'DESC' },
+      order: { price: 'ASC' },
     })
     return plans
-  }
-
-  @Query(() => Plan, { nullable: true })
-  async plan(@Arg('id', () => Int) id: number): Promise<Plan | null> {
-    const plan = await Plan.findOne({
-      where: { id },
-    })
-    return plan
-  }
-
-  @Query(() => Plan, { nullable: true })
-  async defaultPlan(): Promise<Plan | null> {
-    const plan = await Plan.findOne({
-      where: { isDefault: true },
-    })
-    return plan
   }
 
   @Authorized(UserRole.ADMIN)
@@ -48,11 +32,6 @@ export class PlansResolver {
         throw new Error('A plan with this name already exists')
       }
 
-      // If this plan is set as default, unset other default plans
-      if (data.isDefault) {
-        await Plan.update({ isDefault: true }, { isDefault: false })
-      }
-
       const newPlan = new Plan()
       Object.assign(newPlan, data)
 
@@ -66,7 +45,7 @@ export class PlansResolver {
   @Authorized(UserRole.ADMIN)
   @Mutation(() => Plan, { nullable: true })
   async updatePlan(
-    @Arg('id', () => Int) id: number,
+    @Arg('id', () => ID) id: string,
     @Arg('data', () => PlanUpdateInput) data: PlanUpdateInput,
   ): Promise<Plan | null> {
     try {
@@ -75,21 +54,6 @@ export class PlansResolver {
       })
       if (!plan) {
         throw new Error('Plan not found')
-      }
-
-      // Check for duplicate name if name is being updated
-      if (data.name && data.name !== plan.name) {
-        const existingPlan = await Plan.findOne({
-          where: { name: data.name },
-        })
-        if (existingPlan) {
-          throw new Error('A plan with this name already exists')
-        }
-      }
-
-      // If this plan is being set as default, unset other default plans
-      if (data.isDefault === true) {
-        await Plan.update({ isDefault: true }, { isDefault: false })
       }
 
       Object.assign(plan, data)
@@ -102,7 +66,7 @@ export class PlansResolver {
 
   @Authorized(UserRole.ADMIN)
   @Mutation(() => Boolean)
-  async deletePlan(@Arg('id', () => Int) id: number): Promise<boolean> {
+  async deletePlan(@Arg('id', () => ID) id: string): Promise<boolean> {
     try {
       const plan = await Plan.findOne({
         where: { id },

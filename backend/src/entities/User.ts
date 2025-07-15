@@ -20,6 +20,7 @@ import {
 import { IsUser } from '../middlewares/isUser'
 import { UserRole } from '../types'
 import { Snippet } from './Snippet'
+import { UserSubscription } from './UserSubscription'
 
 const USERNAME_CONSTRAINTS = {
   minLength: 2,
@@ -101,6 +102,10 @@ export class User extends BaseEntity {
   @OneToMany(() => Snippet, (snippet) => snippet.user)
   @Field(() => [Snippet])
   snippets!: Snippet[]
+
+  @OneToMany(() => UserSubscription, (subscription) => subscription.user)
+  @Field(() => [UserSubscription])
+  subscriptions!: UserSubscription[]
 }
 
 /**
