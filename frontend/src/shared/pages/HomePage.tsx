@@ -1,12 +1,11 @@
 import { Suspense } from 'react'
-import EditorContainer from '@/features/editor/components/EditorContainer'
 
-const HomePage = () => {
+import { EditorContainer } from '@/features/editor/components'
+
+export default function HomePage() {
   return (
     <Suspense fallback={<p>Loading...</p>}>
       <EditorContainer />
     </Suspense>
   )
 }
-
-export default HomePage

@@ -1,7 +1,5 @@
 import Editor from '@monaco-editor/react'
 
-const EditorContainer = () => {
+export default function EditorContainer() {
   return <Editor defaultLanguage="javascript" theme="vs-dark" />
 }
-
-export default EditorContainer

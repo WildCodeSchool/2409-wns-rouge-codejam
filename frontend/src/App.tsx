@@ -1,7 +1,8 @@
-import { BrowserRouter, Route, Routes } from 'react-router-dom'
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { ApolloClient, InMemoryCache, ApolloProvider } from '@apollo/client'
-import HomePage from '@/shared/pages/HomePage'
-import Layout from './shared/components/Layout'
+
+import { EditorLayout, MainLayout } from '@/shared/components/layouts'
+import { HomePage } from '@/shared/pages'
 
 const client = new ApolloClient({
   uri: '/api',
@@ -14,13 +15,16 @@ const client = new ApolloClient({
   },
 })
 
-const App = () => {
+export default function App() {
   return (
     <ApolloProvider client={client}>
       <BrowserRouter>
         <Routes>
-          <Route path="/" Component={Layout}>
-            <Route index Component={HomePage} />
+          <Route path="/" Component={MainLayout}>
+            <Route path="/" element={<Navigate to="/editor" />} />
+            <Route path="/editor" Component={EditorLayout}>
+              <Route index Component={HomePage} />
+            </Route>
             <Route path="*" Component={HomePage} />
           </Route>
         </Routes>
@@ -28,5 +32,3 @@ const App = () => {
     </ApolloProvider>
   )
 }
-
-export default App
