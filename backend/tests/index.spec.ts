@@ -18,7 +18,6 @@ const testArgs: TestArgs = {
   data: {},
 }
 
-
 async function createEssentialPlans() {
   // Default plan - for registered users
   const defaultPlan = new Plan()
