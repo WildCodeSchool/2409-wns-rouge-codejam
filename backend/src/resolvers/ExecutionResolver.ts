@@ -31,7 +31,7 @@ export class ExecutionResolver {
       if (!currentUser) {
         const newGuestUser = await createGuestUser()
         // Subscribe the guest user to the guest plan
-       await subscribeGuest(newGuestUser.id)
+        await subscribeGuest(newGuestUser.id)
         createCookieWithJwt(newGuestUser.id, context)
 
         currentUser = newGuestUser
@@ -52,9 +52,7 @@ export class ExecutionResolver {
       }
 
       // Get current execution count for the user
-      const currentExecutionCount = await getUserExecutionCount(
-        currentUser.id,
-      )
+      const currentExecutionCount = await getUserExecutionCount(currentUser.id)
 
       // Check if execution limit is exceeded based on user's plan
       if (currentExecutionCount >= activeSubscription.plan.executionLimit) {

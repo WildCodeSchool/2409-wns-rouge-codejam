@@ -53,15 +53,17 @@ export class UsersResolver {
     try {
       // Verify if user already exists (email and username should both be unique)
       const existingUser = await User.findOne({
-        where: [
-          { email: data.email },
-          { username: data.username }
-        ]
+        where: [{ email: data.email }, { username: data.username }],
       })
 
       if (existingUser) {
-        if (existingUser.email === data.email && existingUser.username === data.username) {
-          throw new Error('A user with this email and this username already exists')
+        if (
+          existingUser.email === data.email &&
+          existingUser.username === data.username
+        ) {
+          throw new Error(
+            'A user with this email and this username already exists',
+          )
         } else if (existingUser.email === data.email) {
           throw new Error('A user with this email already exists')
         } else {
@@ -118,7 +120,7 @@ export class UsersResolver {
 
       const valid = await argon2.verify(user.hashedPassword, data.password)
       if (!valid) return null
-      
+
       // Check if user has an active paid subscription that has expired
       const activeSubscription = await UserSubscription.findOne({
         where: {
@@ -131,7 +133,11 @@ export class UsersResolver {
         throw new Error('No active subscription found')
       }
 
-      if (activeSubscription.plan.price > 0 && activeSubscription.expiresAt && activeSubscription?.expiresAt < new Date()) {
+      if (
+        activeSubscription.plan.price > 0 &&
+        activeSubscription.expiresAt &&
+        activeSubscription?.expiresAt < new Date()
+      ) {
         // Subscription has expired, deactivate it
         activeSubscription.isActive = false
         await activeSubscription.save()

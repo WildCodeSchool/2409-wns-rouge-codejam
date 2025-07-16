@@ -27,7 +27,7 @@ export class UserSubscriptionsResolver {
   async getAllUsersSubscriptions(): Promise<User[]> {
     const users = await User.find({
       relations: ['subscriptions', 'subscriptions.plan'],
-      order: { subscriptions: { subscribedAt: 'DESC' } }
+      order: { subscriptions: { subscribedAt: 'DESC' } },
     })
     return users
   }
@@ -43,10 +43,10 @@ export class UserSubscriptionsResolver {
       throw new Error('User not found')
     }
     const isAdmin = context.user.role === UserRole.ADMIN
-    const where = isAdmin 
-      ? { user: { id: user.id } } 
-      : { 
-          user: { id: user.id }, 
+    const where = isAdmin
+      ? { user: { id: user.id } }
+      : {
+          user: { id: user.id },
           isActive: true,
           // Active subscription can be:
           // - Free plan: unsubscribedAt is null and expiresAt is null
@@ -90,9 +90,9 @@ export class UserSubscriptionsResolver {
       // Verify that the user and plan exist
       const [user, plan] = await Promise.all([
         User.findOne({ where: { id: data.userId } }),
-        Plan.findOne({ where: { id: data.planId } })
+        Plan.findOne({ where: { id: data.planId } }),
       ])
-      
+
       if (!user) {
         throw new Error('User not found')
       }
@@ -119,18 +119,24 @@ export class UserSubscriptionsResolver {
         // For paid plans: mark as unsubscribed but keep active until expiry
         // For free plans: immediately deactivate
         const isFreePlan = existingSubscription.expiresAt === null
-        
+
         await UserSubscription.update(existingSubscription.id, {
           unsubscribedAt: new Date(),
-          isActive: isFreePlan ? false : (existingSubscription.expiresAt && existingSubscription.expiresAt < new Date() ? false : true), // Keep active for paid plans until expiry
+          isActive: isFreePlan
+            ? false
+            : existingSubscription.expiresAt &&
+                existingSubscription.expiresAt < new Date()
+              ? false
+              : true, // Keep active for paid plans until expiry
           expiresAt: isFreePlan ? new Date() : existingSubscription.expiresAt,
         })
       }
 
       // Set expiration based on plan type
-      const expiresAt = plan.price === 0 
-        ? null // Free plan: no expiration
-        : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) // Paid plan: 30 days
+      const expiresAt =
+        plan.price === 0
+          ? null // Free plan: no expiration
+          : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) // Paid plan: 30 days
 
       const newSubscription = new UserSubscription()
       Object.assign(newSubscription, {
@@ -194,22 +200,22 @@ export class UserSubscriptionsResolver {
       if (userId && isAdmin) {
         // Admin functionality: cancel a specific subscription by ID
         subscription = await UserSubscription.findOne({
-          where: { 
-            user: { id: userId }, 
-            isActive: true 
+          where: {
+            user: { id: userId },
+            isActive: true,
           },
           relations: ['user', 'plan'],
         })
-        
+
         if (!subscription) {
           throw new Error('Subscription not found')
         }
       } else {
         // Regular user functionality: cancel their own active subscription
         subscription = await UserSubscription.findOne({
-          where: { 
-            user: { id: context.user.id }, 
-            isActive: true 
+          where: {
+            user: { id: context.user.id },
+            isActive: true,
           },
           relations: ['user', 'plan'],
         })
@@ -239,7 +245,7 @@ export class UserSubscriptionsResolver {
             name: Not('guest'),
           },
         })
-        
+
         if (!defaultPlan) {
           throw new Error('Default plan not found')
         }
@@ -268,7 +274,7 @@ export class UserSubscriptionsResolver {
   ): Promise<boolean> {
     try {
       const subscription = await UserSubscription.findOne({
-        where: [{ id }, {isActive: false}],
+        where: [{ id }, { isActive: false }],
       })
 
       if (!subscription) {

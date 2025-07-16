@@ -236,13 +236,15 @@ function isCodeExecutionResponse(res: unknown): res is CodeExecutionResponse {
   )
 }
 
-export async function subscribeGuest(userId: string): Promise<UserSubscription> {
- const [user, guestPlan]= await Promise.all([
-  User.findOne({where: {id: userId}}),
-  Plan.findOne({where: {name: 'guest'}})
- ])
-  
- if (!guestPlan) {
+export async function subscribeGuest(
+  userId: string,
+): Promise<UserSubscription> {
+  const [user, guestPlan] = await Promise.all([
+    User.findOne({ where: { id: userId } }),
+    Plan.findOne({ where: { name: 'guest' } }),
+  ])
+
+  if (!guestPlan) {
     throw new Error('Guest plan not found')
   }
 
