@@ -60,27 +60,30 @@ export class PlansResolver {
     }
   }
 
-  @Authorized(UserRole.ADMIN)
-  @Mutation(() => Boolean)
-  async deletePlan(@Arg('id', () => ID) id: string): Promise<boolean> {
-    try {
-      const plan = await Plan.findOne({
-        where: { id },
-        relations: ['subscriptions'],
-      })
-      if (!plan) {
-        throw new Error('Plan not found')
-      }
+  /* Delete plan: when a plan is deleted, all subscriptions associated with it are also deleted => 
+  Need to implement a way to handle this, we can't delete a plan that has active subscriptions.
+  */
+  // @Authorized(UserRole.ADMIN)
+  // @Mutation(() => Boolean)
+  // async deletePlan(@Arg('id', () => ID) id: string): Promise<boolean> {
+  //   try {
+  //     const plan = await Plan.findOne({
+  //       where: { id },
+  //       relations: ['subscriptions'],
+  //     })
+  //     if (!plan) {
+  //       throw new Error('Plan not found')
+  //     }
 
-      // Check if plan has active subscriptions
-      if (plan.subscriptions && plan.subscriptions.length > 0) {
-        throw new Error('Cannot delete a plan that has active subscriptions')
-      }
+  //     // Check if plan has active subscriptions
+  //     if (plan.subscriptions && plan.subscriptions.length > 0) {
+  //       throw new Error('Cannot delete a plan that has active subscriptions')
+  //     }
 
-      await plan.remove()
-      return true
-    } catch (err) {
-      throw new Error((err as Error).message)
-    }
-  }
+  //     await plan.remove()
+  //     return true
+  //   } catch (err) {
+  //     throw new Error((err as Error).message)
+  //   }
+  // }
 }
