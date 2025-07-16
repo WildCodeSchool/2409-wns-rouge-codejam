@@ -88,7 +88,7 @@ export class SnippetCreateInput {
   @IsNotEmpty()
   code!: string
 
-  @Field(() => String)
+  @Field(() => Language)
   @IsEnum(Language)
   language!: Language
 }

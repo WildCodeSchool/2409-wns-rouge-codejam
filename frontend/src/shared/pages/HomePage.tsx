@@ -1,10 +1,10 @@
 import { Suspense } from 'react'
-import EditorContainer from '@/features/editor/components/EditorContainer'
+import CodeEditor from '@/features/editor/components/editor/CodeEditor'
 
 const HomePage = () => {
   return (
     <Suspense fallback={<p>Loading...</p>}>
-      <EditorContainer />
+      <CodeEditor />
     </Suspense>
   )
 }

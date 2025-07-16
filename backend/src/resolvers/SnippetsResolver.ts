@@ -52,7 +52,7 @@ export class SnippetsResolver {
     @Arg('data', () => SnippetCreateInput) data: SnippetCreateInput,
   ): Promise<Snippet> {
     const newSnippet = new Snippet()
-    Object.assign(newSnippet, data, { user: context.user })
+    Object.assign(newSnippet, data, { user: { id: context.user.id } })
 
     return await Snippet.save(newSnippet)
   }
@@ -66,7 +66,7 @@ export class SnippetsResolver {
     @Arg('data', () => SnippetUpdateInput) data: SnippetUpdateInput,
   ): Promise<Snippet> {
     const snippet = await Snippet.findOne({
-      where: { id, user: context.user },
+      where: { id, user: { id: context.user.id } },
     })
     if (!snippet) throw new Error('Snippet not found or not owned by user')
 
