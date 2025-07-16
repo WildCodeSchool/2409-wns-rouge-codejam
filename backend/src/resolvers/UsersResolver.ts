@@ -118,6 +118,44 @@ export class UsersResolver {
 
       const valid = await argon2.verify(user.hashedPassword, data.password)
       if (!valid) return null
+      
+      // Check if user has an active paid subscription that has expired
+      const activeSubscription = await UserSubscription.findOne({
+        where: {
+          user: { id: user.id },
+          isActive: true,
+        },
+        relations: ['plan'],
+      })
+      if (!activeSubscription) {
+        throw new Error('No active subscription found')
+      }
+
+      if (activeSubscription.plan.price > 0 && activeSubscription.expiresAt && activeSubscription?.expiresAt < new Date()) {
+        // Subscription has expired, deactivate it
+        activeSubscription.isActive = false
+        await activeSubscription.save()
+
+        // Create a new default subscription
+        const defaultPlan = await Plan.findOne({
+          where: {
+            isDefault: true,
+            name: Not('guest'),
+          },
+        })
+
+        if (defaultPlan) {
+          const newUserSubscription = new UserSubscription()
+          Object.assign(newUserSubscription, {
+            user: user,
+            plan: defaultPlan,
+            subscribedAt: new Date(),
+            isActive: true,
+          })
+
+          await newUserSubscription.save()
+        }
+      }
 
       if (process.env.NODE_ENV !== 'test') {
         createCookieWithJwt(user.id, context)

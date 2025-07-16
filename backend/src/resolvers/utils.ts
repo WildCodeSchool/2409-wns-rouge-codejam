@@ -16,6 +16,8 @@ import {
   SnippetCreateInput,
   SnippetUpdateInput,
 } from '../entities/Snippet'
+import { UserSubscription } from '../entities/UserSubscription'
+import { Plan } from '../entities/Plan'
 
 /**
  * Extracts the user ID from a JWT token.
@@ -232,4 +234,28 @@ function isCodeExecutionResponse(res: unknown): res is CodeExecutionResponse {
     'status' in res &&
     'result' in res
   )
+}
+
+export async function subscribeGuest(userId: string): Promise<UserSubscription> {
+ const [user, guestPlan]= await Promise.all([
+  User.findOne({where: {id: userId}}),
+  Plan.findOne({where: {name: 'guest'}})
+ ])
+  
+ if (!guestPlan) {
+    throw new Error('Guest plan not found')
+  }
+
+  if (!user) {
+    throw new Error('User not found')
+  }
+
+  const newUserSubscription = new UserSubscription()
+  Object.assign(newUserSubscription, {
+    user: user,
+    plan: guestPlan,
+    subscribedAt: new Date(),
+    isActive: true,
+  })
+  return await UserSubscription.save(newUserSubscription)
 }

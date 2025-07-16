@@ -17,10 +17,12 @@ export class UserSubscription extends BaseEntity {
   @Field(() => ID)
   id!: string
 
+  // Can not be null as we need to create a subscription when a user is created
   @Column({ type: 'timestamp' })
   @Field(() => GraphQLDateTime)
   subscribedAt!: Date
 
+  // Is defined when user unsubscribes from a plan
   @Column({ type: 'timestamp', nullable: true })
   @Field(() => GraphQLDateTime, { nullable: true })
   unsubscribedAt?: Date
@@ -29,6 +31,7 @@ export class UserSubscription extends BaseEntity {
   @Field(() => Boolean)
   isActive!: boolean
 
+  // Is defined when user subscribes to a paid plan
   @Column({ type: 'timestamp', nullable: true })
   @Field(() => GraphQLDateTime, { nullable: true })
   expiresAt?: Date

@@ -9,12 +9,12 @@ import {
   getUserExecutionCount,
   getUserFromContext,
   sendCodeToExecute,
+  subscribeGuest,
   updateSnippet,
 } from './utils'
 import { ContextType, UserRole } from '../types'
 import { SnippetCreateInput } from '../entities/Snippet'
-
-const EXECUTION_LIMIT = 50
+import { UserSubscription } from '../entities/UserSubscription'
 
 @Resolver()
 export class ExecutionResolver {
@@ -30,19 +30,35 @@ export class ExecutionResolver {
 
       if (!currentUser) {
         const newGuestUser = await createGuestUser()
-        // TODO: add default plan to the guest user
+        // Subscribe the guest user to the guest plan
+       await subscribeGuest(newGuestUser.id)
         createCookieWithJwt(newGuestUser.id, context)
 
         currentUser = newGuestUser
-      } else {
-        // If user exist, check if the execution number related to the user is less than 50 for this day
-        const currentExecutionCount = await getUserExecutionCount(
-          currentUser.id,
-        )
+      }
 
-        if (currentExecutionCount >= EXECUTION_LIMIT) {
-          throw new Error('Execution limit exceeded')
-        }
+      /* Get user's active subscription to check execution limit
+       => we could use redis cache to avoid fetching subscription for each execution */
+      const activeSubscription = await UserSubscription.findOne({
+        where: {
+          user: { id: currentUser.id },
+          isActive: true,
+        },
+        relations: ['plan'],
+      })
+
+      if (!activeSubscription) {
+        throw new Error('No active subscription found')
+      }
+
+      // Get current execution count for the user
+      const currentExecutionCount = await getUserExecutionCount(
+        currentUser.id,
+      )
+
+      // Check if execution limit is exceeded based on user's plan
+      if (currentExecutionCount >= activeSubscription.plan.executionLimit) {
+        throw new Error('Execution limit exceeded for your current plan')
       }
 
       /*

@@ -53,7 +53,7 @@ export class Plan extends BaseEntity {
   @Field(() => Boolean)
   isDefault!: boolean
 
-  @CreateDateColumn()
+  @CreateDateColumn({ type: 'timestamp' })
   @Field(() => GraphQLDateTime)
   createdAt!: Date
 
