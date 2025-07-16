@@ -18,6 +18,9 @@ import {
 } from '../entities/User'
 import { AuthContextType, ContextType, UserRole } from '../types'
 import { createCookieWithJwt, getUserFromContext } from './utils'
+import { UserSubscription } from '../entities/UserSubscription'
+import { Plan } from '../entities/Plan'
+import { Not } from 'typeorm'
 
 @Resolver()
 export class UsersResolver {
@@ -49,21 +52,23 @@ export class UsersResolver {
   ): Promise<User | null> {
     try {
       // Verify if user already exists (email and username should both be unique)
-      const existingUserByEmail = await User.findOne({
-        where: { email: data.email },
-      })
-      const existingUserByUsername = await User.findOne({
-        where: { username: data.username },
+      const existingUser = await User.findOne({
+        where: [{ email: data.email }, { username: data.username }],
       })
 
-      if (existingUserByEmail && existingUserByUsername) {
-        throw new Error(
-          'A user with this email and this username already exists',
-        )
-      } else if (existingUserByEmail) {
-        throw new Error('A user with this email already exists')
-      } else if (existingUserByUsername) {
-        throw new Error('A user with username already exists')
+      if (existingUser) {
+        if (
+          existingUser.email === data.email &&
+          existingUser.username === data.username
+        ) {
+          throw new Error(
+            'A user with this email and this username already exists',
+          )
+        } else if (existingUser.email === data.email) {
+          throw new Error('A user with this email already exists')
+        } else {
+          throw new Error('A user with this username already exists')
+        }
       }
       const newUser = new User()
       const hashedPassword = await argon2.hash(data.password)
@@ -76,6 +81,24 @@ export class UsersResolver {
       })
 
       const createdUser = await newUser.save()
+
+      // Dynamically assign a default plan to the user
+      const defaultPlan = await Plan.findOne({
+        where: {
+          isDefault: true,
+          name: Not('guest'),
+        },
+      })
+      const newUserSubscription = new UserSubscription()
+      Object.assign(newUserSubscription, {
+        user: createdUser,
+        plan: defaultPlan,
+        subscribedAt: new Date(),
+        isActive: true,
+      })
+
+      await newUserSubscription.save()
+
       return createdUser
     } catch (err) {
       throw new Error((err as Error).message)
@@ -97,6 +120,48 @@ export class UsersResolver {
 
       const valid = await argon2.verify(user.hashedPassword, data.password)
       if (!valid) return null
+
+      // Check if user has an active paid subscription that has expired
+      const activeSubscription = await UserSubscription.findOne({
+        where: {
+          user: { id: user.id },
+          isActive: true,
+        },
+        relations: ['plan'],
+      })
+      if (!activeSubscription) {
+        throw new Error('No active subscription found')
+      }
+
+      if (
+        activeSubscription.plan.price > 0 &&
+        activeSubscription.expiresAt &&
+        activeSubscription?.expiresAt < new Date()
+      ) {
+        // Subscription has expired, deactivate it
+        activeSubscription.isActive = false
+        await activeSubscription.save()
+
+        // Create a new default subscription
+        const defaultPlan = await Plan.findOne({
+          where: {
+            isDefault: true,
+            name: Not('guest'),
+          },
+        })
+
+        if (defaultPlan) {
+          const newUserSubscription = new UserSubscription()
+          Object.assign(newUserSubscription, {
+            user: user,
+            plan: defaultPlan,
+            subscribedAt: new Date(),
+            isActive: true,
+          })
+
+          await newUserSubscription.save()
+        }
+      }
 
       if (process.env.NODE_ENV !== 'test') {
         createCookieWithJwt(user.id, context)

@@ -54,15 +54,25 @@ export enum Language {
 
 export type Mutation = {
   __typename?: 'Mutation'
+  createPlan?: Maybe<Plan>
   createSnippet: Snippet
   createUser?: Maybe<User>
   deleteSnippet: Scalars['Boolean']['output']
   deleteUser: Scalars['Boolean']['output']
+  deleteUserSubscription: Scalars['Boolean']['output']
   execute?: Maybe<Execution>
   login?: Maybe<User>
   logout: Scalars['Boolean']['output']
+  subscribe: UserSubscription
+  unsubscribe: Scalars['Boolean']['output']
+  updatePlan?: Maybe<Plan>
   updateSnippet: Snippet
   updateUser?: Maybe<User>
+  updateUserSubscription?: Maybe<UserSubscription>
+}
+
+export type MutationCreatePlanArgs = {
+  data: PlanCreateInput
 }
 
 export type MutationCreateSnippetArgs = {
@@ -81,6 +91,10 @@ export type MutationDeleteUserArgs = {
   id?: InputMaybe<Scalars['ID']['input']>
 }
 
+export type MutationDeleteUserSubscriptionArgs = {
+  id: Scalars['ID']['input']
+}
+
 export type MutationExecuteArgs = {
   data: SnippetCreateInput
   snippetId?: InputMaybe<Scalars['ID']['input']>
@@ -88,6 +102,19 @@ export type MutationExecuteArgs = {
 
 export type MutationLoginArgs = {
   data: UserLoginInput
+}
+
+export type MutationSubscribeArgs = {
+  data: UserSubscriptionCreateInput
+}
+
+export type MutationUnsubscribeArgs = {
+  userId: Scalars['ID']['input']
+}
+
+export type MutationUpdatePlanArgs = {
+  data: PlanUpdateInput
+  id: Scalars['ID']['input']
 }
 
 export type MutationUpdateSnippetArgs = {
@@ -100,10 +127,43 @@ export type MutationUpdateUserArgs = {
   id?: InputMaybe<Scalars['ID']['input']>
 }
 
+export type MutationUpdateUserSubscriptionArgs = {
+  data: UserSubscriptionUpdateInput
+  id: Scalars['ID']['input']
+}
+
+export type Plan = {
+  __typename?: 'Plan'
+  createdAt: Scalars['DateTime']['output']
+  executionLimit: Scalars['Int']['output']
+  id: Scalars['ID']['output']
+  isDefault: Scalars['Boolean']['output']
+  name: Scalars['String']['output']
+  price: Scalars['Int']['output']
+  subscriptions: Array<UserSubscription>
+}
+
+export type PlanCreateInput = {
+  executionLimit: Scalars['Int']['input']
+  isDefault?: InputMaybe<Scalars['Boolean']['input']>
+  name: Scalars['String']['input']
+  price: Scalars['Int']['input']
+}
+
+export type PlanUpdateInput = {
+  executionLimit?: InputMaybe<Scalars['Int']['input']>
+  isDefault?: InputMaybe<Scalars['Boolean']['input']>
+  name?: InputMaybe<Scalars['String']['input']>
+  price?: InputMaybe<Scalars['Int']['input']>
+}
+
 export type Query = {
   __typename?: 'Query'
+  getActiveSubscription: UserSubscription
   getAllSnippets: Array<Snippet>
+  getAllUsersSubscriptions: Array<User>
   getSnippet?: Maybe<Snippet>
+  plans: Array<Plan>
   user?: Maybe<User>
   users: Array<User>
   whoAmI?: Maybe<User>
@@ -149,6 +209,7 @@ export type User = {
   id: Scalars['ID']['output']
   role: UserRole
   snippets: Array<Snippet>
+  subscriptions: Array<UserSubscription>
   updatedAt: Scalars['DateTime']['output']
   username?: Maybe<Scalars['String']['output']>
 }
@@ -169,6 +230,27 @@ export enum UserRole {
   Admin = 'ADMIN',
   Guest = 'GUEST',
   User = 'USER',
+}
+
+export type UserSubscription = {
+  __typename?: 'UserSubscription'
+  expiresAt?: Maybe<Scalars['DateTime']['output']>
+  id: Scalars['ID']['output']
+  isActive: Scalars['Boolean']['output']
+  plan: Plan
+  subscribedAt: Scalars['DateTime']['output']
+  unsubscribedAt?: Maybe<Scalars['DateTime']['output']>
+  user: User
+}
+
+export type UserSubscriptionCreateInput = {
+  planId: Scalars['ID']['input']
+  userId: Scalars['String']['input']
+}
+
+export type UserSubscriptionUpdateInput = {
+  expiresAt?: InputMaybe<Scalars['DateTime']['input']>
+  id: Scalars['ID']['input']
 }
 
 export type UserUpdateInput = {
