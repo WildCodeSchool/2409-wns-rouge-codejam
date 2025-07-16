@@ -1,37 +1,145 @@
+import { useMutation } from '@apollo/client'
 import { PlayIcon, Share2Icon } from 'lucide-react'
+import { useState } from 'react'
+import { useNavigate, useParams } from 'react-router-dom'
+import { toast } from 'sonner'
+import {
+  adjectives,
+  animals,
+  colors,
+  Config,
+  uniqueNamesGenerator,
+} from 'unique-names-generator'
 
+import { LanguageSelect, Subscribe } from '@/features/editor/components/editor'
+import { useEditorContext } from '@/features/editor/hooks'
+import { Status } from '@/features/editor/types'
+
+import { EXECUTE } from '@/shared/api/execute'
+import { Modal } from '@/shared/components'
 import { Button } from '@/shared/components/ui/button'
+import { Spinner } from '@/shared/components/ui/spinner'
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from '@/shared/components/ui/tooltip'
+import { ExecutionStatus } from '@/shared/gql/graphql'
 
-// !TODO: define custom accent color in taiwind theme...
-const baseButtonStyle =
-  'bg-primary/50 hover:text-accent focus-visible:text-accent border-[#7dd3fc] text-[#7dd3fc] hover:bg-radial hover:to-[#0369A1] hover:from-[#7DD3FC] focus-visible:border-[#7dd3fc] focus-visible:bg-radial focus-visible:to-[#0369A1] focus-visible:from-[#7DD3FC] hover:shadow-xl hover:shadow-[#0369A1] '
+const baseUniqueNameConfig: Config = {
+  dictionaries: [adjectives, colors, animals],
+  separator: ' ',
+}
 
 export default function EditorActions() {
+  const [showModal, setShowModal] = useState(false)
+  const [status, setStatus] = useState<Status>('typing')
+  const [execute] = useMutation(EXECUTE)
+  const { code, language, handleChangeResult, handleChangeStatus } =
+    useEditorContext()
+  const navigate = useNavigate()
+  const { snippetId, snippetSlug } = useParams<{
+    snippetId: string
+    snippetSlug: string
+  }>()
+
+  const isExecuting = status === 'executing'
+  const disabled = !code || isExecuting || status === 'disabled'
+
+  const handleExecute = async (_e: React.MouseEvent<HTMLButtonElement>) => {
+    try {
+      setStatus('executing')
+      const { data } = await execute({
+        variables: {
+          data: {
+            name: snippetSlug ?? uniqueNamesGenerator(baseUniqueNameConfig),
+            code,
+            language: language.toLowerCase(),
+          },
+          snippetId: snippetId,
+        },
+      })
+      if (data) {
+        const {
+          result,
+          status,
+          snippet: { id, slug },
+        } = data.execute
+
+        if (status === ExecutionStatus.Success) {
+          // Updates the URL in the address bar without navigating or re-rendering anything
+          // const newPath = `/editor/${id}/${slug}`
+          // window.history.replaceState(null, '', newPath)
+          navigate(`/editor/${id}/${slug}`, {
+            replace: true,
+          })
+
+          // Update context with the result and status
+          handleChangeResult(result)
+          handleChangeStatus(status)
+          setStatus('typing')
+        } else {
+          // Handle error status
+          handleChangeResult(result)
+          handleChangeStatus(status)
+        }
+      }
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        const executionCountExceeded = error.message.includes(
+          'Execution limit exceeded',
+        )
+        if (executionCountExceeded) {
+          setShowModal(true)
+          setStatus('disabled')
+        } else {
+          console.error('Error executing code:', error.message)
+          toast.error(`Error executing code: ${error.message}`, {
+            description: 'Please try again later.',
+          })
+        }
+      } else {
+        console.error('Unexpected error:', error)
+        toast.error('Execution service temporarily unavailable', {
+          description: 'Please try again later.',
+        })
+      }
+    } finally {
+      setStatus('typing')
+    }
+  }
+
+  const handleCloseModal = () => {
+    setShowModal(false)
+  }
+
   return (
-    <div className="absolute top-4 right-6 z-10 flex flex-col gap-4">
+    <div className="flex gap-4">
+      <LanguageSelect />
+
       <Tooltip>
         <TooltipTrigger asChild>
           <Button
             type="button"
-            aria-label={'Run code'}
-            variant="outline"
-            size="icon"
-            className={baseButtonStyle}
-            onClick={() => {
-              alert('🚧 Running code...')
-            }}
+            aria-label={'Execute current snippet'}
+            aria-disabled={disabled}
+            disabled={disabled}
+            onClick={handleExecute}
+            className="min-w-24"
           >
-            <PlayIcon aria-hidden="true" role="img" size={15} />
+            <span>Run</span>
+            {isExecuting ? (
+              <Spinner size="small" />
+            ) : (
+              <PlayIcon aria-hidden="true" role="img" size={15} />
+            )}
           </Button>
         </TooltipTrigger>
-        <TooltipContent align="end">
-          <p>Run code</p>
-        </TooltipContent>
+        {!isExecuting && (
+          <TooltipContent>
+            <p>Execute current snippet</p>
+          </TooltipContent>
+        )}
       </Tooltip>
 
       <Tooltip>
@@ -40,19 +148,31 @@ export default function EditorActions() {
             type="button"
             aria-label={'Copy url to clipboard'}
             variant="outline"
-            size="icon"
-            className={baseButtonStyle}
+            aria-disabled={!code}
+            disabled={!code}
             onClick={() => {
               alert('🚧 Copy current url to clipboard...')
             }}
+            className="min-w-24"
           >
+            <span>Share</span>
             <Share2Icon aria-hidden="true" role="img" size={15} />
           </Button>
         </TooltipTrigger>
-        <TooltipContent side="bottom" align="end">
+        <TooltipContent>
           <p>Copy url to clipboard</p>
         </TooltipContent>
       </Tooltip>
+
+      {showModal && (
+        <Modal
+          open
+          title="You've reached your daily execution limit!"
+          onOpenChange={handleCloseModal}
+        >
+          <Subscribe onRedirect={handleCloseModal} />
+        </Modal>
+      )}
     </div>
   )
 }

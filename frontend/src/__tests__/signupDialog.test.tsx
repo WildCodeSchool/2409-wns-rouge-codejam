@@ -8,11 +8,12 @@ import {
 import { userEvent } from '@testing-library/user-event'
 import { useState } from 'react'
 import { describe, expect, it, vi } from 'vitest'
+
 import SignUpForm from '@/features/auth/components/SignUpForm'
 import { CREATE_USER } from '@/shared/api/createUser'
 import { CreateUserMutation, UserCreateInput } from '@/shared/gql/graphql'
+import { Modal } from '@/shared/components'
 import { Button } from '@/shared/components/ui/button'
-import Modal from '@/shared/components/Modal'
 import { Toaster } from '@/shared/components/ui/sonner'
 
 const mocks: MockedResponse<CreateUserMutation, { data: UserCreateInput }> = {

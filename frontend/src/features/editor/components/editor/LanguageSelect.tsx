@@ -1,5 +1,4 @@
-import { useState } from 'react'
-
+import { useEditorContext } from '@/features/editor/hooks'
 import {
   Select,
   SelectContent,
@@ -13,6 +12,7 @@ import { Language } from '@/shared/gql/graphql'
 import { getLanguageIcon, getObjectKeys } from '@/shared/lib/utils'
 
 const keys = getObjectKeys(Language)
+
 const languages = keys.map((key) => ({
   id: crypto.randomUUID(),
   label: key,
@@ -21,33 +21,28 @@ const languages = keys.map((key) => ({
 }))
 
 export default function LanguageSelect() {
-  const [language, setLanguage] = useState<Language>(Language.Javascript)
-
-  const handleOnChange = (value: string) => {
-    setLanguage(value as Language)
-  }
+  const { language, handleSelectLanguage } = useEditorContext()
 
   return (
-    <div className="text-accent absolute top-4 right-6 z-10 flex flex-col gap-4">
-      <Select value={language} onValueChange={handleOnChange}>
-        <SelectTrigger className="w-fit cursor-pointer border-0 p-0">
+    <div className="text-primary">
+      <Select value={language} onValueChange={handleSelectLanguage}>
+        <SelectTrigger className="cursor-pointer">
           <SelectValue placeholder="Select a language" />
         </SelectTrigger>
-        <SelectContent align="end">
+        <SelectContent>
           <SelectGroup>
             <SelectLabel>Languages</SelectLabel>
             {languages.map((language) => (
-              <SelectItem
-                key={language.id}
-                value={language.value}
-                className="cursor-pointer"
-              >
-                <img
-                  src={language.icon}
-                  alt={language.value.toLowerCase()}
-                  width={36}
-                  height={36}
-                />
+              <SelectItem key={language.id} value={language.value}>
+                <div className="flex cursor-pointer items-center gap-4">
+                  <span>{language.label}</span>
+                  <img
+                    src={language.icon}
+                    alt={language.value.toLowerCase()}
+                    width={18}
+                    height={18}
+                  />
+                </div>
               </SelectItem>
             ))}
           </SelectGroup>
