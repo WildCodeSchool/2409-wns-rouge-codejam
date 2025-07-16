@@ -1,20 +1,36 @@
+import { types } from "node:util"
+
 /**
  * Format the error message from stderr
  * @param error stderr error message to be formatted
  * @returns
  */
 export function formatStdError(error: string): string[] {
-  // Regex to match ANSI escape codes (used for colored terminal output)
-  const ansiRegex = /\x1b\[[0-9;]*m/g
-  const cleanError = error.replace(ansiRegex, '').trim()
+  const cleanError = stripAnsiCodes(error)
   const lines = cleanError.split('\n')
 
-  /* If it's a Deno error, skip the first two lines (usually contain file path and error indicator)
-  and return the actual error message lines */
-  if (lines[0].includes('error: ')) {
-    return lines.slice(2).filter((line) => line.trim() !== '')
+  if (isDenoError(lines)) {
+    return filterErrorLines(lines.slice(2))
   }
 
-  // For other types of errors, return all non-empty lines
-  return lines.filter((line) => line.trim() !== '')
+  return filterErrorLines(lines)
+}
+
+// Remove ANSI escape codes from error text
+function stripAnsiCodes(text: string): string {
+  const ansiRegex = /\x1b\[[0-9;]*m/g
+  return text.replace(ansiRegex, '').trim()
+}
+
+// Check if the error is a Deno-specific error
+function isDenoError(lines: string[]): boolean {
+  return lines.length > 0 && lines[0].includes("error: The module's source")
+}
+
+// Filter out empty lines and file path references
+function filterErrorLines(lines: string[]): string[] {
+  return lines.filter((line) => {
+    const trimmedLine = line.trim()
+    return trimmedLine !== '' && !trimmedLine.includes('tmp')
+  })
 }
