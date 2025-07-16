@@ -54,7 +54,7 @@ export default function UserInfo({ user }: UserInfoProps) {
             <AvatarFallback>
               {user.username?.slice(0, 2).toUpperCase() ?? 'CJ'}
             </AvatarFallback>
-            <PopoverContent className="grid w-fit">
+            <PopoverContent className="mr-4 grid w-fit">
               <Button onClick={handleLogout}>Sign Out</Button>
             </PopoverContent>
           </PopoverTrigger>
