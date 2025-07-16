@@ -1,5 +1,3 @@
-import { types } from "node:util"
-
 /**
  * Format the error message from stderr
  * @param error stderr error message to be formatted
