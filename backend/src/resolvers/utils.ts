@@ -47,7 +47,10 @@ export async function getUserFromContext(
   if (!token) return null
 
   const userId = getUserIdFromToken(token)
-  const user = await User.findOne({ where: { id: userId } })
+  const user = await User.findOne({
+    relations: { snippets: true },
+    where: { id: userId },
+  })
   if (!user) return null
   return user
 }
