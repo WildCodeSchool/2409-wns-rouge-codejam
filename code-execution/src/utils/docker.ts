@@ -157,7 +157,8 @@ export async function runDockerContainer(
   console.log(chalk.yellow(`Starting container ${containerName}...`))
   // Running the container in detached mode allows to await for the `sh`, making sure the container is started, and avoid raising an error when stopping the container running the `sleep infinity` script
   await sh(
-    `docker run -d --name ${containerName} denoland/deno:2.3.1 /bin/bash -c 'sleep infinity';`,
+    // The `NO_COLOR` environment variable is used to disable colored output in the container (avoid tedious cleanup during error formatting)
+    `docker run -e NO_COLOR=true -d --name ${containerName} denoland/deno:2.3.1 /bin/bash -c 'sleep infinity';`,
   )
 
   const isContainerStarted = await checkIfContainerStarted(containerName)

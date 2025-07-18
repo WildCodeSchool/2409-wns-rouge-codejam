@@ -1,10 +1,11 @@
 import { useSuspenseQuery } from '@apollo/client'
 import { useState } from 'react'
+
 import UserInfo from '@/features/auth/components/UserInfo'
 import SignInForm from '@/features/auth/components/SignInForm'
 import SignUpForm from '@/features/auth/components/SignUpForm'
 import { WHO_AM_I } from '@/shared/api/whoAmI'
-import Modal from '@/shared/components/Modal'
+import { Modal } from '@/shared/components'
 import { Button } from '@/shared/components/ui/button'
 
 export default function NavActions() {

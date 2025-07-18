@@ -18,12 +18,12 @@ const EXECUTION_LIMIT = 50
 
 @Resolver()
 export class ExecutionResolver {
-  @Mutation(() => Execution, { nullable: true })
+  @Mutation(() => Execution)
   async execute(
     @Ctx() context: ContextType,
     @Arg('data', () => SnippetCreateInput) data: SnippetCreateInput,
     @Arg('snippetId', () => ID, { nullable: true }) snippetId?: string,
-  ): Promise<Execution | null> {
+  ): Promise<Execution> {
     try {
       let currentUser = await getUserFromContext(context)
       let snippet
