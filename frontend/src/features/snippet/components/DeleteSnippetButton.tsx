@@ -1,0 +1,78 @@
+import { useMutation } from '@apollo/client'
+import { Trash2 } from 'lucide-react'
+import { DELETE_SNIPPET } from '@/shared/api/deleteSnippet'
+import { ConfirmDialog } from '@/shared/components/ui/confirm-dialog'
+import { toast } from 'sonner'
+
+import type {
+  DeleteSnippetMutation,
+  DeleteSnippetMutationVariables,
+} from '@/shared/gql/graphql'
+
+/** Props du bouton de suppression : on lui passe juste l’id et le nom du snippet */
+export interface DeleteSnippetButtonProps {
+  snippetId: string
+  snippetName: string
+}
+export function DeleteSnippetButton({
+  snippetId,
+  snippetName,
+}: DeleteSnippetButtonProps) {
+  // Mutation Apollo pour supprimer le snippet
+  const [deleteSnippet, { loading }] = useMutation<
+    DeleteSnippetMutation,
+    DeleteSnippetMutationVariables
+  >(DELETE_SNIPPET, {
+    variables: { id: snippetId },
+    update(cache, { data }) {
+      if (data?.deleteSnippet) {
+        // Éviction de l’objet Snippet du cache Apollo
+        cache.evict({
+          id: cache.identify({ __typename: 'Snippet', id: snippetId }),
+        })
+        cache.gc() // nettoyage des références orphelines
+      }
+    },
+    onError(error) {
+      let userMessage =
+        'Une erreur est survenue lors de la suppression du snippet.'
+
+      // Erreurs GraphQL
+      if (error.graphQLErrors.length) {
+        const msg = error.graphQLErrors[0].message.replace(
+          /^GraphQL error: /,
+          '',
+        )
+        userMessage += ` Détail : ${msg}`
+      }
+      // Erreur réseau
+      else if (error.networkError) {
+        userMessage += ' Problème de connexion réseau.'
+      }
+
+      toast.error(userMessage)
+    },
+  })
+
+  return (
+    <ConfirmDialog
+      trigger={
+        <button
+          aria-label={`Supprimer ${snippetName}`}
+          disabled={loading}
+          className="text-destructive hover:text-destructive-foreground cursor-pointer rounded p-2 transition focus:ring-2 focus:outline-none focus-visible:ring-2 disabled:pointer-events-none"
+        >
+          <Trash2 className="h-5 w-5" />
+        </button>
+      }
+      title={`Supprimer le snippet « ${snippetName} » ?`}
+      description="Cette action est irréversible."
+      // Quand on confirme : on lance la mutation
+      onConfirm={() => void deleteSnippet()}
+      confirmLabel="Supprimer"
+      cancelLabel="Annuler"
+    />
+  )
+}
+
+export default DeleteSnippetButton
