@@ -1,4 +1,4 @@
-import { useMutation } from '@apollo/client'
+import { useMutation, type ApolloError } from '@apollo/client'
 import { Trash2 } from 'lucide-react'
 import { DELETE_SNIPPET } from '@/shared/api/deleteSnippet'
 import { ConfirmDialog } from '@/shared/components/ui/confirm-dialog'
@@ -33,16 +33,17 @@ export function DeleteSnippetButton({
         cache.gc() // nettoyage des références orphelines
       }
     },
-    onError(error) {
+    onError(error: ApolloError) {
       let userMessage =
         'Une erreur est survenue lors de la suppression du snippet.'
 
       // Erreurs GraphQL
-      if (error.graphQLErrors.length) {
-        const msg = error.graphQLErrors[0].message.replace(
-          /^GraphQL error: /,
-          '',
-        )
+      if (
+        Array.isArray(error.graphQLErrors) &&
+        error.graphQLErrors.length > 0
+      ) {
+        const gqlErrors = error.graphQLErrors as readonly { message: string }[]
+        const msg = gqlErrors[0].message.replace(/^GraphQL error: /, '')
         userMessage += ` Détail : ${msg}`
       }
       // Erreur réseau
