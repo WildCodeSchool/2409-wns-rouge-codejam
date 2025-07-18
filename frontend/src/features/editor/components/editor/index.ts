@@ -1,7 +1,6 @@
 export * from './config'
 export { default as CodeEditor } from './CodeEditor'
 export { default as EditorActions } from './EditorActions'
-export { default as EditorHeader } from './EditorHeader'
 export { default as EditorOutput } from './EditorOutput'
 export { default as LanguageSelect } from './LanguageSelect'
 export { default as Subscribe } from './Subscribe'

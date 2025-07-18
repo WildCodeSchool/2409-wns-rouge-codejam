@@ -11,7 +11,7 @@ import {
   uniqueNamesGenerator,
 } from 'unique-names-generator'
 
-import { LanguageSelect, Subscribe } from '@/features/editor/components/editor'
+import { Subscribe } from '@/features/editor/components/editor'
 import { useEditorContext } from '@/features/editor/hooks'
 import { Status } from '@/features/editor/types'
 
@@ -114,9 +114,7 @@ export default function EditorActions() {
   }
 
   return (
-    <div className="flex gap-4">
-      <LanguageSelect />
-
+    <div className="flex justify-end gap-4">
       <Tooltip>
         <TooltipTrigger asChild>
           <Button

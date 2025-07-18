@@ -1,7 +1,8 @@
 import {
   CodeEditor,
-  EditorHeader,
+  EditorActions,
   EditorOutput,
+  LanguageSelect,
 } from '@/features/editor/components/editor'
 import { EditorContextProvider } from '@/features/editor/providers'
 
@@ -14,17 +15,27 @@ import {
 export default function EditorPage() {
   return (
     <EditorContextProvider>
-      <div className="grid h-full grid-rows-[auto_1fr] gap-4">
-        <EditorHeader />
-
+      <div className="h-full">
         <ResizablePanelGroup direction="horizontal" className="h-full">
-          <ResizablePanel defaultSize={50} minSize={25} maxSize={75}>
+          <ResizablePanel
+            defaultSize={50}
+            minSize={25}
+            maxSize={75}
+            className="grid grid-rows-[auto_1fr] gap-2"
+          >
+            <LanguageSelect />
             <CodeEditor />
           </ResizablePanel>
 
-          <ResizableHandle withHandle />
+          <ResizableHandle withHandle className="bg-transparent" />
 
-          <ResizablePanel defaultSize={50} maxSize={75} minSize={25}>
+          <ResizablePanel
+            defaultSize={50}
+            maxSize={75}
+            minSize={25}
+            className="grid grid-rows-[auto_1fr] gap-2"
+          >
+            <EditorActions />
             <EditorOutput />
           </ResizablePanel>
         </ResizablePanelGroup>
