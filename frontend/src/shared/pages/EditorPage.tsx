@@ -71,12 +71,13 @@ export default function EditorPage() {
       </div>
     )
   }
-  // !TODO: properly handle error...
   if (error) {
     return (
-      <p>
-        Oops the editor is momentarily unavailable... Please try again later.
-      </p>
+      <div className="grid h-full place-items-center">
+        <p>
+          Oops the editor is momentarily unavailable... Please try again later.
+        </p>
+      </div>
     )
   }
 
