@@ -12,7 +12,7 @@ import {
 } from 'unique-names-generator'
 
 import { Subscribe } from '@/features/editor/components/editor'
-import { Status } from '@/features/editor/types'
+import { EditorUrlParams, Status } from '@/features/editor/types'
 
 import { EXECUTE } from '@/shared/api/execute'
 import { Modal } from '@/shared/components'
@@ -47,10 +47,7 @@ export default function EditorActions({
   const [status, setStatus] = useState<Status>('typing')
   const [execute] = useMutation(EXECUTE)
   const navigate = useNavigate()
-  const { snippetId, snippetSlug } = useParams<{
-    snippetId: string
-    snippetSlug: string
-  }>()
+  const { snippetId, snippetSlug } = useParams<EditorUrlParams>()
 
   const isExecuting = status === 'executing'
   const disabled = !code || isExecuting || status === 'disabled'
