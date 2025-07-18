@@ -49,8 +49,11 @@ export default function UserInfo({ user }: UserInfoProps) {
       <p>{user.username ?? 'codejamer'}</p>
       <Popover>
         <Avatar>
-          <PopoverTrigger className="cursor-pointer">
-            <AvatarImage src="https://github.com/shadcn.png" />
+          <PopoverTrigger
+            aria-label="Show your account settings"
+            className="cursor-pointer"
+          >
+            <AvatarImage src="https://github.com/shadcn.png" alt="" />
             <AvatarFallback>
               {user.username?.slice(0, 2).toUpperCase() ?? 'CJ'}
             </AvatarFallback>

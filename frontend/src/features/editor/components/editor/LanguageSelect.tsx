@@ -31,7 +31,10 @@ export default function LanguageSelect({
   return (
     <div className="text-primary">
       <Select value={language} onValueChange={onChange}>
-        <SelectTrigger className="cursor-pointer">
+        <SelectTrigger
+          aria-label="Select a language"
+          className="cursor-pointer"
+        >
           <SelectValue placeholder="Select a language" />
         </SelectTrigger>
         <SelectContent>
@@ -41,12 +44,7 @@ export default function LanguageSelect({
               <SelectItem key={language.id} value={language.value}>
                 <div className="flex cursor-pointer items-center gap-4">
                   <span>{language.label}</span>
-                  <img
-                    src={language.icon}
-                    alt={language.value.toLowerCase()}
-                    width={18}
-                    height={18}
-                  />
+                  <img src={language.icon} alt="" width={18} height={18} />
                 </div>
               </SelectItem>
             ))}
