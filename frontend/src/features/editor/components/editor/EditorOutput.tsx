@@ -2,16 +2,18 @@ import Editor from '@monaco-editor/react'
 import { twMerge } from 'tailwind-merge'
 
 import { BASE_EDITOR_OPTIONS } from '@/features/editor/components/editor'
-import { useEditorContext } from '@/features/editor/hooks'
 import { Spinner } from '@/shared/components/ui/spinner'
 import { ExecutionStatus } from '@/shared/gql/graphql'
+
+type EditorOutputProps = {
+  result: string
+  status?: ExecutionStatus
+}
 
 // Allocate space for action buttons (share and execute)
 const baseStyle = '[&_.margin]:pt-4 [&_.overflow-guard]:pt-4'
 
-export default function EditorOutput() {
-  const { result, status } = useEditorContext()
-
+export default function EditorOutput({ result, status }: EditorOutputProps) {
   const isError = !!status && status === ExecutionStatus.Error
   const outputValue =
     result || 'Click the "Run code" button to visualize the output here...'

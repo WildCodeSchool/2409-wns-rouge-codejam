@@ -12,7 +12,6 @@ import {
 } from 'unique-names-generator'
 
 import { Subscribe } from '@/features/editor/components/editor'
-import { useEditorContext } from '@/features/editor/hooks'
 import { Status } from '@/features/editor/types'
 
 import { EXECUTE } from '@/shared/api/execute'
@@ -24,19 +23,29 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from '@/shared/components/ui/tooltip'
-import { ExecutionStatus } from '@/shared/gql/graphql'
+import { ExecutionStatus, Language } from '@/shared/gql/graphql'
+
+type EditorActionProps = {
+  code: string
+  language: Language
+  onChangeResult: (nextResult: string) => void
+  onChangeStatus: (nextStatus: ExecutionStatus | undefined) => void
+}
 
 const baseUniqueNameConfig: Config = {
   dictionaries: [adjectives, colors, animals],
   separator: ' ',
 }
 
-export default function EditorActions() {
+export default function EditorActions({
+  code,
+  language,
+  onChangeResult,
+  onChangeStatus,
+}: EditorActionProps) {
   const [showModal, setShowModal] = useState(false)
   const [status, setStatus] = useState<Status>('typing')
   const [execute] = useMutation(EXECUTE)
-  const { code, language, handleChangeResult, handleChangeStatus } =
-    useEditorContext()
   const navigate = useNavigate()
   const { snippetId, snippetSlug } = useParams<{
     snippetId: string
@@ -74,15 +83,11 @@ export default function EditorActions() {
             replace: true,
           })
 
-          // Update context with the result and status
-          handleChangeResult(result)
-          handleChangeStatus(status)
           setStatus('typing')
-        } else {
-          // Handle error status
-          handleChangeResult(result)
-          handleChangeStatus(status)
         }
+        // Update context with the result and status
+        onChangeResult(result)
+        onChangeStatus(status)
       }
     } catch (error: unknown) {
       if (error instanceof Error) {

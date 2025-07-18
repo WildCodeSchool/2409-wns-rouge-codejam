@@ -1,4 +1,3 @@
-import { useEditorContext } from '@/features/editor/hooks'
 import {
   Select,
   SelectContent,
@@ -11,6 +10,11 @@ import {
 import { Language } from '@/shared/gql/graphql'
 import { getLanguageIcon, getObjectKeys } from '@/shared/lib/utils'
 
+type LanguageSelectProps = {
+  language: Language
+  onChange: (nextLanguage: string) => void
+}
+
 const keys = getObjectKeys(Language)
 
 const languages = keys.map((key) => ({
@@ -20,12 +24,13 @@ const languages = keys.map((key) => ({
   icon: getLanguageIcon(Language[key]),
 }))
 
-export default function LanguageSelect() {
-  const { language, handleSelectLanguage } = useEditorContext()
-
+export default function LanguageSelect({
+  language,
+  onChange,
+}: LanguageSelectProps) {
   return (
     <div className="text-primary">
-      <Select value={language} onValueChange={handleSelectLanguage}>
+      <Select value={language} onValueChange={onChange}>
         <SelectTrigger className="cursor-pointer">
           <SelectValue placeholder="Select a language" />
         </SelectTrigger>

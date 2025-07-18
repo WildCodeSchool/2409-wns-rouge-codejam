@@ -3,13 +3,22 @@ import { editor } from 'monaco-editor'
 import { useRef } from 'react'
 
 import { BASE_EDITOR_OPTIONS } from '@/features/editor/components/editor'
-import { useEditorContext } from '@/features/editor/hooks'
 import { Spinner } from '@/shared/components/ui/spinner'
+import { Language } from '@/shared/gql/graphql'
+
+type CodeEditorProps = {
+  code: string
+  language: Language
+  onChange: (nextCode?: string) => void
+}
 
 const defaultValue = '// Write your code here...'
 
-export default function CodeEditor() {
-  const { code, language, handleChangeCode } = useEditorContext()
+export default function CodeEditor({
+  code,
+  language,
+  onChange,
+}: CodeEditorProps) {
   const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null)
 
   // Focus the editor when it mounts and set the cursor position at the end of the code
@@ -17,14 +26,22 @@ export default function CodeEditor() {
     editorInstance: editor.IStandaloneCodeEditor,
   ) => {
     editorRef.current = editorInstance
+
+    // Focus the editor and
     editorInstance.focus()
+
+    // Set the cursor position at the end of the code
+    const model = editorInstance.getModel()
+    if (!model) return
+    const lastLine = model.getLineCount()
     const position = editorInstance.getPosition()
     if (position) {
+      const nextLinePosition = lastLine - 1
       const nextColumnPosition =
         (code.length > 0 ? code : defaultValue).length + 1
       editorInstance.setPosition({
-        lineNumber: position.lineNumber,
-        column: nextColumnPosition, // set cursor at the end of the default text
+        lineNumber: nextLinePosition,
+        column: nextColumnPosition,
       })
     }
   }
@@ -36,7 +53,7 @@ export default function CodeEditor() {
         defaultValue={defaultValue}
         language={language.toLowerCase()}
         value={code}
-        onChange={handleChangeCode}
+        onChange={onChange}
         onMount={handleOnEditorMount}
         loading={<Spinner />}
         theme="vs-dark"

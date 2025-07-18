@@ -3,14 +3,17 @@ import { twMerge } from 'tailwind-merge'
 
 import { Language } from '@/shared/gql/graphql'
 
+import javascriptIcon from '/assets/icons/javascript.svg'
+import typescriptIcon from '/assets/icons/typescript.svg'
+
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
 export function getLanguageIcon(language: Language) {
   const languageIcons: Record<Language, string> = {
-    [Language.Javascript]: '/assets/icons/javascript.svg',
-    [Language.Typescript]: '/assets/icons/typescript.svg',
+    [Language.Javascript]: javascriptIcon,
+    [Language.Typescript]: typescriptIcon,
   }
   if (!(language in languageIcons)) {
     throw new Error(
