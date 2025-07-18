@@ -21,7 +21,7 @@ const App = () => {
         <Routes>
           <Route path="/" Component={Layout}>
             <Route index Component={HomePage} />
-            <Route path="/:snippetId/:slug" Component={HomePage} />
+            <Route path="/:snippetId/:snippetSlug" Component={HomePage} />
           </Route>
           <Route path="*" Component={HomePage} />
         </Routes>
