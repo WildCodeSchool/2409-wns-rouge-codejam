@@ -13,6 +13,8 @@ import { GET_ALL_SNIPPETS } from '../../../shared/api/getUserSnippets'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import { Pencil, Plus, Trash } from 'lucide-react'
+import CreateSnippetModal from '@/features/editor/components/CreateSnippetModal'
+import Modal from '@/shared/components/Modal'
 
 interface Snippet {
   id: string
@@ -28,6 +30,7 @@ export default function EditorSidebar() {
   const location = useLocation()
   const snippets = data.getAllSnippets
   const [activeSnippetId, setActiveSnippetId] = useState<string | null>(null)
+  const [isModalOpen, setIsModalOpen] = useState(false)
 
   // On mount and when location/snippets change, sync activeSnippetId with URL or default to first snippet
   useEffect(() => {
@@ -60,7 +63,12 @@ export default function EditorSidebar() {
               {snippets.length > 0 && (
                 <SidebarMenu className="gap-3">
                   <SidebarMenuItem key="add-new-snippet">
-                    <SidebarMenuButton className="group flex cursor-pointer items-center justify-center">
+                    <SidebarMenuButton
+                      className="group flex cursor-pointer items-center justify-center"
+                      onClick={() => {
+                        setIsModalOpen(true)
+                      }}
+                    >
                       <Plus className="h-4 w-4 text-neutral-300 group-hover:text-neutral-100" />
                     </SidebarMenuButton>
                   </SidebarMenuItem>
@@ -98,6 +106,17 @@ export default function EditorSidebar() {
           </SidebarGroup>
         </SidebarContent>
       </Sidebar>
+      <Modal
+        title="Create Snippet"
+        open={isModalOpen}
+        onOpenChange={setIsModalOpen}
+      >
+        <CreateSnippetModal
+          onClose={() => {
+            setIsModalOpen(false)
+          }}
+        />
+      </Modal>
     </SidebarProvider>
   )
 }

@@ -202,7 +202,6 @@ const SignUpForm = (props: SignUpFormPropsType) => {
           }}
         />
         <Button
-          data-testid="submit-signup"
           id="signup-submit"
           className="w-full"
           type="submit"

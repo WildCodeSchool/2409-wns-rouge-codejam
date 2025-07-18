@@ -41,6 +41,7 @@ export class SnippetsResolver {
     return Snippet.find({
       where,
       relations,
+      order: { updatedAt: 'DESC' },
     })
   }
 
