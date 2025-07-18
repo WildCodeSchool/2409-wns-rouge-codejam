@@ -13,24 +13,28 @@ import {
   SnippetUpdateInput,
 } from '../entities/Snippet'
 import { AuthContextType, UserRole } from '../types'
+import { getUserFromContext } from './utils'
 
 @Resolver()
 export class SnippetsResolver {
-  // Query to get snippet by ID
-  @Authorized(UserRole.ADMIN, UserRole.USER)
+  // Public route to allow code sharing between users regardless their role
   @Query(() => Snippet, { nullable: true })
   async getSnippet(
     @Ctx() context: AuthContextType,
     @Arg('id', () => ID) id: string,
   ): Promise<Snippet | null> {
-    const isAdmin = context.user.role === UserRole.ADMIN
-    const where = isAdmin ? {} : { user: { id: context.user.id }, id }
+    const currentUser = await getUserFromContext(context)
+    const isAdmin = currentUser && currentUser.role === UserRole.ADMIN
     const relations = isAdmin ? ['user'] : []
-    return Snippet.findOne({
-      where,
+    const snippet = await Snippet.findOne({
+      where: {
+        id,
+      },
       relations,
     })
+    return snippet
   }
+
   // Query to get all snippets
   @Authorized(UserRole.ADMIN, UserRole.USER)
   @Query(() => [Snippet])
