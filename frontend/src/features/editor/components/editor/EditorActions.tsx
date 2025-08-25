@@ -15,6 +15,7 @@ import { Subscribe } from '@/features/editor/components/editor'
 import { EditorUrlParams, Status } from '@/features/editor/types'
 
 import { EXECUTE } from '@/shared/api/execute'
+import { WHO_AM_I } from '@/shared/api/whoAmI'
 import { Modal } from '@/shared/components'
 import { Button } from '@/shared/components/ui/button'
 import { Spinner } from '@/shared/components/ui/spinner'
@@ -24,12 +25,13 @@ import {
   TooltipTrigger,
 } from '@/shared/components/ui/tooltip'
 import { ExecutionStatus, Language } from '@/shared/gql/graphql'
+import { Skeleton } from '@/shared/components/ui/skeleton'
 
 type EditorActionProps = {
   code: string
   language: Language
-  onChangeResult: (nextResult: string) => void
-  onChangeStatus: (nextStatus: ExecutionStatus | undefined) => void
+  onChangeOutput: (nextOutput: string) => void
+  onChangeStatus: (nextStatus?: ExecutionStatus) => void
 }
 
 const baseUniqueNameConfig: Config = {
@@ -40,7 +42,7 @@ const baseUniqueNameConfig: Config = {
 export default function EditorActions({
   code,
   language,
-  onChangeResult,
+  onChangeOutput,
   onChangeStatus,
 }: EditorActionProps) {
   const [showModal, setShowModal] = useState(false)
@@ -64,6 +66,7 @@ export default function EditorActions({
           },
           snippetId: snippetId,
         },
+        refetchQueries: [{ query: WHO_AM_I }],
       })
       if (data) {
         const {
@@ -74,8 +77,6 @@ export default function EditorActions({
 
         if (status === ExecutionStatus.Success) {
           // Updates the URL in the address bar without navigating or re-rendering anything
-          // const newPath = `/editor/${id}/${slug}`
-          // window.history.replaceState(null, '', newPath)
           navigate(`/editor/${id}/${slug}`, {
             replace: true,
           })
@@ -83,7 +84,7 @@ export default function EditorActions({
           setStatus('typing')
         }
         // Update context with the result and status
-        onChangeResult(result)
+        onChangeOutput(result)
         onChangeStatus(status)
       }
     } catch (error: unknown) {
@@ -173,6 +174,15 @@ export default function EditorActions({
           <Subscribe onRedirect={handleCloseModal} />
         </Modal>
       )}
+    </div>
+  )
+}
+
+export function EditorActionsSkeleton() {
+  return (
+    <div className="ml-auto flex justify-end gap-4">
+      <Skeleton className="h-9 w-24" />
+      <Skeleton className="h-9 w-24" />
     </div>
   )
 }

@@ -1,72 +1,58 @@
-import { useSuspenseQuery } from '@apollo/client'
-import { useState } from 'react'
-
-import UserInfo from '@/features/auth/components/UserInfo'
-import SignInForm from '@/features/auth/components/SignInForm'
-import SignUpForm from '@/features/auth/components/SignUpForm'
-import { WHO_AM_I } from '@/shared/api/whoAmI'
+import { SignInForm, SignUpForm } from '@/features/auth/components'
+import { useActions } from '@/features/auth/hooks'
 import { Modal } from '@/shared/components'
 import { Button } from '@/shared/components/ui/button'
+import { Skeleton } from '@/shared/components/ui/skeleton'
 
 export default function NavActions() {
-  const [isSignIn, setIsSignIn] = useState<boolean>()
-  const { data: { whoAmI: user } = {} } = useSuspenseQuery(WHO_AM_I)
-
-  const isUserLoggedIn = user !== null && user !== undefined
-  const showModal = isSignIn !== undefined
-
-  const closeModal = () => {
-    setIsSignIn(undefined)
-  }
+  const { modal, closeModal, openSignIn, openSignUp } = useActions()
 
   return (
-    <div className="flex flex-row items-center gap-4">
-      {isUserLoggedIn ? (
-        <UserInfo user={user} />
-      ) : (
-        <>
-          <Button
-            variant="outline"
-            onClick={() => {
-              setIsSignIn(true)
-            }}
-          >
-            Sign In
-          </Button>
-          <Button
-            data-testid="navbar-signup"
-            onClick={() => {
-              setIsSignIn(false)
-            }}
-          >
-            Sign Up
-          </Button>
-        </>
-      )}
+    <>
+      <Button
+        variant="outline"
+        data-testid="navbar-signin"
+        onClick={openSignIn}
+        className="min-w-20"
+      >
+        Sign In
+      </Button>
+      <Button
+        data-testid="navbar-signup"
+        onClick={openSignUp}
+        className="min-w-20"
+      >
+        Sign Up
+      </Button>
 
-      {showModal && (
+      {modal && (
         <Modal
           open
-          title={isSignIn ? 'Sign In' : 'Sign Up'}
+          title={modal === 'signIn' ? 'Sign In' : 'Sign Up'}
           onOpenChange={closeModal}
         >
-          {isSignIn ? (
-            <SignInForm
-              onSignUp={() => {
-                setIsSignIn(false)
-              }}
-              callbackOnSubmit={closeModal}
-            />
+          {modal === 'signIn' ? (
+            <SignInForm onSignUp={openSignUp} callbackOnSubmit={closeModal} />
           ) : (
             <SignUpForm
-              onSignIn={() => {
-                setIsSignIn(true)
+              onSignIn={openSignIn}
+              callbackOnSubmit={() => {
+                closeModal()
+                openSignIn()
               }}
-              callbackOnSubmit={closeModal}
             />
           )}
         </Modal>
       )}
+    </>
+  )
+}
+
+export function NavActionsSkeleton() {
+  return (
+    <div className="flex flex-row items-center gap-4">
+      <Skeleton className="h-8 w-20" />
+      <Skeleton className="h-8 w-20" />
     </div>
   )
 }

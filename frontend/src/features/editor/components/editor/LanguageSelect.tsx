@@ -7,6 +7,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/shared/components/ui/select'
+import { Skeleton } from '@/shared/components/ui/skeleton'
 import { Language } from '@/shared/gql/graphql'
 import { getLanguageIcon, getObjectKeys } from '@/shared/lib/utils'
 
@@ -33,7 +34,7 @@ export default function LanguageSelect({
       <Select value={language} onValueChange={onChange}>
         <SelectTrigger
           aria-label="Select a language"
-          className="cursor-pointer"
+          className="min-w-40 cursor-pointer"
         >
           <SelectValue placeholder="Select a language" />
         </SelectTrigger>
@@ -53,4 +54,8 @@ export default function LanguageSelect({
       </Select>
     </div>
   )
+}
+
+export function LanguageSelectSkeleton() {
+  return <Skeleton className="h-9 w-40" />
 }

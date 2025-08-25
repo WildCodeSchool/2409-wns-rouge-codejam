@@ -108,6 +108,7 @@
 
 @plugin 'tailwindcss-animate';
 
+/* Use the @custom-variant directive to add a custom variant to the project */
 @custom-variant dark (&:is(.dark *));
 
 :root {
@@ -226,6 +227,17 @@
   --font-editor: 'Fira Code VF', 'Fira Code', monospace;
 }
 
+/* Use the @theme directive to define project's custom design tokens, like fonts, colors, and breakpoints */
+@theme {
+  --animate-shimmer: shimmer 1s infinite;
+  @keyframes shimmer {
+    to {
+      background-position-x: 0%;
+    }
+  }
+}
+
+/* Use the @layer base directive to add default styles for specific HTML elements */
 @layer base {
   * {
     @apply border-border outline-ring/50;
@@ -233,4 +245,17 @@
   body {
     @apply bg-background text-foreground font-main;
   }
+}
+
+/* Use the @layer component directive to add more complicated classes that can still be overriden with utility classes */
+@layer component {
+  .shimmer {
+    background: linear-gradient(-45deg, #eee 40%, #fafafa 50%, #eee 60%);
+    background-size: 300%;
+    background-position-x: 100%;
+  }
+}
+/* Use the @utility directive to add custom utilities to your project that work with variants like hover, focus and lg */
+@utility gradient-accent {
+  @apply bg-gradient-to-r from-[#0369A1] via-[#7DD3FC] to-[#0369A1];
 }

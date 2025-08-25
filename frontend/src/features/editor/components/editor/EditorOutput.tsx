@@ -1,18 +1,19 @@
 import { twMerge } from 'tailwind-merge'
 
+import { Skeleton } from '@/shared/components/ui/skeleton'
 import { ExecutionStatus } from '@/shared/gql/graphql'
 
 type EditorOutputProps = {
-  result: string
+  output: string
   status?: ExecutionStatus
 }
 
 const baseStyle = 'font-editor w-full resize-none bg-[#1e1e1e] p-4 text-sm '
 
-export default function EditorOutput({ result, status }: EditorOutputProps) {
+export default function EditorOutput({ output, status }: EditorOutputProps) {
   const isError = !!status && status === ExecutionStatus.Error
   const outputValue =
-    result || 'Click the "Run code" button to visualize the output here...'
+    output || 'Click the "Run code" button to visualize the output here...'
 
   return (
     <div className="flex h-full overflow-hidden rounded-md">
@@ -30,4 +31,8 @@ export default function EditorOutput({ result, status }: EditorOutputProps) {
       />
     </div>
   )
+}
+
+export function EditorOutputSkeleton() {
+  return <Skeleton className="h-full bg-[#1e1e1e]" />
 }

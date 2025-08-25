@@ -1,20 +1,34 @@
-import { Suspense } from 'react'
-import NavActions from '@/features/auth/components/NavActions'
-import { Spinner } from '@/shared/components/ui/spinner'
+import {
+  NavActions,
+  NavActionsSkeleton,
+  UserInfo,
+  UserInfoSkeleton,
+} from '@/features/auth/components'
+import { useAuth } from '@/features/auth/hooks'
 
-const NavBar = () => {
+export default function NavBar() {
+  const { user, loading, logout } = useAuth()
+
+  const navContent = (() => {
+    if (loading) {
+      return user?.username ? <UserInfoSkeleton /> : <NavActionsSkeleton />
+    }
+    return user?.username ? (
+      <UserInfo userName={user.username} onSignOut={logout} />
+    ) : (
+      <NavActions />
+    )
+  })()
+
   return (
-    <div className="flex justify-between rounded-xs bg-gradient-to-r from-[#0369A1] via-[#7DD3FC] to-[#0369A1] pb-0.5">
+    <div className="gradient-accent flex justify-between rounded-xs pb-0.5">
       <header className="bg-background flex h-full w-full flex-row items-center justify-between pb-3">
-        <h1 className="bg-gradient-to-r from-[#0369A1] via-[#7DD3FC] to-[#0369A1] bg-clip-text text-3xl font-bold tracking-wide text-transparent">
+        <h1 className="gradient-accent bg-clip-text text-3xl font-bold tracking-wide text-transparent">
           CodeJam
         </h1>
-        <Suspense fallback={<Spinner className="min-h-8" />}>
-          <NavActions />
-        </Suspense>
+
+        <div className="flex flex-row items-center gap-4">{navContent}</div>
       </header>
     </div>
   )
 }
-
-export default NavBar

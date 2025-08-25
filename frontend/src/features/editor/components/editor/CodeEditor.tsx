@@ -3,7 +3,7 @@ import { editor } from 'monaco-editor'
 import { useRef } from 'react'
 
 import { BASE_EDITOR_OPTIONS } from '@/features/editor/components/editor'
-import { Spinner } from '@/shared/components/ui/spinner'
+import { Skeleton } from '@/shared/components/ui/skeleton'
 import { Language } from '@/shared/gql/graphql'
 
 type CodeEditorProps = {
@@ -11,8 +11,6 @@ type CodeEditorProps = {
   language: Language
   onChange: (nextCode?: string) => void
 }
-
-const defaultValue = '// Write your code here...'
 
 export default function CodeEditor({
   code,
@@ -37,8 +35,7 @@ export default function CodeEditor({
     const position = editorInstance.getPosition()
     if (position) {
       const nextLinePosition = lastLine - 1
-      const nextColumnPosition =
-        (code.length > 0 ? code : defaultValue).length + 1
+      const nextColumnPosition = code.length > 0 ? code.length + 1 : 0
       editorInstance.setPosition({
         lineNumber: nextLinePosition,
         column: nextColumnPosition,
@@ -50,12 +47,11 @@ export default function CodeEditor({
     <div className="flex h-full overflow-hidden rounded-md border">
       <Editor
         defaultLanguage="javascript"
-        defaultValue={defaultValue}
         language={language.toLowerCase()}
         value={code}
         onChange={onChange}
         onMount={handleOnEditorMount}
-        loading={<Spinner />}
+        loading={<Skeleton className="h-full w-full" />}
         theme="vs-dark"
         options={{
           ...BASE_EDITOR_OPTIONS,
@@ -66,4 +62,8 @@ export default function CodeEditor({
       />
     </div>
   )
+}
+
+export function CodeEditorSkeleton() {
+  return <Skeleton className="h-full" />
 }
