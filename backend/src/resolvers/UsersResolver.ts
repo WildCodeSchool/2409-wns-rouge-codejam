@@ -16,11 +16,16 @@ import {
   UserLoginInput,
   UserUpdateInput,
 } from '../entities/User'
-import { AuthContextType, ContextType, UserRole } from '../types'
+import {
+  AuthContextType,
+  CancellationReason,
+  ContextType,
+  UserRole,
+} from '../types'
 import { createCookieWithJwt, getUserFromContext } from './utils'
 import { UserSubscription } from '../entities/UserSubscription'
 import { Plan } from '../entities/Plan'
-import { Not } from 'typeorm'
+import { IsNull, LessThanOrEqual, MoreThan, Not } from 'typeorm'
 
 @Resolver()
 export class UsersResolver {
@@ -82,7 +87,7 @@ export class UsersResolver {
 
       const createdUser = await newUser.save()
 
-      // Dynamically assign a default plan to the user
+      // Assign a default free plan to the user
       const defaultPlan = await Plan.findOne({
         where: {
           isDefault: true,
@@ -94,7 +99,6 @@ export class UsersResolver {
         user: createdUser,
         plan: defaultPlan,
         subscribedAt: new Date(),
-        isActive: true,
       })
 
       await newUserSubscription.save()
@@ -121,45 +125,53 @@ export class UsersResolver {
       const valid = await argon2.verify(user.hashedPassword, data.password)
       if (!valid) return null
 
-      // Check if user has an active paid subscription that has expired
+      // Check user active subscription
+      const now = new Date()
+
+      // Find the currently active subscription (paid or free)
       const activeSubscription = await UserSubscription.findOne({
-        where: {
-          user: { id: user.id },
-          isActive: true,
-        },
-        relations: ['plan'],
-      })
-      if (!activeSubscription) {
-        throw new Error('No active subscription found')
-      }
-
-      if (
-        activeSubscription.plan.price > 0 &&
-        activeSubscription.expiresAt &&
-        activeSubscription?.expiresAt < new Date()
-      ) {
-        // Subscription has expired, deactivate it
-        activeSubscription.isActive = false
-        await activeSubscription.save()
-
-        // Create a new default subscription
-        const defaultPlan = await Plan.findOne({
-          where: {
-            isDefault: true,
-            name: Not('guest'),
+        where: [
+          { user: { id: user.id }, expiresAt: MoreThan(now) }, // can be null if subscription is inactive
+          {
+            user: { id: user.id },
+            expiresAt: IsNull(),
+            plan: { isDefault: true },
           },
+        ],
+        relations: ['plan', 'user'],
+        order: { subscribedAt: 'DESC' },
+      })
+
+      // If an active subscription isn't found, check for an expired paid one to trigger a one-time downgrade.
+      if (!activeSubscription) {
+        const expiredPaidSubscription = await UserSubscription.findOne({
+          where: {
+            user: { id: user.id },
+            expiresAt: LessThanOrEqual(now),
+            plan: { isDefault: false },
+            cancellationReason: IsNull(), // Find only if it hasn't been marked as expired yet
+          },
+          relations: ['plan', 'user'],
+          order: { subscribedAt: 'DESC' },
         })
 
-        if (defaultPlan) {
-          const newUserSubscription = new UserSubscription()
-          Object.assign(newUserSubscription, {
-            user: user,
-            plan: defaultPlan,
-            subscribedAt: new Date(),
-            isActive: true,
-          })
+        // If an expired paid subscription is found, perform the downgrade
+        if (expiredPaidSubscription) {
+          const defaultPlan = await Plan.findOne({ where: { isDefault: true } })
 
-          await newUserSubscription.save()
+          if (defaultPlan) {
+            const newUserSubscription = new UserSubscription()
+            Object.assign(newUserSubscription, {
+              user: user,
+              plan: defaultPlan,
+            })
+            await newUserSubscription.save()
+
+            expiredPaidSubscription.cancellationReason =
+              CancellationReason.EXPIRED
+            expiredPaidSubscription.terminatedAt = now
+            await expiredPaidSubscription.save()
+          }
         }
       }
 

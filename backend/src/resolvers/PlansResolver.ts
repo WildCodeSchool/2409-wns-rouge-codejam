@@ -14,10 +14,10 @@ export class PlansResolver {
   }
 
   @Authorized(UserRole.ADMIN)
-  @Mutation(() => Plan, { nullable: true })
+  @Mutation(() => Plan)
   async createPlan(
     @Arg('data', () => PlanCreateInput) data: PlanCreateInput,
-  ): Promise<Plan | null> {
+  ): Promise<Plan> {
     try {
       // Verify if plan with same name already exists
       const existingPlan = await Plan.findOne({
@@ -39,11 +39,11 @@ export class PlansResolver {
   }
 
   @Authorized(UserRole.ADMIN)
-  @Mutation(() => Plan, { nullable: true })
+  @Mutation(() => Plan)
   async updatePlan(
     @Arg('id', () => ID) id: string,
     @Arg('data', () => PlanUpdateInput) data: PlanUpdateInput,
-  ): Promise<Plan | null> {
+  ): Promise<Plan> {
     try {
       const plan = await Plan.findOne({
         where: { id },
@@ -56,34 +56,11 @@ export class PlansResolver {
       const updatedPlan = await plan.save()
       return updatedPlan
     } catch (err) {
-      throw new Error((err as Error).message)
+      throw new Error(err instanceof Error ? err.message : JSON.stringify(err))
     }
   }
 
   /* Delete plan: when a plan is deleted, all subscriptions associated with it are also deleted => 
-  Need to implement a way to handle this, we can't delete a plan that has active subscriptions.
+    we shouldn't delete plans but only update
   */
-  // @Authorized(UserRole.ADMIN)
-  // @Mutation(() => Boolean)
-  // async deletePlan(@Arg('id', () => ID) id: string): Promise<boolean> {
-  //   try {
-  //     const plan = await Plan.findOne({
-  //       where: { id },
-  //       relations: ['subscriptions'],
-  //     })
-  //     if (!plan) {
-  //       throw new Error('Plan not found')
-  //     }
-
-  //     // Check if plan has active subscriptions
-  //     if (plan.subscriptions && plan.subscriptions.length > 0) {
-  //       throw new Error('Cannot delete a plan that has active subscriptions')
-  //     }
-
-  //     await plan.remove()
-  //     return true
-  //   } catch (err) {
-  //     throw new Error((err as Error).message)
-  //   }
-  // }
 }

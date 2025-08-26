@@ -257,7 +257,6 @@ export async function subscribeGuest(
     user: user,
     plan: guestPlan,
     subscribedAt: new Date(),
-    isActive: true,
   })
   return await UserSubscription.save(newUserSubscription)
 }

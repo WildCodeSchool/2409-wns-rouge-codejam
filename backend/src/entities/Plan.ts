@@ -8,14 +8,16 @@ import {
   Entity,
   OneToMany,
   PrimaryGeneratedColumn,
+  UpdateDateColumn,
 } from 'typeorm'
 import { UserSubscription } from './UserSubscription'
 
 const PLAN_NAME_CONSTRAINTS = {
-  minLength: 1,
+  minLength: 3,
   maxLength: 60,
 }
 
+// Price is in cents to avoid floating point arithmetic issues.
 const PRICE_CONSTRAINTS = {
   min: 0,
   max: 999999,
@@ -53,9 +55,13 @@ export class Plan extends BaseEntity {
   @Field(() => Boolean)
   isDefault!: boolean
 
-  @CreateDateColumn({ type: 'timestamp' })
+  @CreateDateColumn()
   @Field(() => GraphQLDateTime)
   createdAt!: Date
+
+  @UpdateDateColumn({ type: 'timestamp' })
+  @Field(() => GraphQLDateTime)
+  updatedAt!: Date
 
   @OneToMany(() => UserSubscription, (subscription) => subscription.plan)
   @Field(() => [UserSubscription])
@@ -78,26 +84,26 @@ export class PlanCreateInput {
   @Max(EXECUTION_LIMIT_CONSTRAINTS.max)
   executionLimit!: number
 
-  @Field(() => Boolean, { nullable: true })
+  @Field(() => Boolean)
   isDefault?: boolean
 }
 
 @InputType()
 export class PlanUpdateInput {
-  @Field(() => String, { nullable: true })
+  @Field(() => String)
   @Length(PLAN_NAME_CONSTRAINTS.minLength, PLAN_NAME_CONSTRAINTS.maxLength)
   name?: string
 
-  @Field(() => Int, { nullable: true })
+  @Field(() => Int)
   @Min(PRICE_CONSTRAINTS.min)
   @Max(PRICE_CONSTRAINTS.max)
   price?: number
 
-  @Field(() => Int, { nullable: true })
+  @Field(() => Int)
   @Min(EXECUTION_LIMIT_CONSTRAINTS.min)
   @Max(EXECUTION_LIMIT_CONSTRAINTS.max)
   executionLimit?: number
 
-  @Field(() => Boolean, { nullable: true })
+  @Field(() => Boolean)
   isDefault?: boolean
 }
