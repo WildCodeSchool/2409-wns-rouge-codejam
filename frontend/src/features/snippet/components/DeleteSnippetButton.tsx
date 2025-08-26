@@ -19,7 +19,7 @@ export function DeleteSnippetButton({
   snippetName,
 }: DeleteSnippetButtonProps) {
   // Mutation Apollo pour supprimer le snippet
-  const [deleteSnippet, { loading }] = useMutation<
+  const mutation = useMutation<
     DeleteSnippetMutation,
     DeleteSnippetMutationVariables
   >(DELETE_SNIPPET, {
@@ -42,7 +42,9 @@ export function DeleteSnippetButton({
         Array.isArray(error.graphQLErrors) &&
         error.graphQLErrors.length > 0
       ) {
-        const gqlErrors = error.graphQLErrors as readonly { message: string }[]
+        const gqlErrors = error.graphQLErrors as readonly {
+          message: string
+        }[]
         const msg = gqlErrors[0].message.replace(/^GraphQL error: /, '')
         userMessage += ` Détail : ${msg}`
       }
@@ -54,6 +56,10 @@ export function DeleteSnippetButton({
       toast.error(userMessage)
     },
   })
+
+  // Typage sûr de la fonction deleteSnippet
+  const deleteSnippet = (): Promise<void> => mutation[0]().then(() => void 0)
+  const loading = mutation[1].loading
 
   return (
     <ConfirmDialog
