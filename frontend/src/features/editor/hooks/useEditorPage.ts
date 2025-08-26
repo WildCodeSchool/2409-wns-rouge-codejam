@@ -12,13 +12,15 @@ export default function useEditorPage(snippetId?: string) {
 
   // Initialize from snippet or starter code
   useEffect(() => {
-    if (snippetId && snippet?.code) {
-      dispatch({ type: 'SET_INITIAL_CODE', code: snippet.code })
+    if (!snippetId) {
       return
     }
+
+    const { code, executions } = snippet ?? {}
     dispatch({
-      type: 'SET_INITIAL_CODE',
-      code: STARTER_SNIPPET[state.language],
+      type: 'SET_INITIAL_VALUES',
+      code: code ?? STARTER_SNIPPET[state.language],
+      output: executions?.[0].result ?? '',
     })
   }, [snippetId, snippet])
 

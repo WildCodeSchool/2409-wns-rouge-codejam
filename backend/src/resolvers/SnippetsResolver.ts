@@ -6,6 +6,7 @@ import {
   ID,
   Authorized,
   Ctx,
+  Int,
 } from 'type-graphql'
 import {
   Snippet,
@@ -22,16 +23,25 @@ export class SnippetsResolver {
   async getSnippet(
     @Ctx() context: AuthContextType,
     @Arg('id', () => ID) id: string,
+    @Arg('limit', () => Int, { nullable: true }) limit = 1,
+    @Arg('offset', () => Int, { nullable: true }) offset = 0,
   ): Promise<Snippet | null> {
     const currentUser = await getUserFromContext(context)
     const isAdmin = currentUser && currentUser.role === UserRole.ADMIN
-    const relations = isAdmin ? ['user'] : []
-    const snippet = await Snippet.findOne({
-      where: {
-        id,
-      },
-      relations,
-    })
+
+    const qb = Snippet.createQueryBuilder('snippet')
+      .leftJoinAndSelect('snippet.executions', 'execution')
+      .where('snippet.id = :id', { id })
+      .orderBy('execution.executedAt', 'DESC')
+      .limit(Math.min(limit, 50)) // Cap the limit to 50 to avoid abuse
+      .offset(offset)
+
+    if (isAdmin) {
+      qb.leftJoinAndSelect('snippet.user', 'user')
+    }
+
+    const snippet = await qb.getOne()
+
     return snippet
   }
 

@@ -2,9 +2,9 @@ import { STARTER_SNIPPET } from '@/features/editor/components/editor'
 import { ExecutionStatus, Language } from '@/shared/gql/graphql'
 
 type EditorAction =
-  | { type: 'SET_INITIAL_CODE'; code: string }
   | { type: 'SET_CODE'; code: string }
   | { type: 'SET_LANGUAGE'; language: Language; code: string }
+  | { type: 'SET_INITIAL_VALUES'; code: string; output: string }
   | { type: 'SET_OUTPUT'; output: string }
   | { type: 'SET_EXECUTION_STATUS'; executionStatus?: ExecutionStatus }
 
@@ -27,11 +27,11 @@ export default function editorReducer(
   action: EditorAction,
 ): EditorState {
   switch (action.type) {
-    case 'SET_INITIAL_CODE': {
-      return { ...state, code: action.code }
-    }
     case 'SET_CODE': {
       return { ...state, code: action.code }
+    }
+    case 'SET_INITIAL_VALUES': {
+      return { ...state, code: action.code, output: action.output }
     }
     case 'SET_LANGUAGE': {
       return {
