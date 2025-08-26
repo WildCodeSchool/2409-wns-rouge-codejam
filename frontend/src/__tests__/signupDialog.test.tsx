@@ -45,7 +45,7 @@ function MockedSignupDialog() {
   }
   return (
     <div>
-      <MockedProvider addTypename={false} mocks={[mocks]}>
+      <MockedProvider mocks={[mocks]}>
         <div className="flex flex-row items-center gap-4">
           <Button
             data-testid="navbar-signup"
