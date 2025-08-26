@@ -21,7 +21,7 @@ export default function EditorPage() {
     updateStatus,
   } = useEditorPage(snippetId)
 
-  if (loading) {
+  if (loading && !snippetId) {
     return <EditorPageSkeleton />
   }
 

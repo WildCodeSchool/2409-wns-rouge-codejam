@@ -53,7 +53,7 @@ export default function CodeEditor({
         value={code}
         onChange={onChange}
         onMount={handleOnEditorMount}
-        loading={<Skeleton className="h-full w-full" />}
+        loading={<></>} // 👈 prevent displaying default loader
         theme="vs-dark"
         options={{
           ...BASE_EDITOR_OPTIONS,
