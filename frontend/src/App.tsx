@@ -19,6 +19,7 @@ const client = new ApolloClient({
 export default function App() {
   return (
     <ApolloProvider client={client}>
+      <Toaster richColors />
       <BrowserRouter>
         <Routes>
           <Route path="/" Component={MainLayout}>
@@ -31,7 +32,6 @@ export default function App() {
           </Route>
           <Route path="*" element={<Navigate to="/editor" replace />} />
         </Routes>
-        <Toaster richColors />
       </BrowserRouter>
     </ApolloProvider>
   )

@@ -19,7 +19,7 @@ type UserInfoProps = {
 export default function UserInfo({ userName, onSignOut }: UserInfoProps) {
   return (
     <div className="flex items-center gap-2">
-      <p className="min-w-26">{userName ?? 'codejamer'}</p>
+      <p className="min-w-26 text-right">{userName ?? 'codejamer'}</p>
 
       <Popover>
         <Avatar>
