@@ -17,6 +17,9 @@ export const BASE_EDITOR_OPTIONS: monaco.editor.IStandaloneEditorConstructionOpt
     minimap: { enabled: false },
     lineDecorationsWidth: 0, // disable line decorations width to avoid extra space on the left
     lineNumbersMinChars: 3, // minimum number of characters to reserve for line numbers
+    padding: {
+      top: 16,
+    },
     tabSize: 2, // set tab size to 2 spaces
     wrappingStrategy: 'advanced', // use advanced wrapping strategy for better performance
     wordWrap: 'bounded', // wrap at min(viewport width, wordWrapColumn)

@@ -30,7 +30,9 @@ export default function CodeEditor({
 
     // Set the cursor position at the end of the code
     const model = editorInstance.getModel()
-    if (!model) return
+    if (!model) {
+      return
+    }
     const lastLine = model.getLineCount()
     const position = editorInstance.getPosition()
     if (position) {
@@ -58,7 +60,6 @@ export default function CodeEditor({
           wrappingIndent: 'indent',
           renderLineHighlight: 'gutter',
         }}
-        className="[&_.margin]:pt-4 [&_.overflow-guard]:pt-4"
       />
     </div>
   )
