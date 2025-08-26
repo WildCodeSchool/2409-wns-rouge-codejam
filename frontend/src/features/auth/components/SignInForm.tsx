@@ -93,20 +93,20 @@ export default function SignInForm({
             {form.formState.errors.root.message}
           </div>
         )}
-
-        <div className="text-muted-foreground mt-4 mb-2 flex items-center justify-center gap-2 text-sm">
-          New user?
-          <Button
-            variant="link"
-            size="sm"
-            className="p-1"
-            disabled={isSubmitting}
-            onClick={onSignUp}
-          >
-            Sign Up
-          </Button>
-        </div>
       </form>
+
+      <div className="text-muted-foreground mt-4 mb-2 flex items-center justify-center gap-2 text-sm">
+        New user?
+        <Button
+          variant="link"
+          size="sm"
+          className="p-1"
+          disabled={isSubmitting}
+          onClick={onSignUp}
+        >
+          Sign Up
+        </Button>
+      </div>
     </Form>
   )
 }

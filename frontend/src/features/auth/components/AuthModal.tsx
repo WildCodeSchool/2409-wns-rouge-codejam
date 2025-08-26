@@ -32,7 +32,7 @@ export default function AuthModal({
     >
       <motion.div
         layout
-        className="relative mx-auto w-[400px] overflow-hidden"
+        className="relative mx-auto w-[400px]"
         transition={{ duration: 0.35, ease: 'easeInOut' }}
       >
         <AnimatePresence mode="wait" initial={false}>

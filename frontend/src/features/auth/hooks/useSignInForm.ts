@@ -20,9 +20,10 @@ export default function useSignInForm(cbFn?: () => void) {
       password: '',
     }, // required for controlled inputs
     resolver: zodResolver(signInFormSchema),
-    mode: 'onTouched', // 	validation strategy before submitting (validate only after user interacted once with the input)
+    mode: 'onChange', // 	validation strategy before submitting (validate only after user interacted once with the input)
     reValidateMode: 'onChange', // after touched, re-validate as user types
     shouldFocusError: true, // focus first invalid field on submit
+    delayError: 2000, // wait after user stops typing to show error
   })
 
   const isSubmitting = form.formState.isSubmitting
