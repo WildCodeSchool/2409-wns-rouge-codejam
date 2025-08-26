@@ -46,23 +46,26 @@ export default function CodeEditor({
   }
 
   return (
-    <div className="flex h-full overflow-hidden rounded-md border">
-      <Editor
-        defaultLanguage="javascript"
-        language={language.toLowerCase()}
-        value={code}
-        onChange={onChange}
-        onMount={handleOnEditorMount}
-        loading={<></>} // 👈 prevent displaying default loader
-        theme="vs-dark"
-        options={{
-          ...BASE_EDITOR_OPTIONS,
-          wrappingIndent: 'indent',
-          renderLineHighlight: 'gutter',
-        }}
-      />
-    </div>
+    <Editor
+      defaultLanguage="javascript"
+      language={language.toLowerCase()}
+      value={code}
+      onChange={onChange}
+      onMount={handleOnEditorMount}
+      loading={<EditorLoadingSkeleton />} // 👈 prevent displaying default loader and layout flickering
+      theme="vs-dark"
+      options={{
+        ...BASE_EDITOR_OPTIONS,
+        wrappingIndent: 'indent',
+        renderLineHighlight: 'gutter',
+      }}
+      className="[&_.monaco-editor]:rounded-md [&_.overflow-guard]:rounded-md"
+    />
   )
+}
+
+function EditorLoadingSkeleton() {
+  return <div className="h-full w-full rounded-md bg-[#1e1e1e]" />
 }
 
 export function CodeEditorSkeleton() {
