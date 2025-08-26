@@ -191,6 +191,15 @@ export type CreateUserMutation = {
   } | null
 }
 
+export type DeleteSnippetMutationVariables = Exact<{
+  id: Scalars['ID']['input']
+}>
+
+export type DeleteSnippetMutation = {
+  __typename?: 'Mutation'
+  deleteSnippet: boolean
+}
+
 export type LoginMutationVariables = Exact<{
   data: UserLoginInput
 }>
@@ -266,6 +275,48 @@ export const CreateUserDocument = {
     },
   ],
 } as unknown as DocumentNode<CreateUserMutation, CreateUserMutationVariables>
+export const DeleteSnippetDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'mutation',
+      name: { kind: 'Name', value: 'deleteSnippet' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'id' } },
+          type: {
+            kind: 'NonNullType',
+            type: { kind: 'NamedType', name: { kind: 'Name', value: 'ID' } },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'deleteSnippet' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'id' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'id' },
+                },
+              },
+            ],
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  DeleteSnippetMutation,
+  DeleteSnippetMutationVariables
+>
 export const LoginDocument = {
   kind: 'Document',
   definitions: [
