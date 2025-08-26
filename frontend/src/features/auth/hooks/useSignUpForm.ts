@@ -22,9 +22,9 @@ export default function useSignInForm(cbFn?: () => void) {
       confirmPassword: '',
     }, // required for controlled inputs
     resolver: zodResolver(signUpFormSchema),
-    mode: 'onBlur', // 	validation strategy before submitting
-    reValidateMode: 'onBlur', // validation strategy after submitting
-    shouldFocusError: true, // focus first field with an error if the form that fails validation ()
+    mode: 'onTouched', // 	validation strategy before submitting (validate only after user interacted once with the input)
+    reValidateMode: 'onChange', // after touched, re-validate as user types
+    shouldFocusError: true, // focus first invalid field on submit
   })
 
   const isSubmitting = form.formState.isSubmitting

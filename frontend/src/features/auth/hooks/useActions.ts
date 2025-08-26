@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react'
 
-type AuthModal = 'signIn' | 'signUp' | null
+export type AuthModal = 'signIn' | 'signUp' | null
 
 export default function useActions() {
   const [modal, setModal] = useState<AuthModal>(null)

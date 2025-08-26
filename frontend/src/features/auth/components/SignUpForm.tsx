@@ -31,7 +31,7 @@ export default function SignUpForm({
         data-testid="signup-form"
         aria-label="signup form"
         onSubmit={form.handleSubmit(submitForm)}
-        className="space-y-8"
+        className="space-y-6"
         noValidate
       >
         <FormField
@@ -47,7 +47,6 @@ export default function SignUpForm({
                   }}
                 >
                   <Input
-                    autoFocus
                     data-testid="email-input"
                     type="email"
                     placeholder="Enter your email"
@@ -142,7 +141,7 @@ export default function SignUpForm({
         </Button>
       </form>
 
-      <div className="text-muted-foreground flex items-center justify-center gap-2 text-sm">
+      <div className="text-muted-foreground mt-4 mb-2 flex items-center justify-center gap-2 text-sm">
         Already have an account?
         <Button
           variant="link"

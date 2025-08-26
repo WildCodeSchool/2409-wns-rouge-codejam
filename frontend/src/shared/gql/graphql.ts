@@ -55,7 +55,7 @@ export enum Language {
 export type Mutation = {
   __typename?: 'Mutation'
   createSnippet: Snippet
-  createUser?: Maybe<User>
+  createUser: User
   deleteSnippet: Scalars['Boolean']['output']
   deleteUser: Scalars['Boolean']['output']
   execute: Execution
@@ -183,12 +183,12 @@ export type CreateUserMutationVariables = Exact<{
 
 export type CreateUserMutation = {
   __typename?: 'Mutation'
-  createUser?: {
+  createUser: {
     __typename?: 'User'
     email?: string | null
     username?: string | null
     id: string
-  } | null
+  }
 }
 
 export type MutationMutationVariables = Exact<{

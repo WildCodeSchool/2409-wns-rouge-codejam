@@ -30,7 +30,7 @@ export default function SignInForm({
         data-testid="signin-form"
         aria-label="signin form"
         onSubmit={form.handleSubmit(submitForm)}
-        className="space-y-8"
+        className="space-y-6"
         noValidate
       >
         <FormField
@@ -46,7 +46,6 @@ export default function SignInForm({
                   }}
                 >
                   <Input
-                    autoFocus
                     type="email"
                     placeholder="Enter your email"
                     autoComplete="email"
@@ -82,7 +81,7 @@ export default function SignInForm({
         <Button
           data-testid="submit-signin"
           id="signin-submit"
-          className="w-full"
+          className="mb-0 w-full"
           type="submit"
           disabled={isSubmitting}
         >
@@ -90,12 +89,12 @@ export default function SignInForm({
         </Button>
 
         {form.formState.errors.root && (
-          <div className="text-destructive text-center text-sm">
+          <div className="text-destructive mt-6 text-center text-sm">
             {form.formState.errors.root.message}
           </div>
         )}
 
-        <div className="text-muted-foreground flex items-center justify-center gap-2 text-sm">
+        <div className="text-muted-foreground mt-4 mb-2 flex items-center justify-center gap-2 text-sm">
           New user?
           <Button
             variant="link"

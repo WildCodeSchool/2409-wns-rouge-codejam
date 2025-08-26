@@ -1,6 +1,5 @@
-import { SignInForm, SignUpForm } from '@/features/auth/components'
+import { AuthModal } from '@/features/auth/components'
 import { useActions } from '@/features/auth/hooks'
-import { Modal } from '@/shared/components'
 import { Button } from '@/shared/components/ui/button'
 import { Skeleton } from '@/shared/components/ui/skeleton'
 
@@ -26,23 +25,12 @@ export default function NavActions() {
       </Button>
 
       {modal && (
-        <Modal
-          open
-          title={modal === 'signIn' ? 'Sign In' : 'Sign Up'}
-          onOpenChange={closeModal}
-        >
-          {modal === 'signIn' ? (
-            <SignInForm onSignUp={openSignUp} callbackOnSubmit={closeModal} />
-          ) : (
-            <SignUpForm
-              onSignIn={openSignIn}
-              callbackOnSubmit={() => {
-                closeModal()
-                openSignIn()
-              }}
-            />
-          )}
-        </Modal>
+        <AuthModal
+          modal={modal}
+          closeModal={closeModal}
+          openSignIn={openSignIn}
+          openSignUp={openSignUp}
+        />
       )}
     </>
   )
