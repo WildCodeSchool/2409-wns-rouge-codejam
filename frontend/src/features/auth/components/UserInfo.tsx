@@ -1,7 +1,3 @@
-import { useMutation } from '@apollo/client'
-import { toast } from 'sonner'
-import { LOGOUT } from '@/shared/api/logout'
-import { WHO_AM_I } from '@/shared/api/whoAmI'
 import {
   Avatar,
   AvatarFallback,
@@ -13,53 +9,43 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/shared/components/ui/popover'
-import { WhoAmIQuery } from '@/shared/gql/graphql'
+import { Skeleton } from '@/shared/components/ui/skeleton'
 
 type UserInfoProps = {
-  user: NonNullable<WhoAmIQuery['whoAmI']>
+  userName: string | null | undefined
+  onSignOut: () => void
 }
 
-export default function UserInfo({ user }: UserInfoProps) {
-  const [logout] = useMutation(LOGOUT)
-
-  const handleLogout = async (_e: React.MouseEvent<HTMLButtonElement>) => {
-    try {
-      const { data, errors } = await logout({
-        refetchQueries: [{ query: WHO_AM_I }],
-      })
-
-      if (errors !== undefined || !data?.logout) {
-        if (errors) console.error('Failed to sign out:', errors)
-        throw new Error('Failed to sign out!')
-      }
-
-      toast.success('Successful logout', {
-        description: '👋 Hope to see you soon!',
-      })
-    } catch (error: unknown) {
-      console.error(error)
-      toast.error('Failed to logout', {
-        description: 'Oops! Something went wrong.',
-      })
-    }
-  }
-
+export default function UserInfo({ userName, onSignOut }: UserInfoProps) {
   return (
     <div className="flex items-center gap-2">
-      <p>{user.username ?? 'codejamer'}</p>
+      <p className="min-w-26 text-right">{userName ?? 'codejamer'}</p>
+
       <Popover>
         <Avatar>
-          <PopoverTrigger className="cursor-pointer">
-            <AvatarImage src="https://github.com/shadcn.png" />
+          <PopoverTrigger
+            aria-label="Show your account settings"
+            className="cursor-pointer"
+          >
+            <AvatarImage src="/assets/images/avatar.jpeg" alt="" />
             <AvatarFallback>
-              {user.username?.slice(0, 2).toUpperCase() ?? 'CJ'}
+              {userName?.slice(0, 2).toUpperCase() ?? 'CJ'}
             </AvatarFallback>
-            <PopoverContent className="grid w-fit">
-              <Button onClick={handleLogout}>Sign Out</Button>
+            <PopoverContent className="mr-4 grid w-fit">
+              <Button onClick={onSignOut}>Sign Out</Button>
             </PopoverContent>
           </PopoverTrigger>
         </Avatar>
       </Popover>
+    </div>
+  )
+}
+
+export function UserInfoSkeleton() {
+  return (
+    <div className="flex items-center gap-2">
+      <Skeleton className="h-8 min-w-26" />
+      <Skeleton className="h-8 w-8 rounded-full" />
     </div>
   )
 }
