@@ -1,3 +1,6 @@
+import { AnimatePresence, motion, MotionProps } from 'motion/react'
+
+import { AuthModal } from '@/features/auth/hooks'
 import {
   Dialog,
   DialogContent,
@@ -6,23 +9,41 @@ import {
   DialogTitle,
 } from '@/shared/components/ui/dialog'
 
+const baseMotionProps: MotionProps = {
+  initial: { y: -50, opacity: 0 },
+  animate: { y: 0, opacity: 1 },
+  exit: { y: -0, opacity: 0 },
+  transition: { duration: 0.3, ease: 'easeInOut' },
+}
+
 type ModalProps = React.PropsWithChildren & {
   title?: string
+  titleKey?: AuthModal // 👈 key for animation (e.g. "signIn" | "signUp")
   open: boolean
   onOpenChange?: (nextOpen: boolean) => void
 }
 
-const Modal = ({
+export default function Modal({
   title = 'Modal',
+  titleKey = undefined,
   open,
   onOpenChange,
   children,
-}: ModalProps) => {
+}: ModalProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
-        <DialogHeader>
-          <DialogTitle className="text-center text-3xl">{title}</DialogTitle>
+        <DialogHeader className="overflow-hidden">
+          <AnimatePresence mode="wait" initial={false}>
+            <motion.div
+              key={titleKey} // 👈 triggers re-animation when switching
+              {...baseMotionProps}
+            >
+              <DialogTitle className="text-center text-3xl">
+                {title}
+              </DialogTitle>
+            </motion.div>
+          </AnimatePresence>
           <DialogDescription></DialogDescription>
         </DialogHeader>
         {children}
@@ -30,5 +51,3 @@ const Modal = ({
     </Dialog>
   )
 }
-
-export default Modal

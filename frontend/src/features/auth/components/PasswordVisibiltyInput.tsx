@@ -20,6 +20,7 @@ const PasswordVisibiltyInput = ({
   ...restProps
 }: PasswordVisibiltyInputProps) => {
   const [isVisible, setIsVisible] = useState<boolean>(false)
+
   return (
     <div className="relative">
       <FormControl onChange={onChange}>

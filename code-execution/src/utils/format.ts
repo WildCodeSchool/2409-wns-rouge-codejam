@@ -1,20 +1,18 @@
 /**
- * Format the error message from stderr
- * @param error stderr error message to be formatted
- * @returns
+ * Extracts and formats the first JavaScript error message from a raw `stderr` string.
+ *
+ * Searches for a recognizable JavaScript error pattern (e.g., "TypeError: ...", "ReferenceError: ...") and returns the first match. If no such error message is found, a default message is returned.
+ *
+ * @param {string} error - The raw error string (e.g., from `stderr` or a thrown error).
+ * @returns {string} The extracted and cleaned error message, or a default fallback message.
  */
-export function formatStdError(error: string): string[] {
-  // Regex to match ANSI escape codes (used for colored terminal output)
-  const ansiRegex = /\x1b\[[0-9;]*m/g
-  const cleanError = error.replace(ansiRegex, '').trim()
-  const lines = cleanError.split('\n')
+export function formatStdError(error: string): string {
+  // Extract error message starting from JavaScript error type pattern (e.g., "TypeError", "ReferenceError", etc.)
+  const javaScriptErrorRegex = /\b(?:\w+Error): .+/gim
+  const match = error.trim().match(javaScriptErrorRegex)
+  const formattedError = match
+    ? match[0].trim()
+    : 'Declaration or statement expected'
 
-  /* If it's a Deno error, skip the first two lines (usually contain file path and error indicator)
-  and return the actual error message lines */
-  if (lines[0].includes('error: ')) {
-    return lines.slice(2).filter((line) => line.trim() !== '')
-  }
-
-  // For other types of errors, return all non-empty lines
-  return lines.filter((line) => line.trim() !== '')
+  return formattedError
 }
