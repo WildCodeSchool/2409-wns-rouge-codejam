@@ -5,15 +5,15 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from '@/shared/components/ui/tooltip'
-import { Save } from 'lucide-react'
+import { PlayIcon } from 'lucide-react'
 
-type SaveButtonProps = {
+type RunButtonProps = {
   onClick: (_e: React.MouseEvent<HTMLButtonElement>) => void
   loading: boolean
   disabled: boolean
 }
 
-const SaveButton = ({ onClick, loading, disabled }: SaveButtonProps) => {
+const RunButton = ({ onClick, loading, disabled }: RunButtonProps) => {
   return (
     <Tooltip>
       <TooltipTrigger asChild>
@@ -23,24 +23,23 @@ const SaveButton = ({ onClick, loading, disabled }: SaveButtonProps) => {
           aria-disabled={disabled}
           disabled={disabled}
           onClick={onClick}
-          variant="outline"
           className="min-w-24"
         >
-          <span>Save</span>
+          <span>Run</span>
           {loading ? (
             <Spinner size="small" />
           ) : (
-            <Save aria-hidden="true" role="img" size={15} />
+            <PlayIcon aria-hidden="true" role="img" size={15} />
           )}
         </Button>
       </TooltipTrigger>
       {!loading && (
         <TooltipContent>
-          <p>Save current snippet</p>
+          <p>Execute current snippet</p>
         </TooltipContent>
       )}
     </Tooltip>
   )
 }
 
-export default SaveButton
+export default RunButton
