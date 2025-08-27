@@ -88,4 +88,4 @@ jobs:
           directory: "code-execution"
           docker-username: ${{ vars.DOCKERHUB_USERNAME }}
           docker-token: ${{ secrets.DOCKERHUB_TOKEN }}
-          docker-repository: ${{ vars.DOCKERHUB_REPO_BACKEND }}
+          docker-repository: ${{ vars.DOCKERHUB_REPO_CODE_EXECUTION }}
