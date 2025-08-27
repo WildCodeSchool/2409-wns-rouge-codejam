@@ -39,7 +39,7 @@ const HomePage = () => {
                 Sign In
               </Button>
               <p className="text-center text-sm">
-                Don&apos;t have an account?{' '}
+                Don&apos;t have an account?
                 <span
                   className="cursor-pointer text-sky-500 hover:underline"
                   onClick={() => {

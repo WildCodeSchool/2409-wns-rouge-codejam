@@ -22,7 +22,6 @@ import {
 } from '@/shared/components/ui/tooltip'
 import { cn } from '@/shared/lib/utils'
 
-
 interface Snippet {
   id: string
   name: string
@@ -38,7 +37,6 @@ export default function EditorSidebar() {
   const snippets = data.getAllSnippets
   const [activeSnippetId, setActiveSnippetId] = useState<string | null>(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
-
 
   // On mount and when location/snippets change, sync activeSnippetId with URL or default to first snippet
   useEffect(() => {
@@ -92,10 +90,10 @@ export default function EditorSidebar() {
                               handleClick(snippet)
                             }}
                             className={cn(
-                              'flex-1 text-left truncate px-2 py-1.5 rounded-md transition-colors cursor-pointer',
+                              'flex-1 cursor-pointer truncate rounded-md px-2 py-1.5 text-left transition-colors',
                               activeSnippetId === snippet.id
                                 ? 'text-sky-500 hover:text-sky-300'
-                                : hoveredTextStyles
+                                : hoveredTextStyles,
                             )}
                           >
                             {snippet.name}
