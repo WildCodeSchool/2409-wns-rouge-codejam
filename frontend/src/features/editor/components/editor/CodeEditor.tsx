@@ -46,21 +46,23 @@ export default function CodeEditor({
   }
 
   return (
-    <Editor
-      defaultLanguage="javascript"
-      language={language.toLowerCase()}
-      value={code}
-      onChange={onChange}
-      onMount={handleOnEditorMount}
-      loading={<EditorLoadingSkeleton />} // 👈 prevent displaying default loader and layout flickering
-      theme="vs-dark"
-      options={{
-        ...BASE_EDITOR_OPTIONS,
-        wrappingIndent: 'indent',
-        renderLineHighlight: 'gutter',
-      }}
-      className="[&_.monaco-editor]:rounded-md [&_.overflow-guard]:rounded-md"
-    />
+    <div className="relative">
+      <Editor
+        defaultLanguage="javascript"
+        language={language.toLowerCase()}
+        value={code}
+        onChange={onChange}
+        onMount={handleOnEditorMount}
+        loading={<EditorLoadingSkeleton />} // 👈 prevent displaying default loader and layout flickering
+        theme="vs-dark"
+        options={{
+          ...BASE_EDITOR_OPTIONS,
+          wrappingIndent: 'indent',
+          renderLineHighlight: 'gutter',
+        }}
+        className="absolute h-full w-full [&_.monaco-editor]:rounded-md [&_.overflow-guard]:rounded-md"
+      />
+    </div>
   )
 }
 
