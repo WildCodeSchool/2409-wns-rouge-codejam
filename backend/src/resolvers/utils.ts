@@ -10,7 +10,7 @@ import {
   UserIDJwtPayload,
 } from '../types'
 import { Execution } from '../entities/Execution'
-import { MoreThan } from 'typeorm'
+import { IsNull, LessThan, MoreThan, Not } from 'typeorm'
 import {
   Snippet,
   SnippetCreateInput,
@@ -183,9 +183,13 @@ export async function getUserExecutionCount(
  * @param userId - The user id
  * @param context - The context of the request
  */
-export function createCookieWithJwt(userId: string, context: ContextType) {
+export function createCookieWithJwt(
+  userId: string,
+  context: ContextType,
+  expiresIn: number = 24 * 60 * 60,
+) {
   const token = jwt.sign({ userId }, process.env.JWT_SECRET || '', {
-    expiresIn: '24h',
+    expiresIn: expiresIn,
   })
   new Cookies(context.req, context.res).set('access_token', token, {
     httpOnly: true,
@@ -234,6 +238,54 @@ function isCodeExecutionResponse(res: unknown): res is CodeExecutionResponse {
     'status' in res &&
     'result' in res
   )
+}
+
+export async function findActiveSubscription(
+  targetUserId: string,
+): Promise<UserSubscription | null> {
+  // can be null if premium subscription is expired and user hasn't logged in since its expiration
+  const now = new Date()
+  let activePremiumSubscription = await UserSubscription.findOne({
+    where: {
+      user: { id: targetUserId },
+      expiresAt: MoreThan(now),
+    },
+    relations: ['plan', 'user'],
+  })
+
+  // If no active premium subscription is found, check for an active free one
+  if (!activePremiumSubscription) {
+    const activeSubscription = await UserSubscription.findOne({
+      where: {
+        user: { id: targetUserId },
+        terminatedAt: IsNull(),
+        expiresAt: IsNull(),
+        subscribedAt: LessThan(now),
+        plan: { isDefault: true },
+      },
+      relations: ['plan', 'user'],
+      order: { subscribedAt: 'DESC' },
+    })
+    return activeSubscription
+  }
+  return activePremiumSubscription
+}
+
+export async function createDefaultSubscription(user: User): Promise<Boolean> {
+  const defaultPlan = await Plan.findOne({
+    where: { isDefault: true, name: Not('guest') },
+  })
+
+  if (defaultPlan) {
+    const newUserSubscription = new UserSubscription()
+    Object.assign(newUserSubscription, {
+      user: user,
+      plan: defaultPlan,
+    })
+    await newUserSubscription.save()
+    return true
+  }
+  return false
 }
 
 export async function subscribeGuest(

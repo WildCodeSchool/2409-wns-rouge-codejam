@@ -16,16 +16,13 @@ import {
   UserLoginInput,
   UserUpdateInput,
 } from '../entities/User'
+import { AuthContextType, ContextType, UserRole } from '../types'
 import {
-  AuthContextType,
-  CancellationReason,
-  ContextType,
-  UserRole,
-} from '../types'
-import { createCookieWithJwt, getUserFromContext } from './utils'
-import { UserSubscription } from '../entities/UserSubscription'
-import { Plan } from '../entities/Plan'
-import { IsNull, LessThanOrEqual, MoreThan, Not } from 'typeorm'
+  createCookieWithJwt,
+  createDefaultSubscription,
+  findActiveSubscription,
+  getUserFromContext,
+} from './utils'
 
 @Resolver()
 export class UsersResolver {
@@ -88,20 +85,7 @@ export class UsersResolver {
       const createdUser = await newUser.save()
 
       // Assign a default free plan to the user
-      const defaultPlan = await Plan.findOne({
-        where: {
-          isDefault: true,
-          name: Not('guest'),
-        },
-      })
-      const newUserSubscription = new UserSubscription()
-      Object.assign(newUserSubscription, {
-        user: createdUser,
-        plan: defaultPlan,
-        subscribedAt: new Date(),
-      })
-
-      await newUserSubscription.save()
+      await createDefaultSubscription(createdUser)
 
       return createdUser
     } catch (err) {
@@ -115,7 +99,7 @@ export class UsersResolver {
     @Ctx() context: ContextType,
   ): Promise<User | null> {
     try {
-      if (context.user) throw new Error('Already logged in')
+      // if (context.user) throw new Error('Already logged in')
 
       const user = await User.findOne({
         where: { email: data.email },
@@ -125,58 +109,35 @@ export class UsersResolver {
       const valid = await argon2.verify(user.hashedPassword, data.password)
       if (!valid) return null
 
-      // Check user active subscription
-      const now = new Date()
+      let tokenExpirationInSeconds = 24 * 60 * 60 // Default 24 hours
 
-      // Find the currently active subscription (paid or free)
-      const activeSubscription = await UserSubscription.findOne({
-        where: [
-          { user: { id: user.id }, expiresAt: MoreThan(now) }, // can be null if subscription is inactive
-          {
-            user: { id: user.id },
-            expiresAt: IsNull(),
-            plan: { isDefault: true },
-          },
-        ],
-        relations: ['plan', 'user'],
-        order: { subscribedAt: 'DESC' },
-      })
-
-      // If an active subscription isn't found, check for an expired paid one to trigger a one-time downgrade.
+      // Get active subscription
+      const activeSubscription = await findActiveSubscription(user.id)
       if (!activeSubscription) {
-        const expiredPaidSubscription = await UserSubscription.findOne({
-          where: {
-            user: { id: user.id },
-            expiresAt: LessThanOrEqual(now),
-            plan: { isDefault: false },
-            cancellationReason: IsNull(), // Find only if it hasn't been marked as expired yet
-          },
-          relations: ['plan', 'user'],
-          order: { subscribedAt: 'DESC' },
-        })
+        await createDefaultSubscription(user)
+      } else {
+        // Check if the subscription has an expiration date
+        const now = new Date()
+        if (activeSubscription.expiresAt) {
+          const remainingTime = Math.floor(
+            (activeSubscription.expiresAt.getTime() - now.getTime()) / 1000,
+          )
+          const oneDayInSeconds = 24 * 60 * 60
 
-        // If an expired paid subscription is found, perform the downgrade
-        if (expiredPaidSubscription) {
-          const defaultPlan = await Plan.findOne({ where: { isDefault: true } })
-
-          if (defaultPlan) {
-            const newUserSubscription = new UserSubscription()
-            Object.assign(newUserSubscription, {
-              user: user,
-              plan: defaultPlan,
-            })
-            await newUserSubscription.save()
-
-            expiredPaidSubscription.cancellationReason =
-              CancellationReason.EXPIRED
-            expiredPaidSubscription.terminatedAt = now
-            await expiredPaidSubscription.save()
+          // If remaining time is positive and less than a day, use that value
+          if (remainingTime > 0 && remainingTime < oneDayInSeconds) {
+            tokenExpirationInSeconds = remainingTime
+          }
+          // If the subscription is already expired, set a very short token life
+          else if (remainingTime <= 0) {
+            tokenExpirationInSeconds = 5 * 60 // 5 minutes
+            await createDefaultSubscription(user) // Downgrade the user
           }
         }
       }
 
       if (process.env.NODE_ENV !== 'test') {
-        createCookieWithJwt(user.id, context)
+        createCookieWithJwt(user.id, context, tokenExpirationInSeconds)
       }
       return user
     } catch (err) {

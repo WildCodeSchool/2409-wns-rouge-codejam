@@ -16,7 +16,7 @@ import {
 import { Plan } from '../entities/Plan'
 import { User } from '../entities/User'
 import { AuthContextType, CancellationReason, UserRole } from '../types'
-import { IsNull, MoreThan, Not } from 'typeorm'
+import { findActiveSubscription } from './utils'
 
 @Resolver()
 export class UserSubscriptionsResolver {
@@ -31,8 +31,8 @@ export class UserSubscriptionsResolver {
     return users
   }
 
-  /* Only connected admin and user (owns subscription) can see active subscription.
-    If active subscription is a premium one subscribe button should be desabled or hidden 
+  /* 
+  Only connected admin and user (owns subscription) can see active subscription.
   */
   @Authorized(UserRole.ADMIN, UserRole.USER)
   @Query(() => UserSubscription, { nullable: true })
@@ -52,31 +52,7 @@ export class UserSubscriptionsResolver {
       throw new Error('Unauthorized')
     }
 
-    // A subscription is active if:
-    // - it's not terminated
-    // - AND it's either a free plan and experation date is Null OR a paid plan with an `expiresAt` > now
-    const now = new Date()
-
-    // Try to find an active paid subscription first
-    let activeSubscription = await UserSubscription.findOne({
-      where: {
-        user: { id: targetUserId },
-        expiresAt: MoreThan(now),
-      },
-      relations: ['plan', 'user'],
-    })
-
-    // If no active paid subscription is found, check for an active free one
-    if (!activeSubscription) {
-      activeSubscription = await UserSubscription.findOne({
-        where: {
-          user: { id: targetUserId },
-          terminatedAt: IsNull(),
-          expiresAt: IsNull(),
-        },
-        relations: ['plan', 'user'],
-      })
-    }
+    const activeSubscription = await findActiveSubscription(targetUserId)
 
     return activeSubscription
   }
@@ -172,6 +148,7 @@ export class UserSubscriptionsResolver {
   @Authorized(UserRole.ADMIN)
   @Mutation(() => UserSubscription, { nullable: true })
   async updateUserSubscription(
+    @Ctx() context: AuthContextType,
     @Arg('data', () => UserSubscriptionUpdateInput)
     data: UserSubscriptionUpdateInput,
     @Arg('email', () => String) email: string,
@@ -187,34 +164,35 @@ export class UserSubscriptionsResolver {
       }
 
       // Find the user's active premium subscription
-      const subscription = await UserSubscription.findOne({
-        where: {
-          user: { id: user.id },
-          expiresAt: MoreThan(new Date()),
-        },
-        relations: ['user', 'plan'],
-      })
+      const subscription = await this.getActiveSubscription(context, user.id)
 
       // Handle the case where no active subscription is found
       if (!subscription) {
         throw new Error('Active subscription not found for this user.')
       }
 
+      const premiumSubscription = !subscription?.plan.isDefault
+
       // Update the subscription with the provided data
-      if (data.expiresAt) {
-        subscription.expiresAt = data.expiresAt
-      }
-      if (data.terminatedAt) {
-        subscription.terminatedAt = data.terminatedAt
-      }
-      if (data.cancellationReason) {
-        subscription.cancellationReason = data.cancellationReason
+      if (subscription && premiumSubscription) {
+        if (data.expiresAt) {
+          subscription.expiresAt = data.expiresAt
+        }
+        if (data.terminatedAt) {
+          subscription.terminatedAt = data.terminatedAt
+        }
+        if (data.cancellationReason) {
+          subscription.cancellationReason = data.cancellationReason
+        }
+        const updatedPremiumSubscription = await subscription.save()
+        return updatedPremiumSubscription
       }
 
-      // Save the updated subscription
-      const updatedSubscription = await subscription.save()
+      subscription.terminatedAt = new Date()
+      subscription.cancellationReason = CancellationReason.SUBSCRIBED
+      const updatedFreeSubscription = await subscription.save()
 
-      return updatedSubscription
+      return updatedFreeSubscription
     } catch (err) {
       throw new Error(
         err instanceof Error
@@ -232,14 +210,8 @@ export class UserSubscriptionsResolver {
   ): Promise<boolean> {
     try {
       const currentUser = context.user
-
-      const isAdmin = currentUser.role === UserRole.ADMIN
-      let targetUserId = currentUser.id
-
-      if (isAdmin && userId) {
-        targetUserId = userId
-      }
-
+      const targetUserId =
+        currentUser.role === UserRole.ADMIN ? userId : currentUser.id
       // Find the currently active subscription
       const activeSubscription = await this.getActiveSubscription(
         context,
@@ -250,42 +222,14 @@ export class UserSubscriptionsResolver {
         throw new Error('No active subscription found to unsubscribe from.')
       }
 
-      const isPaidPlan = activeSubscription.plan.price > 0
-      const isPaidPlanExpired =
-        activeSubscription.expiresAt &&
-        new Date() > activeSubscription.expiresAt
+      const isPaidPlan = !activeSubscription.plan.isDefault
 
-      const cancellationReason = isAdmin
-        ? CancellationReason.CANCELEDADMIN
-        : isPaidPlanExpired
-          ? CancellationReason.EXPIRED
-          : CancellationReason.CANCELLED
-
-      if (isPaidPlan) {
+      // If user active plan is a premium and it's not yet terminated he can cancel
+      if (isPaidPlan && !activeSubscription.terminatedAt) {
         activeSubscription.terminatedAt = new Date()
-        activeSubscription.cancellationReason = cancellationReason
+        activeSubscription.cancellationReason = CancellationReason.CANCELLED
         await activeSubscription.save()
 
-        // Assign a default plan to the user
-        const defaultPlan = await Plan.findOne({
-          where: {
-            isDefault: true,
-            name: Not('guest'),
-          },
-        })
-
-        if (!defaultPlan) {
-          throw new Error('Default plan not found')
-        }
-
-        const newUserSubscription = new UserSubscription()
-        Object.assign(newUserSubscription, {
-          user: activeSubscription.user,
-          plan: defaultPlan,
-          subscribedAt: new Date(),
-        })
-
-        await newUserSubscription.save()
         return true
       }
       return false

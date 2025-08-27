@@ -18,6 +18,15 @@ export type Scalars = {
   DateTime: { input: any; output: any; }
 };
 
+/** Cancelation possible reason */
+export enum CancelationReadon {
+  Canceledadmin = 'CANCELEDADMIN',
+  Cancelled = 'CANCELLED',
+  Expired = 'EXPIRED',
+  Subscribed = 'SUBSCRIBED',
+  Unpaid = 'UNPAID'
+}
+
 export type Execution = {
   __typename?: 'Execution';
   executedAt: Scalars['DateTime']['output'];
@@ -41,18 +50,17 @@ export enum Language {
 
 export type Mutation = {
   __typename?: 'Mutation';
-  createPlan?: Maybe<Plan>;
+  createPlan: Plan;
   createSnippet: Snippet;
   createUser?: Maybe<User>;
   deleteSnippet: Scalars['Boolean']['output'];
   deleteUser: Scalars['Boolean']['output'];
-  deleteUserSubscription: Scalars['Boolean']['output'];
   execute?: Maybe<Execution>;
   login?: Maybe<User>;
   logout: Scalars['Boolean']['output'];
   subscribe: UserSubscription;
   unsubscribe: Scalars['Boolean']['output'];
-  updatePlan?: Maybe<Plan>;
+  updatePlan: Plan;
   updateSnippet: Snippet;
   updateUser?: Maybe<User>;
   updateUserSubscription?: Maybe<UserSubscription>;
@@ -81,11 +89,6 @@ export type MutationDeleteSnippetArgs = {
 
 export type MutationDeleteUserArgs = {
   id?: InputMaybe<Scalars['ID']['input']>;
-};
-
-
-export type MutationDeleteUserSubscriptionArgs = {
-  id: Scalars['ID']['input'];
 };
 
 
@@ -130,7 +133,7 @@ export type MutationUpdateUserArgs = {
 
 export type MutationUpdateUserSubscriptionArgs = {
   data: UserSubscriptionUpdateInput;
-  id: Scalars['ID']['input'];
+  email: Scalars['String']['input'];
 };
 
 export type Plan = {
@@ -142,25 +145,26 @@ export type Plan = {
   name: Scalars['String']['output'];
   price: Scalars['Int']['output'];
   subscriptions: Array<UserSubscription>;
+  updatedAt: Scalars['DateTime']['output'];
 };
 
 export type PlanCreateInput = {
   executionLimit: Scalars['Int']['input'];
-  isDefault?: InputMaybe<Scalars['Boolean']['input']>;
+  isDefault: Scalars['Boolean']['input'];
   name: Scalars['String']['input'];
   price: Scalars['Int']['input'];
 };
 
 export type PlanUpdateInput = {
-  executionLimit?: InputMaybe<Scalars['Int']['input']>;
-  isDefault?: InputMaybe<Scalars['Boolean']['input']>;
-  name?: InputMaybe<Scalars['String']['input']>;
-  price?: InputMaybe<Scalars['Int']['input']>;
+  executionLimit: Scalars['Int']['input'];
+  isDefault: Scalars['Boolean']['input'];
+  name: Scalars['String']['input'];
+  price: Scalars['Int']['input'];
 };
 
 export type Query = {
   __typename?: 'Query';
-  getActiveSubscription: UserSubscription;
+  getActiveSubscription?: Maybe<UserSubscription>;
   getAllSnippets: Array<Snippet>;
   getAllUsersSubscriptions: Array<User>;
   getSnippet?: Maybe<Snippet>;
@@ -168,6 +172,11 @@ export type Query = {
   user?: Maybe<User>;
   users: Array<User>;
   whoAmI?: Maybe<User>;
+};
+
+
+export type QueryGetActiveSubscriptionArgs = {
+  userId?: InputMaybe<Scalars['String']['input']>;
 };
 
 
@@ -237,23 +246,24 @@ export enum UserRole {
 
 export type UserSubscription = {
   __typename?: 'UserSubscription';
+  cancellationReason: CancelationReadon;
   expiresAt?: Maybe<Scalars['DateTime']['output']>;
   id: Scalars['ID']['output'];
-  isActive: Scalars['Boolean']['output'];
   plan: Plan;
   subscribedAt: Scalars['DateTime']['output'];
-  unsubscribedAt?: Maybe<Scalars['DateTime']['output']>;
+  terminatedAt?: Maybe<Scalars['DateTime']['output']>;
   user: User;
 };
 
 export type UserSubscriptionCreateInput = {
   planId: Scalars['ID']['input'];
-  userId: Scalars['String']['input'];
+  userId?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type UserSubscriptionUpdateInput = {
+  cancellationReason?: InputMaybe<Scalars['String']['input']>;
   expiresAt?: InputMaybe<Scalars['DateTime']['input']>;
-  id: Scalars['ID']['input'];
+  terminatedAt?: InputMaybe<Scalars['DateTime']['input']>;
 };
 
 export type UserUpdateInput = {
