@@ -1,5 +1,1 @@
-export {
-  default as editorReducer,
-  initialEditorState,
-  type EditorState,
-} from './editorReducer'
+export { default as editorReducer, type EditorState } from './editorReducer'

@@ -15,7 +15,7 @@ import { Subscribe } from '@/features/editor/components/editor'
 import { EditorUrlParams, Status } from '@/features/editor/types'
 
 import { EXECUTE } from '@/shared/api/execute'
-import { WHO_AM_I } from '@/shared/api/whoAmI'
+import { GET_SNIPPET } from '@/shared/api/getSnippet'
 import { Modal } from '@/shared/components'
 import { Button } from '@/shared/components/ui/button'
 import { Spinner } from '@/shared/components/ui/spinner'
@@ -45,11 +45,11 @@ export default function EditorActions({
   onChangeOutput,
   onChangeStatus,
 }: EditorActionProps) {
+  const navigate = useNavigate()
+  const { snippetId, snippetSlug } = useParams<EditorUrlParams>()
   const [showModal, setShowModal] = useState(false)
   const [status, setStatus] = useState<Status>('typing')
   const [execute] = useMutation(EXECUTE)
-  const navigate = useNavigate()
-  const { snippetId, snippetSlug } = useParams<EditorUrlParams>()
 
   const isExecuting = status === 'executing'
   const disabled = !code || isExecuting || status === 'disabled'
@@ -66,7 +66,7 @@ export default function EditorActions({
           },
           snippetId: snippetId,
         },
-        refetchQueries: [{ query: WHO_AM_I }],
+        refetchQueries: [{ query: GET_SNIPPET, variables: { id: snippetId } }],
       })
       if (data) {
         const {
@@ -83,7 +83,7 @@ export default function EditorActions({
 
           setStatus('typing')
         }
-        // Update context with the result and status
+        // Update state with the result and status
         onChangeOutput(result)
         onChangeStatus(status)
       }

@@ -3,12 +3,39 @@ import { toast } from 'sonner'
 
 import { STARTER_SNIPPET } from '@/features/editor/components/editor'
 import { useSnippet } from '@/features/editor/hooks'
-import { editorReducer, initialEditorState } from '@/features/editor/reducers'
-import { ExecutionStatus, Language } from '@/shared/gql/graphql'
+import { editorReducer, EditorState } from '@/features/editor/reducers'
+import {
+  ExecutionStatus,
+  GetSnippetQuery,
+  Language,
+} from '@/shared/gql/graphql'
+
+const initialEditorState: EditorState = {
+  code: STARTER_SNIPPET.JAVASCRIPT,
+  language: Language.Javascript,
+  output: '',
+  executionStatus: undefined,
+}
+
+const initializeEditorState = (
+  snippet: GetSnippetQuery['getSnippet'] | null | undefined,
+): EditorState => {
+  if (!snippet) {
+    return initialEditorState
+  }
+  return {
+    language: snippet.language,
+    code: snippet.code,
+    output: snippet.executions?.[0].result ?? '',
+    executionStatus: snippet.executions?.[0].status ?? undefined,
+  }
+}
 
 export default function useEditorPage(snippetId?: string) {
   const { snippet, loading, error } = useSnippet(snippetId)
-  const [state, dispatch] = useReducer(editorReducer, initialEditorState)
+  const [state, dispatch] = useReducer(editorReducer, initialEditorState, () =>
+    initializeEditorState(snippet),
+  )
 
   // Initialize from snippet or starter code
   useEffect(() => {
@@ -16,12 +43,19 @@ export default function useEditorPage(snippetId?: string) {
       return
     }
 
-    const { code, executions } = snippet ?? {}
-    dispatch({
-      type: 'SET_INITIAL_VALUES',
-      code: code ?? STARTER_SNIPPET[state.language],
-      output: executions?.[0].result ?? '',
-    })
+    const lastExecution = snippet?.executions?.[0]
+
+    if (lastExecution) {
+      dispatch({
+        type: 'SET_INITIAL_VALUES',
+        payload: {
+          language: snippet.language,
+          code: snippet.code,
+          output: lastExecution.result,
+          executionStatus: lastExecution.status,
+        },
+      })
+    }
   }, [snippetId, snippet])
 
   /**
