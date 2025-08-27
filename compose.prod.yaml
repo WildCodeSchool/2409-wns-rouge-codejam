@@ -22,7 +22,7 @@ services:
 
   code-execution:
     container_name: codejam-code-execution
-    build: codejam2025proton/code-execution:latest
+    image: codejam2025proton/code-execution:latest
     volumes:
       # Use the host's docker daemon (DooD)
       - /var/run/docker.sock:/var/run/docker.sock
