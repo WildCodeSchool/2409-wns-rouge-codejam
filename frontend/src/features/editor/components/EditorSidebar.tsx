@@ -15,6 +15,13 @@ import { useEffect, useState } from 'react'
 import { Pencil, Plus, Trash } from 'lucide-react'
 import CreateSnippetModal from '@/features/editor/components/CreateSnippetModal'
 import Modal from '@/shared/components/Modal'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '@/shared/components/ui/tooltip'
+import { cn } from '@/shared/lib/utils'
+
 
 interface Snippet {
   id: string
@@ -31,6 +38,7 @@ export default function EditorSidebar() {
   const snippets = data.getAllSnippets
   const [activeSnippetId, setActiveSnippetId] = useState<string | null>(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
+
 
   // On mount and when location/snippets change, sync activeSnippetId with URL or default to first snippet
   useEffect(() => {
@@ -77,19 +85,26 @@ export default function EditorSidebar() {
                       key={snippet.id}
                       className="flex cursor-pointer justify-between"
                     >
-                      <SidebarMenuButton
-                        asChild
-                        onClick={() => {
-                          handleClick(snippet)
-                        }}
-                        className={
-                          activeSnippetId === snippet.id
-                            ? 'text-sky-500 hover:text-sky-300'
-                            : hoveredTextStyles
-                        }
-                      >
-                        <span>{snippet.name}</span>
-                      </SidebarMenuButton>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <button
+                            onClick={() => {
+                              handleClick(snippet)
+                            }}
+                            className={cn(
+                              'flex-1 text-left truncate px-2 py-1.5 rounded-md transition-colors cursor-pointer',
+                              activeSnippetId === snippet.id
+                                ? 'text-sky-500 hover:text-sky-300'
+                                : hoveredTextStyles
+                            )}
+                          >
+                            {snippet.name}
+                          </button>
+                        </TooltipTrigger>
+                        <TooltipContent side="right" align="center">
+                          {snippet.name}
+                        </TooltipContent>
+                      </Tooltip>
                       <div className="flex items-center gap-2 pr-2">
                         <SidebarMenuButton className="p-0">
                           <Pencil className={iconsStyles} />
