@@ -1,93 +1,75 @@
-import { CREATE_SNIPPET } from '@/shared/api/createSnippet'
-import { UPDATE_SNIPPET } from '@/shared/api/updateSnippet'
-import { Language, Snippet, UserRole } from '@/shared/gql/graphql'
-import { useMutation, useSuspenseQuery } from '@apollo/client'
 import Editor from '@monaco-editor/react'
-import { useState } from 'react'
-import SaveButton from './SaveButton'
-import { toast } from 'sonner'
-import { WHO_AM_I } from '@/shared/api/whoAmI'
+import { editor } from 'monaco-editor'
+import { useRef } from 'react'
+
+import { BASE_EDITOR_OPTIONS } from '@/features/editor/components/editor'
+import { Skeleton } from '@/shared/components/ui/skeleton'
+import { Language } from '@/shared/gql/graphql'
 
 type CodeEditorProps = {
-  snippet?: Snippet
+  code: string
+  language: Language
+  onChange: (nextCode?: string) => void
 }
 
-const CodeEditor = ({ snippet }: CodeEditorProps) => {
-  const [snippetCode, setSnippetCode] = useState(snippet?.code ?? '')
-  const [snippetLanguage] = useState(snippet?.language ?? Language.Javascript)
-  const [snippetName] = useState(snippet?.name ?? 'Default')
-  const [snippetId, setSnippetId] = useState<string | undefined>(snippet?.id)
-  const [isSaving, setIsSaving] = useState<boolean>(false)
-  const [updateSnippet] = useMutation(UPDATE_SNIPPET)
-  const [createSnippet] = useMutation(CREATE_SNIPPET)
-  const { data: { whoAmI: user } = {} } = useSuspenseQuery(WHO_AM_I)
+export default function CodeEditor({
+  code,
+  language,
+  onChange,
+}: CodeEditorProps) {
+  const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null)
 
-  const isUserLoggedIn = user !== null && user !== undefined
-  const isUserGuest = user?.role === UserRole.Guest
+  // Focus the editor when it mounts and set the cursor position at the end of the code
+  const handleOnEditorMount = (
+    editorInstance: editor.IStandaloneCodeEditor,
+  ) => {
+    editorRef.current = editorInstance
 
-  async function handleSave() {
-    try {
-      setIsSaving(true)
+    // Focus the editor and
+    editorInstance.focus()
 
-      // If a snippet exists, we update it, otherwise we create a new one
-      if (snippetId) {
-        await updateSnippet({
-          variables: {
-            data: {
-              code: snippetCode,
-              language: snippetLanguage,
-              name: snippetName,
-            },
-            updateSnippetId: snippetId,
-          },
-        })
-      } else {
-        const { data } = await createSnippet({
-          variables: {
-            data: {
-              code: snippetCode,
-              language: snippetLanguage,
-              name: snippetName,
-            },
-          },
-        })
-
-        if (data?.createSnippet) {
-          setSnippetId(data.createSnippet.id)
-        }
-      }
-
-      toast.success('Successfully saved')
-    } catch (err) {
-      toast.error('Failed to save', {
-        description: err instanceof Error ? err.message : JSON.stringify(err),
+    // Set the cursor position at the end of the code
+    const model = editorInstance.getModel()
+    if (!model) {
+      return
+    }
+    const lastLine = model.getLineCount()
+    const position = editorInstance.getPosition()
+    if (position) {
+      const nextLinePosition = lastLine - 1
+      const nextColumnPosition = code.length > 0 ? code.length + 1 : 0
+      editorInstance.setPosition({
+        lineNumber: nextLinePosition,
+        column: nextColumnPosition,
       })
-    } finally {
-      setIsSaving(false)
     }
   }
 
   return (
-    <div className="flex h-full flex-col items-end justify-around gap-2">
-      {
-        // TODO: To move at the right place when PR #100 is merged
-
-        snippetCode && isUserLoggedIn && (
-          <SaveButton onClick={handleSave} loading={isSaving} />
-        )
-      }
+    <div className="relative">
       <Editor
-        value={snippetCode}
-        onChange={(value) => {
-          if (value) {
-            setSnippetCode(value)
-          }
-        }}
         defaultLanguage="javascript"
+        language={language.toLowerCase()}
+        value={code}
+        onChange={onChange}
+        onMount={handleOnEditorMount}
+        loading={<EditorLoadingSkeleton />} // 👈 prevent displaying default loader and layout flickering
         theme="vs-dark"
+        options={{
+          ...BASE_EDITOR_OPTIONS,
+          wrappingIndent: 'indent',
+          renderLineHighlight: 'gutter',
+        }}
+        className="absolute h-full w-full [&_.monaco-editor]:rounded-md [&_.overflow-guard]:rounded-md"
       />
     </div>
   )
 }
 
-export default CodeEditor
+function EditorLoadingSkeleton() {
+  return <div className="h-full w-full rounded-md bg-[#1e1e1e]" />
+}
+
+export function CodeEditorSkeleton() {
+  return <Skeleton className="h-full" />
+}

@@ -43,10 +43,10 @@ export class UsersResolver {
     return me
   }
 
-  @Mutation(() => User, { nullable: true })
+  @Mutation(() => User)
   async createUser(
     @Arg('data', () => UserCreateInput) data: UserCreateInput,
-  ): Promise<User | null> {
+  ): Promise<User> {
     try {
       // Verify if user already exists (email and username should both be unique)
       const existingUserByEmail = await User.findOne({
