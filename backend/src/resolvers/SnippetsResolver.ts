@@ -6,6 +6,7 @@ import {
   ID,
   Authorized,
   Ctx,
+  Int,
 } from 'type-graphql'
 import {
   Snippet,
@@ -13,24 +14,37 @@ import {
   SnippetUpdateInput,
 } from '../entities/Snippet'
 import { AuthContextType, UserRole } from '../types'
+import { getUserFromContext } from './utils'
 
 @Resolver()
 export class SnippetsResolver {
-  // Query to get snippet by ID
-  @Authorized(UserRole.ADMIN, UserRole.USER)
+  // Public route to allow code sharing between users regardless their role
   @Query(() => Snippet, { nullable: true })
   async getSnippet(
     @Ctx() context: AuthContextType,
     @Arg('id', () => ID) id: string,
+    @Arg('limit', () => Int, { nullable: true }) limit = 1,
+    @Arg('offset', () => Int, { nullable: true }) offset = 0,
   ): Promise<Snippet | null> {
-    const isAdmin = context.user.role === UserRole.ADMIN
-    const where = isAdmin ? {} : { user: { id: context.user.id }, id }
-    const relations = isAdmin ? ['user'] : []
-    return Snippet.findOne({
-      where,
-      relations,
-    })
+    const currentUser = await getUserFromContext(context)
+    const isAdmin = currentUser && currentUser.role === UserRole.ADMIN
+
+    const qb = Snippet.createQueryBuilder('snippet')
+      .leftJoinAndSelect('snippet.executions', 'execution')
+      .where('snippet.id = :id', { id })
+      .orderBy('execution.executedAt', 'DESC')
+      .limit(Math.min(limit, 50)) // Cap the limit to 50 to avoid abuse
+      .offset(offset)
+
+    if (isAdmin) {
+      qb.leftJoinAndSelect('snippet.user', 'user')
+    }
+
+    const snippet = await qb.getOne()
+
+    return snippet
   }
+
   // Query to get all snippets
   @Authorized(UserRole.ADMIN, UserRole.USER)
   @Query(() => [Snippet])

@@ -1,7 +1,114 @@
+/*___________________ MAIN FONT __________________ */
+/* Load the variable font */
+@font-face {
+  /* Use VF to make it distinguishable from static fonts */
+  font-family: 'Inter VF';
+  src:
+    local('Inter'),
+    /* Main modern font format */
+      url('/assets/fonts/inter/Inter-VariableFont_wght.woff2')
+      format('woff2-variations'),
+    /* Fallback font format */
+      url('/assets/fonts/inter/Inter-VariableFont_wght.woff')
+      format('woff-variations'),
+    url('/assets/fonts/inter/Inter-VariableFont_wght.ttf')
+      format('truetype-variations');
+  font-style: normal;
+  /* Allowable range for the weight of the variable font */
+  font-weight: 400 700;
+  /* Displaying text quickly is a top priority, but ensure the custom web-font is used */
+  font-display: swap;
+}
+
+/* Load the static fonts as a fallback */
+@font-face {
+  font-family: 'Inter';
+  src:
+    local('Inter'),
+    url('/assets/fonts/inter/static/Inter_18pt-Regular.woff2') format('woff2'),
+    url('/assets/fonts/inter/static/Inter_18pt-Regular.woff') format('woff'),
+    url('/assets/fonts/inter/static/Inter_18pt-Regular.ttf') format('truetype');
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Inter';
+  src:
+    local('Inter'),
+    url('/assets/fonts/inter/static/Inter_18pt-Medium.woff2') format('woff2'),
+    url('/assets/fonts/inter/static/Inter_18pt-Medium.woff') format('woff'),
+    url('/assets/fonts/inter/static/Inter_18pt-Medium.ttf') format('truetype');
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Inter';
+  src:
+    local('Inter'),
+    url('/assets/fonts/inter/static/Inter_18pt-SemiBold.woff2') format('woff2'),
+    url('/assets/fonts/inter/static/Inter_18pt-SemiBold.woff') format('woff'),
+    url('/assets/fonts/inter/static/Inter_18pt-SemiBold.ttf') format('truetype');
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Inter';
+  src:
+    local('Inter'),
+    url('/assets/fonts/inter/static/Inter_18pt-Bold.woff2') format('woff2'),
+    url('/assets/fonts/inter/static/Inter_18pt-Bold.woff') format('woff'),
+    url('/assets/fonts/inter/static/Inter_18pt-Bold.ttf') format('truetype');
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+}
+/*________________________________________________ */
+
+/*_____________ EDITOR CUSTOM FONT _______________ */
+/* Load the variable font */
+@font-face {
+  /* Use VF to make it distinguishable from static fonts */
+  font-family: 'Fira Code VF';
+  src:
+    local('Fira Code'),
+    /* Main modern font format */
+      url('/assets/fonts/fira-code/FiraCode-VariableFont_wght.woff2')
+      format('woff2-variations'),
+    /* Fallback font format */
+      url('/assets/fonts/fira-code/FiraCode-VariableFont_wght.woff')
+      format('woff-variations'),
+    url('/assets/fonts/fira-code/FiraCode-VariableFont_wght.ttf')
+      format('truetype-variations');
+  font-style: normal;
+  /* Allowable range for the weight of the variable font */
+  font-weight: 400 400;
+  /* Displaying text quickly is a top priority, but ensure the custom web-font is used */
+  font-display: swap;
+}
+
+/* Load the static fonts as a fallback */
+@font-face {
+  font-family: 'Fira Code';
+  src:
+    local('Fira Code'),
+    url('/assets/fonts/fira-code/static/FiraCode-Regular.woff2') format('woff2'),
+    url('/assets/fonts/fira-code/static/FiraCode-Regular.woff') format('woff'),
+    url('/assets/fonts/fira-code/static/FiraCode-Regular.ttf')
+      format('truetype');
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+/*________________________________________________ */
+
 @import 'tailwindcss';
 
 @plugin 'tailwindcss-animate';
 
+/* Use the @custom-variant directive to add a custom variant to the project */
 @custom-variant dark (&:is(.dark *));
 
 :root {
@@ -115,13 +222,40 @@
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-link: var(--link);
+
+  --font-main: 'Inter VF', 'Inter', sans-serif;
+  --font-editor: 'Fira Code VF', 'Fira Code', monospace;
 }
 
+/* Use the @theme directive to define project's custom design tokens, like fonts, colors, and breakpoints */
+@theme {
+  --animate-shimmer: shimmer 1s infinite;
+  @keyframes shimmer {
+    to {
+      background-position-x: 0%;
+    }
+  }
+}
+
+/* Use the @layer base directive to add default styles for specific HTML elements */
 @layer base {
   * {
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-main;
   }
+}
+
+/* Use the @layer component directive to add more complicated classes that can still be overriden with utility classes */
+@layer component {
+  .shimmer {
+    background: linear-gradient(-45deg, #eee 40%, #fafafa 50%, #eee 60%);
+    background-size: 300%;
+    background-position-x: 100%;
+  }
+}
+/* Use the @utility directive to add custom utilities to your project that work with variants like hover, focus and lg */
+@utility gradient-accent {
+  @apply bg-gradient-to-r from-[#0369A1] via-[#7DD3FC] to-[#0369A1];
 }

@@ -6,7 +6,41 @@ on:
       - v*
 
 jobs:
+  test-frontend:
+    runs-on: ubuntu-latest
+    env:
+      directory: frontend
+    steps:
+      # Retrieve code from the repository
+      - name: Check out code
+        uses: actions/checkout@v4
+      # Custom action to setup environment
+      - uses: ./.github/actions/common-steps
+        with:
+          directory: $directory
+      # Ensure tests pass
+      - name: Run tests
+        run: cd $directory && pnpm run test
+
+  test-backend:
+    runs-on: ubuntu-latest
+    env:
+      directory: backend
+    steps:
+      # Retrieve code from the repository
+      - name: Check out code
+        uses: actions/checkout@v4
+      # Custom action to setup environment
+      - uses: ./.github/actions/common-steps
+        with:
+          directory: $directory
+      # Ensure tests pass
+      - name: Run tests
+        run: cd $directory && pnpm run test:db
+
   build-frontend:
+    # Ensure frontend tests pass before building and pushing the Docker image
+    needs: test-frontend
     # Run job only if:
     # - the commit is tagged starting with v
     runs-on: ubuntu-latest
@@ -17,12 +51,14 @@ jobs:
       # Custom action to login to Docker Hub, build and push the Docker image
       - uses: ./.github/actions/build-common-steps
         with:
-          directory: 'frontend'
+          directory: "frontend"
           docker-username: ${{ vars.DOCKERHUB_USERNAME }}
           docker-token: ${{ secrets.DOCKERHUB_TOKEN }}
           docker-repository: ${{ vars.DOCKERHUB_REPO_FRONTEND }}
 
   build-backend:
+    # Ensure backend tests pass before building and pushing the Docker image
+    needs: test-backend
     # Run job only if:
     # - the commit is tagged starting with v
     runs-on: ubuntu-latest
@@ -33,7 +69,7 @@ jobs:
       # Custom action to login to Docker Hub, build and push the Docker image
       - uses: ./.github/actions/build-common-steps
         with:
-          directory: 'backend'
+          directory: "backend"
           docker-username: ${{ vars.DOCKERHUB_USERNAME }}
           docker-token: ${{ secrets.DOCKERHUB_TOKEN }}
           docker-repository: ${{ vars.DOCKERHUB_REPO_BACKEND }}

@@ -1,7 +1,9 @@
-import { BrowserRouter, Route, Routes } from 'react-router-dom'
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { ApolloClient, InMemoryCache, ApolloProvider } from '@apollo/client'
-import HomePage from '@/shared/pages/HomePage'
-import Layout from './shared/components/Layout'
+
+import { MainLayout } from '@/shared/components/layouts'
+import { Toaster } from '@/shared/components/ui/sonner'
+import { EditorPage } from '@/shared/pages'
 
 const client = new ApolloClient({
   uri: '/api',
@@ -14,20 +16,23 @@ const client = new ApolloClient({
   },
 })
 
-const App = () => {
+export default function App() {
   return (
     <ApolloProvider client={client}>
+      <Toaster richColors />
       <BrowserRouter>
         <Routes>
-          <Route path="/" Component={Layout}>
-            <Route index Component={HomePage} />
-            <Route path="/:snippetId/:snippetSlug" Component={HomePage} />
+          <Route path="/" Component={MainLayout}>
+            <Route index element={<Navigate to="/editor" />} />
+            <Route path="/editor" Component={EditorPage} />
+            <Route
+              path="/editor/:snippetId/:snippetSlug"
+              Component={EditorPage}
+            />
           </Route>
-          <Route path="*" Component={HomePage} />
+          <Route path="*" element={<Navigate to="/editor" replace />} />
         </Routes>
       </BrowserRouter>
     </ApolloProvider>
   )
 }
-
-export default App
