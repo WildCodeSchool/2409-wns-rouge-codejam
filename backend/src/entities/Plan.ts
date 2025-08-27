@@ -51,15 +51,11 @@ export class Plan extends BaseEntity {
   @Field(() => Int)
   executionLimit!: number
 
-  @Column({ type: 'boolean', default: false })
-  @Field(() => Boolean)
-  isDefault!: boolean
-
   @CreateDateColumn()
   @Field(() => GraphQLDateTime)
   createdAt!: Date
 
-  @UpdateDateColumn({ type: 'timestamp' })
+  @UpdateDateColumn()
   @Field(() => GraphQLDateTime)
   updatedAt!: Date
 
@@ -83,9 +79,6 @@ export class PlanCreateInput {
   @Min(EXECUTION_LIMIT_CONSTRAINTS.min)
   @Max(EXECUTION_LIMIT_CONSTRAINTS.max)
   executionLimit!: number
-
-  @Field(() => Boolean)
-  isDefault?: boolean
 }
 
 @InputType()
@@ -103,7 +96,4 @@ export class PlanUpdateInput {
   @Min(EXECUTION_LIMIT_CONSTRAINTS.min)
   @Max(EXECUTION_LIMIT_CONSTRAINTS.max)
   executionLimit?: number
-
-  @Field(() => Boolean)
-  isDefault?: boolean
 }

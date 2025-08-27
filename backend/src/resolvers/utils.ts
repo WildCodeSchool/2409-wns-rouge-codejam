@@ -244,36 +244,29 @@ export async function findActiveSubscription(
   targetUserId: string,
 ): Promise<UserSubscription | null> {
   // can be null if premium subscription is expired and user hasn't logged in since its expiration
-  const now = new Date()
-  let activePremiumSubscription = await UserSubscription.findOne({
+
+  let activeSubscription = await UserSubscription.findOne({
     where: {
       user: { id: targetUserId },
-      expiresAt: MoreThan(now),
     },
+    order: { subscribedAt: 'DESC' },
     relations: ['plan', 'user'],
   })
 
-  // If no active premium subscription is found, check for an active free one
-  if (!activePremiumSubscription) {
-    const activeSubscription = await UserSubscription.findOne({
-      where: {
-        user: { id: targetUserId },
-        terminatedAt: IsNull(),
-        expiresAt: IsNull(),
-        subscribedAt: LessThan(now),
-        plan: { isDefault: true },
-      },
-      relations: ['plan', 'user'],
-      order: { subscribedAt: 'DESC' },
-    })
+  if (activeSubscription?.expiresAt) {
+    const isExpired = activeSubscription.expiresAt < new Date()
+    if (isExpired) {
+      return null
+    }
     return activeSubscription
   }
-  return activePremiumSubscription
+
+  return activeSubscription
 }
 
 export async function createDefaultSubscription(user: User): Promise<Boolean> {
   const defaultPlan = await Plan.findOne({
-    where: { isDefault: true, name: Not('guest') },
+    where: { name: Not('guest'), price: 0 },
   })
 
   if (defaultPlan) {

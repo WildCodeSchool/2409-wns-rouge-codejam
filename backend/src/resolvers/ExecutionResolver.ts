@@ -44,7 +44,7 @@ export class ExecutionResolver {
       if (!activeSubscription) {
         throw new Error('No active subscription found')
       }
-
+      console.log('======== ACTIVE SUB ==========', activeSubscription.plan)
       // Get current execution count for the user
       const currentExecutionCount = await getUserExecutionCount(currentUser.id)
 

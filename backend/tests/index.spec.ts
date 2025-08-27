@@ -25,7 +25,6 @@ async function createEssentialPlans() {
     name: 'default',
     price: 0,
     executionLimit: 50,
-    isDefault: true,
   })
   await defaultPlan.save()
 

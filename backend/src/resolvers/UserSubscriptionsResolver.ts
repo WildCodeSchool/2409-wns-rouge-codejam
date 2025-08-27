@@ -73,19 +73,17 @@ export class UserSubscriptionsResolver {
       const isAdmin = currentUser.role === UserRole.ADMIN
       let targetUserId = currentUser.id
 
+      let user: User | null = currentUser
       if (isAdmin && data.userId) {
         targetUserId = data.userId
-      } else if (!isAdmin && data.userId && data.userId !== currentUser.id) {
+        user = await User.findOne({ where: { id: targetUserId } })
+      } else if (!isAdmin && data.userId) {
         // Prevent a non-admin from querying another user's subscription
         throw new Error('Unauthorized')
       }
       const now = new Date()
 
-      // Verify that user and plan exist
-      const [user, plan] = await Promise.all([
-        User.findOne({ where: { id: targetUserId } }),
-        Plan.findOne({ where: { id: data.planId } }),
-      ])
+      const plan = await Plan.findOne({ where: { id: data.planId } })
 
       // Verify if user has already an active premium subscription
       const activeSubscription = await this.getActiveSubscription(
@@ -94,14 +92,14 @@ export class UserSubscriptionsResolver {
       )
 
       if (!user) {
-        throw new Error('User not found')
+        throw new Error('User not found admin')
       }
 
       if (!plan) {
         throw new Error('Plan not found')
       }
 
-      if (activeSubscription?.plan.isDefault && !plan.isDefault) {
+      if (activeSubscription?.plan.price === 0 && plan.price > 0) {
         const newSubscription = new UserSubscription()
         Object.assign(newSubscription, {
           plan: plan,
@@ -115,30 +113,8 @@ export class UserSubscriptionsResolver {
         activeSubscription.terminatedAt = now
         await activeSubscription.save()
         return createdSubscription
-      } else if (
-        !activeSubscription?.plan.isDefault &&
-        activeSubscription?.expiresAt &&
-        activeSubscription?.expiresAt > now &&
-        plan.isDefault
-      ) {
-        const newSubscription = new UserSubscription()
-        Object.assign(newSubscription, {
-          plan: plan,
-          user: user,
-          subscribedAt: now,
-        })
-
-        const createdSubscription = await newSubscription.save()
-        const cancellationReason = isAdmin
-          ? CancellationReason.CANCELEDADMIN
-          : CancellationReason.CANCELLED
-        activeSubscription.cancellationReason = cancellationReason
-        activeSubscription.terminatedAt = now
-        await activeSubscription.save()
-
-        return createdSubscription
       }
-      return activeSubscription
+      return null
     } catch (err) {
       throw new Error(err instanceof Error ? err.message : JSON.stringify(err))
     }
@@ -171,7 +147,7 @@ export class UserSubscriptionsResolver {
         throw new Error('Active subscription not found for this user.')
       }
 
-      const premiumSubscription = !subscription?.plan.isDefault
+      const premiumSubscription = subscription?.plan.price > 0
 
       // Update the subscription with the provided data
       if (subscription && premiumSubscription) {
@@ -217,19 +193,25 @@ export class UserSubscriptionsResolver {
         context,
         targetUserId,
       )
-
+      console.log('========= Active sub ========= ', activeSubscription)
       if (!activeSubscription) {
         throw new Error('No active subscription found to unsubscribe from.')
       }
 
-      const isPaidPlan = !activeSubscription.plan.isDefault
+      const premiumSubscription = activeSubscription.plan.price > 0
 
       // If user active plan is a premium and it's not yet terminated he can cancel
-      if (isPaidPlan && !activeSubscription.terminatedAt) {
+      if (premiumSubscription && !activeSubscription.terminatedAt) {
         activeSubscription.terminatedAt = new Date()
-        activeSubscription.cancellationReason = CancellationReason.CANCELLED
-        await activeSubscription.save()
+        const cancellationReason =
+          currentUser.role === UserRole.ADMIN
+            ? CancellationReason.CANCELEDADMIN
+            : CancellationReason.CANCELLED
+        activeSubscription.cancellationReason = cancellationReason
+        console.log('========= Active sub 2 ========= ', activeSubscription)
 
+        const sub = await activeSubscription.save()
+        console.log('========= Updated ========= ', sub)
         return true
       }
       return false

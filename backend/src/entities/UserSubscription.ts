@@ -31,7 +31,7 @@ export class UserSubscription extends BaseEntity {
   id!: string
 
   // Can not be null as we need to create a subscription when a user is created
-  @CreateDateColumn({ type: 'timestamp' })
+  @CreateDateColumn()
   @Field(() => GraphQLDateTime)
   subscribedAt!: Date
 
