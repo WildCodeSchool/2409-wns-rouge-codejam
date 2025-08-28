@@ -10,6 +10,7 @@ import { EditorUrlParams } from '@/features/editor/types'
 
 export default function EditorPage() {
   const { snippetId } = useParams<EditorUrlParams>()
+  console.log('snippet use editor page', snippetId)
   const {
     loading,
     error,

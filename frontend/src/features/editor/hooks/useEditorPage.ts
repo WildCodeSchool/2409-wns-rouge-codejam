@@ -39,23 +39,24 @@ export default function useEditorPage(snippetId?: string) {
 
   // Initialize from snippet or starter code
   useEffect(() => {
+    console.log('snippet id useeffect', snippetId)
     if (!snippetId) {
       return
     }
 
     const lastExecution = snippet?.executions?.[0]
 
-    if (lastExecution) {
-      dispatch({
-        type: 'SET_INITIAL_VALUES',
-        payload: {
-          language: snippet.language,
-          code: snippet.code,
-          output: lastExecution.result,
-          executionStatus: lastExecution.status,
-        },
-      })
-    }
+    // if (lastExecution) {
+    dispatch({
+      type: 'SET_INITIAL_VALUES',
+      payload: {
+        language: snippet?.language,
+        code: snippet?.code,
+        output: lastExecution?.result,
+        executionStatus: lastExecution?.status,
+      },
+    })
+    // }
   }, [snippetId, snippet])
 
   /**

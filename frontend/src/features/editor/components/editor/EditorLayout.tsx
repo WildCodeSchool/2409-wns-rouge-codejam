@@ -15,6 +15,10 @@ import {
   ResizablePanelGroup,
 } from '@/shared/components/ui/resizable'
 import { ExecutionStatus } from '@/shared/gql/graphql'
+import EditorSidebar from '../EditorSidebar'
+import useAuth from '@/features/auth/hooks/useAuth'
+import GuestSidebar from '../GuestSidebar'
+import { Suspense } from 'react'
 
 type EditorLayoutProps = {
   state: EditorState
@@ -31,9 +35,21 @@ export default function EditorLayout({
   onChangeOutput,
   onChangeStatus,
 }: EditorLayoutProps) {
+  const { user } = useAuth()
+
   return (
     <div className="h-full">
       <ResizablePanelGroup direction="horizontal" className="h-full">
+        <ResizablePanel className="gap-2" minSize={25} maxSize={25}>
+          {user ? (
+            <Suspense fallback={'...loading'}>
+              <EditorSidebar />
+            </Suspense>
+          ) : (
+            <GuestSidebar />
+          )}
+        </ResizablePanel>
+        <ResizableHandle withHandle className="bg-transparent" />
         <ResizablePanel
           defaultSize={50}
           minSize={25}

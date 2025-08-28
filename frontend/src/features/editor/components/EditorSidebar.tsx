@@ -10,7 +10,7 @@ import {
 } from '../../../shared/components/ui/sidebar'
 import { useSuspenseQuery } from '@apollo/client'
 import { GET_ALL_SNIPPETS } from '../../../shared/api/getUserSnippets'
-import { useNavigate, useLocation } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import { Pencil, Plus, Trash } from 'lucide-react'
 import CreateSnippetModal from '@/features/editor/components/CreateSnippetModal'
@@ -21,6 +21,7 @@ import {
   TooltipTrigger,
 } from '@/shared/components/ui/tooltip'
 import { cn } from '@/shared/lib/utils'
+import { EditorUrlParams } from '../types'
 
 interface Snippet {
   id: string
@@ -33,32 +34,37 @@ export default function EditorSidebar() {
     data: { getAllSnippets: Snippet[] }
   }
   const navigate = useNavigate()
-  const location = useLocation()
+  // const location = useLocation()
+  const { snippetId } = useParams<EditorUrlParams>()
   const snippets = data.getAllSnippets
   const [activeSnippetId, setActiveSnippetId] = useState<string | null>(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
 
   // On mount and when location/snippets change, sync activeSnippetId with URL or default to first snippet
+
   useEffect(() => {
-    const match = /^\/([^/]+)/.exec(location.pathname)
-    if (match && snippets.some((s) => s.id === match[1])) {
-      setActiveSnippetId(match[1])
+    console.log('useeffect ', snippetId)
+    if (snippetId && snippets.some((s) => s.id === snippetId)) {
+      setActiveSnippetId(snippetId)
     } else if (snippets.length > 0) {
       setActiveSnippetId(snippets[0].id)
-      navigate(`/${snippets[0].id}/${snippets[0].slug}`, { replace: true })
+      navigate(`/editor/${snippets[0].id}/${snippets[0].slug}`, {
+        replace: true,
+      })
     }
-  }, [location.pathname, snippets, navigate])
+  }, [snippetId, snippets, navigate])
 
   const handleClick = (snippet: Snippet) => {
-    setActiveSnippetId(snippet.id)
-    navigate(`/${snippet.id}/${snippet.slug}`)
+    // setActiveSnippetId(snippet.id)
+
+    navigate(`/editor/${snippet.id}/${snippet.slug}`)
   }
 
   const hoveredTextStyles = 'text-neutral-300 hover:text-neutral-100'
   const iconsStyles = `cursor-pointer h-4 w-4 ${hoveredTextStyles}`
 
   return (
-    <SidebarProvider>
+    <SidebarProvider defaultOpen={true}>
       <Sidebar
         collapsible="none"
         className="bg-sidebar-foreground h-screen max-w-[300px]"
@@ -66,55 +72,53 @@ export default function EditorSidebar() {
         <SidebarContent>
           <SidebarGroup className="px-3 py-4">
             <SidebarGroupContent>
-              {snippets.length > 0 && (
-                <SidebarMenu className="gap-3">
-                  <SidebarMenuItem key="add-new-snippet">
-                    <SidebarMenuButton
-                      className="group flex cursor-pointer items-center justify-center"
-                      onClick={() => {
-                        setIsModalOpen(true)
-                      }}
-                    >
-                      <Plus className="h-4 w-4 text-neutral-300 group-hover:text-neutral-100" />
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                  {snippets.map((snippet) => (
-                    <SidebarMenuItem
-                      key={snippet.id}
-                      className="flex cursor-pointer justify-between"
-                    >
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <button
-                            onClick={() => {
-                              handleClick(snippet)
-                            }}
-                            className={cn(
-                              'flex-1 cursor-pointer truncate rounded-md px-2 py-1.5 text-left transition-colors',
-                              activeSnippetId === snippet.id
-                                ? 'text-sky-500 hover:text-sky-300'
-                                : hoveredTextStyles,
-                            )}
-                          >
-                            {snippet.name}
-                          </button>
-                        </TooltipTrigger>
-                        <TooltipContent side="right" align="center">
+              <SidebarMenu className="gap-3">
+                <SidebarMenuItem key="add-new-snippet">
+                  <SidebarMenuButton
+                    className="group flex cursor-pointer items-center justify-center"
+                    onClick={() => {
+                      setIsModalOpen(true)
+                    }}
+                  >
+                    <Plus className="h-4 w-4 text-neutral-300 group-hover:text-neutral-100" />
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+                {snippets.map((snippet) => (
+                  <SidebarMenuItem
+                    key={snippet.id}
+                    className="flex cursor-pointer justify-between"
+                  >
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <button
+                          onClick={() => {
+                            handleClick(snippet)
+                          }}
+                          className={cn(
+                            'flex-1 cursor-pointer truncate rounded-md px-2 py-1.5 text-left transition-colors',
+                            activeSnippetId === snippet.id
+                              ? 'text-sky-500 hover:text-sky-300'
+                              : hoveredTextStyles,
+                          )}
+                        >
                           {snippet.name}
-                        </TooltipContent>
-                      </Tooltip>
-                      <div className="flex items-center gap-2 pr-2">
-                        <SidebarMenuButton className="p-0">
-                          <Pencil className={iconsStyles} />
-                        </SidebarMenuButton>
-                        <SidebarMenuButton className="p-0">
-                          <Trash className={iconsStyles} />
-                        </SidebarMenuButton>
-                      </div>
-                    </SidebarMenuItem>
-                  ))}
-                </SidebarMenu>
-              )}
+                        </button>
+                      </TooltipTrigger>
+                      <TooltipContent side="right" align="center">
+                        {snippet.name}
+                      </TooltipContent>
+                    </Tooltip>
+                    <div className="flex items-center gap-2 pr-2">
+                      <SidebarMenuButton className="p-0">
+                        <Pencil className={iconsStyles} />
+                      </SidebarMenuButton>
+                      <SidebarMenuButton className="p-0">
+                        <Trash className={iconsStyles} />
+                      </SidebarMenuButton>
+                    </div>
+                  </SidebarMenuItem>
+                ))}
+              </SidebarMenu>
             </SidebarGroupContent>
           </SidebarGroup>
         </SidebarContent>
