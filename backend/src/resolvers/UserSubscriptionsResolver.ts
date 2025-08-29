@@ -53,7 +53,7 @@ export class UserSubscriptionsResolver {
     }
 
     const activeSubscription = await findActiveSubscription(targetUserId)
-
+    // console.log('Expired ====> ',activeSubscription?.expiresAt activeSubscription?.expiresAt < new Date())
     return activeSubscription
   }
 
@@ -193,7 +193,7 @@ export class UserSubscriptionsResolver {
         context,
         targetUserId,
       )
-      console.log('========= Active sub ========= ', activeSubscription)
+
       if (!activeSubscription) {
         throw new Error('No active subscription found to unsubscribe from.')
       }
@@ -208,10 +208,8 @@ export class UserSubscriptionsResolver {
             ? CancellationReason.CANCELEDADMIN
             : CancellationReason.CANCELLED
         activeSubscription.cancellationReason = cancellationReason
-        console.log('========= Active sub 2 ========= ', activeSubscription)
 
-        const sub = await activeSubscription.save()
-        console.log('========= Updated ========= ', sub)
+        await activeSubscription.save()
         return true
       }
       return false

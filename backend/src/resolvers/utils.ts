@@ -10,7 +10,7 @@ import {
   UserIDJwtPayload,
 } from '../types'
 import { Execution } from '../entities/Execution'
-import { IsNull, LessThan, MoreThan, Not } from 'typeorm'
+import { MoreThan, Not } from 'typeorm'
 import {
   Snippet,
   SnippetCreateInput,
@@ -249,12 +249,13 @@ export async function findActiveSubscription(
     where: {
       user: { id: targetUserId },
     },
-    order: { subscribedAt: 'DESC' },
     relations: ['plan', 'user'],
+    order: { subscribedAt: 'DESC' },
   })
 
   if (activeSubscription?.expiresAt) {
     const isExpired = activeSubscription.expiresAt < new Date()
+
     if (isExpired) {
       return null
     }

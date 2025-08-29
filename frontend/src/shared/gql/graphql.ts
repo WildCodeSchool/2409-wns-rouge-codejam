@@ -141,7 +141,6 @@ export type Plan = {
   createdAt: Scalars['DateTime']['output'];
   executionLimit: Scalars['Int']['output'];
   id: Scalars['ID']['output'];
-  isDefault: Scalars['Boolean']['output'];
   name: Scalars['String']['output'];
   price: Scalars['Int']['output'];
   subscriptions: Array<UserSubscription>;
@@ -150,14 +149,12 @@ export type Plan = {
 
 export type PlanCreateInput = {
   executionLimit: Scalars['Int']['input'];
-  isDefault: Scalars['Boolean']['input'];
   name: Scalars['String']['input'];
   price: Scalars['Int']['input'];
 };
 
 export type PlanUpdateInput = {
   executionLimit: Scalars['Int']['input'];
-  isDefault: Scalars['Boolean']['input'];
   name: Scalars['String']['input'];
   price: Scalars['Int']['input'];
 };
