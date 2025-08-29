@@ -4,7 +4,7 @@ import { Skeleton } from '@/shared/components/ui/skeleton'
 import SaveButton from './SaveButton'
 import useEditorLeftActions from '../../hooks/useEditorLeftActions'
 
-type EditorActionProps = {
+type EditorLeftActionProps = {
   code: string
   language: Language
   onChangeLanguage: (language: string) => void
@@ -14,7 +14,7 @@ export default function EditorLeftActions({
   code,
   language,
   onChangeLanguage,
-}: EditorActionProps) {
+}: EditorLeftActionProps) {
   const { saveSnippet } = useEditorLeftActions()
 
   const handleSave = async () => {

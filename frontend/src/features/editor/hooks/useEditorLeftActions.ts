@@ -11,8 +11,7 @@ import {
   uniqueNamesGenerator,
 } from 'unique-names-generator'
 import { useNavigate, useParams } from 'react-router-dom'
-import { UPDATE_SNIPPET } from '@/shared/api/updateSnippet'
-import { CREATE_SNIPPET } from '@/shared/api/createSnippet'
+import { SAVE_SNIPPET } from '@/shared/api/saveSnippet'
 
 const baseUniqueNameConfig: Config = {
   dictionaries: [adjectives, colors, animals],
@@ -22,44 +21,31 @@ const baseUniqueNameConfig: Config = {
 export default function useEditorLeftActions() {
   const { snippetId, snippetSlug } = useParams<EditorUrlParams>()
   const [status, setStatus] = useState<Status>('typing')
-  const [updateSnippet] = useMutation(UPDATE_SNIPPET)
-  const [createSnippet] = useMutation(CREATE_SNIPPET)
+  const [saveSnippet] = useMutation(SAVE_SNIPPET)
   const navigate = useNavigate()
 
-  async function saveSnippet(code: string, language: Language) {
+  async function handleSaveSnippet(code: string, language: Language) {
     try {
       setStatus('saving')
 
-      // If a snippet exists, we update it, otherwise we create a new one
-      if (snippetId) {
-        await updateSnippet({
-          variables: {
-            data: {
-              code,
-              language,
-            },
-            updateSnippetId: snippetId,
+      const { data } = await saveSnippet({
+        variables: {
+          data: {
+            code,
+            language,
+            name: snippetSlug ?? uniqueNamesGenerator(baseUniqueNameConfig),
           },
-        })
-      } else {
-        const { data } = await createSnippet({
-          variables: {
-            data: {
-              code,
-              language,
-              name: snippetSlug ?? uniqueNamesGenerator(baseUniqueNameConfig),
-            },
-          },
-        })
-        if (data) {
-          const { id, slug } = data.createSnippet
+          id: snippetId ?? '',
+        },
+      })
+      if (data?.saveSnippet) {
+        const { id, slug } = data.saveSnippet
 
-          // Updates the URL in the address bar without navigating or re-rendering anything
-          navigate(`/editor/${id}/${slug}`, {
-            replace: true,
-          })
-          setStatus('typing')
-        }
+        // Updates the URL in the address bar without navigating or re-rendering anything
+        navigate(`/editor/${id}/${slug}`, {
+          replace: true,
+        })
+        setStatus('typing')
       }
 
       toast.success('Successfully saved')
@@ -72,5 +58,5 @@ export default function useEditorLeftActions() {
     }
   }
 
-  return { saveSnippet, status }
+  return { saveSnippet: handleSaveSnippet, status }
 }

@@ -7,7 +7,7 @@ import RunButton from './RunButton'
 import ShareButton from './ShareButton'
 import useEditorRightActions from '../../hooks/useEditorRightActions'
 
-type EditorActionProps = {
+type EditorRightActionProps = {
   code: string
   language: Language
   onChangeOutput: (nextOutput: string) => void
@@ -19,7 +19,7 @@ export default function EditorRightActions({
   language,
   onChangeOutput,
   onChangeStatus,
-}: EditorActionProps) {
+}: EditorRightActionProps) {
   const [showModal, setShowModal] = useState(false)
   const { executeSnippet, shareSnippet, status } = useEditorRightActions(
     onChangeOutput,
