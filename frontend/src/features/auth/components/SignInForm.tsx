@@ -1,15 +1,5 @@
-import { useEffect } from 'react'
-import { useForm } from 'react-hook-form'
-import { toast } from 'sonner'
-import { useMutation } from '@apollo/client'
-import { zodResolver } from '@hookform/resolvers/zod'
 import PasswordVisibiltyInput from '@/features/auth/components/PasswordVisibiltyInput'
-import {
-  signInFormSchema,
-  SignInFormType,
-} from '@/features/auth/schemas/formSchema'
-import { LOGIN } from '@/shared/api/login'
-import { WHO_AM_I } from '@/shared/api/whoAmI'
+import { useSignInForm } from '@/features/auth/hooks'
 import { Button } from '@/shared/components/ui/button'
 import {
   Form,
@@ -27,80 +17,20 @@ type SignInFormPropsType = {
   onSignUp: () => void
 }
 
-const SignInForm = (props: SignInFormPropsType) => {
-  const [login] = useMutation(LOGIN)
-
-  const form = useForm<SignInFormType>({
-    defaultValues: {
-      email: '',
-      password: '',
-    }, // required for controlled inputs
-    resolver: zodResolver(signInFormSchema),
-    mode: 'onBlur', //  validation strategy before submitting
-    reValidateMode: 'onBlur', // validation strategy after submitting
-    shouldFocusError: true, // focus first field with an error if the form that fails validation ()
-  })
-
-  const hasRootError = !!form.formState.errors.root
-  const isSubmitting = form.formState.isSubmitting
-
-  useEffect(() => {
-    if (hasRootError) {
-      form.setFocus('email', { shouldSelect: true })
-    }
-  }, [hasRootError, form])
-
-  const handleChange = (
-    e: React.FormEvent<HTMLElement>,
-    onChange: (...event: unknown[]) => void,
-  ) => {
-    onChange(e)
-    if (e.target instanceof HTMLInputElement) {
-      form.clearErrors(e.target.name as keyof SignInFormType)
-      form.clearErrors('root')
-    }
-  }
-
-  const onSubmit = async (values: SignInFormType) => {
-    try {
-      const { data } = await login({
-        variables: {
-          data: {
-            email: values.email,
-            password: values.password,
-          },
-        },
-        refetchQueries: [{ query: WHO_AM_I }],
-      })
-
-      if (!data?.login) {
-        form.setError('root', {
-          type: 'custom',
-          message: 'Invalid credentials',
-        })
-        return
-      }
-
-      toast.success('Successful login', {
-        description: `Welcome back ${data.login.username ?? 'Codejamer'}!`,
-      })
-      if (props.callbackOnSubmit) {
-        form.reset()
-        props.callbackOnSubmit()
-      }
-    } catch (err: unknown) {
-      toast.error(`Failed to login`, {
-        description: err instanceof Error ? err.message : JSON.stringify(err),
-      })
-    }
-  }
+export default function SignInForm({
+  callbackOnSubmit,
+  onSignUp,
+}: SignInFormPropsType) {
+  const { form, handleChange, isSubmitting, submitForm } =
+    useSignInForm(callbackOnSubmit)
 
   return (
     <Form {...form}>
       <form
+        data-testid="signin-form"
         aria-label="signin form"
-        onSubmit={form.handleSubmit(onSubmit)}
-        className="space-y-8"
+        onSubmit={form.handleSubmit(submitForm)}
+        className="space-y-6"
         noValidate
       >
         <FormField
@@ -151,7 +81,7 @@ const SignInForm = (props: SignInFormPropsType) => {
         <Button
           data-testid="submit-signin"
           id="signin-submit"
-          className="w-full"
+          className="mb-0 w-full"
           type="submit"
           disabled={isSubmitting}
         >
@@ -159,26 +89,24 @@ const SignInForm = (props: SignInFormPropsType) => {
         </Button>
 
         {form.formState.errors.root && (
-          <div className="text-destructive text-center text-sm">
+          <div className="text-destructive mt-6 text-center text-sm">
             {form.formState.errors.root.message}
           </div>
         )}
-
-        <div className="text-muted-foreground flex items-center justify-center gap-2 text-sm">
-          New user?
-          <Button
-            variant="link"
-            size="sm"
-            className="p-1"
-            disabled={isSubmitting}
-            onClick={props.onSignUp}
-          >
-            Sign Up
-          </Button>
-        </div>
       </form>
+
+      <div className="text-muted-foreground mt-4 mb-2 flex items-center justify-center gap-2 text-sm">
+        New user?
+        <Button
+          variant="link"
+          size="sm"
+          className="p-1"
+          disabled={isSubmitting}
+          onClick={onSignUp}
+        >
+          Sign Up
+        </Button>
+      </div>
     </Form>
   )
 }
-
-export default SignInForm

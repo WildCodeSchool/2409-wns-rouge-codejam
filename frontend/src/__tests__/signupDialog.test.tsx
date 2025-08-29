@@ -8,11 +8,12 @@ import {
 import { userEvent } from '@testing-library/user-event'
 import { useState } from 'react'
 import { describe, expect, it, vi } from 'vitest'
+
 import SignUpForm from '@/features/auth/components/SignUpForm'
 import { CREATE_USER } from '@/shared/api/createUser'
 import { CreateUserMutation, UserCreateInput } from '@/shared/gql/graphql'
+import { Modal } from '@/shared/components'
 import { Button } from '@/shared/components/ui/button'
-import Modal from '@/shared/components/Modal'
 import { Toaster } from '@/shared/components/ui/sonner'
 
 const mocks: MockedResponse<CreateUserMutation, { data: UserCreateInput }> = {
@@ -44,7 +45,7 @@ function MockedSignupDialog() {
   }
   return (
     <div>
-      <MockedProvider addTypename={false} mocks={[mocks]}>
+      <MockedProvider mocks={[mocks]}>
         <div className="flex flex-row items-center gap-4">
           <Button
             data-testid="navbar-signup"

@@ -275,9 +275,7 @@ export async function UsersResolverTest(testArgs: TestArgs) {
       assert(response.body.kind === 'single')
       const { data, errors } = response.body.singleResult
       expect(errors).toBeDefined()
-      expect(data).toBeDefined()
-      assert(data !== undefined && data !== null)
-      expect(data.createUser).toBeNull()
+      expect(data).toBeNull()
     })
 
     it('should fail if username already exist', async () => {
@@ -297,8 +295,7 @@ export async function UsersResolverTest(testArgs: TestArgs) {
       const { data, errors } = response.body.singleResult
       expect(errors).toBeDefined()
       expect(data).toBeDefined()
-      assert(data !== undefined && data !== null)
-      expect(data.createUser).toBeNull()
+      expect(data).toBeNull()
     })
   })
 }
