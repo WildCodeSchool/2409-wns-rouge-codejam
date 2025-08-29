@@ -46,8 +46,8 @@ export default function useEditorPage(snippetId?: string) {
       dispatch({
         type: 'SET_INITIAL_VALUES',
         payload: {
-          language: snippet?.language,
-          code: snippet?.code,
+          language: snippet.language,
+          code: snippet.code,
           output: lastExecution?.result,
           executionStatus: lastExecution?.status,
         },

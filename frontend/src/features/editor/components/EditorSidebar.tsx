@@ -26,7 +26,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from '@/shared/components/ui/tooltip'
-import { GetSnippetQuery, Snippet } from '@/shared/gql/graphql'
+import { Snippet } from '@/shared/gql/graphql'
 import { cn } from '@/shared/lib/utils'
 
 type EditorSidebarProps = {
@@ -59,18 +59,14 @@ export default function EditorSidebar({ language }: EditorSidebarProps) {
     } else {
       nextActiveSnippetId = snippets?.[0]?.id
       // Load first snippet (if any) when user signned in and there is no snippet in the url
-      if ((snippets ?? []).length > 0) {
-        navigate(`/editor/${snippets?.[0].id}/${snippets?.[0]?.slug}`, {
+      if (snippets && snippets.length > 0) {
+        navigate(`/editor/${snippets[0].id}/${snippets[0]?.slug}`, {
           replace: true,
         })
       }
     }
     setActiveSnippetId(nextActiveSnippetId)
   }, [snippetId, snippets, navigate])
-
-  const handleClick = (snippet: GetSnippetQuery['getSnippet']) => {
-    navigate(`/editor/${snippet?.id}/${snippet?.slug}`)
-  }
 
   const hoveredTextStyles = 'text-neutral-300 hover:text-neutral-100'
   const iconsStyles = `cursor-pointer h-4 w-4 ${hoveredTextStyles}`
@@ -116,7 +112,9 @@ export default function EditorSidebar({ language }: EditorSidebarProps) {
                           <TooltipTrigger asChild>
                             <button
                               onClick={() => {
-                                handleClick(snippet)
+                                navigate(
+                                  `/editor/${snippet.id}/${snippet.slug}`,
+                                )
                               }}
                               className={cn(
                                 'flex-1 cursor-pointer truncate rounded-md px-2 py-1.5 text-left transition-colors',
