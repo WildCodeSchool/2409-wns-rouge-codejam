@@ -13,18 +13,20 @@ import {
 } from '@/features/auth/schemas/formSchema'
 import { toast } from 'sonner'
 import { useNavigate } from 'react-router-dom'
-import { CreateSnippetMutation } from '@/shared/gql/graphql'
+import { CreateSnippetMutation, Snippet } from '@/shared/gql/graphql'
+
+type CreateSnippetModalProps = {
+  language: Snippet['language']
+  onClose: () => void
+}
 
 export default function CreateSnippetModal({
+  language,
   onClose,
-}: {
-  onClose: () => void
-}) {
+}: CreateSnippetModalProps) {
   const form = useForm<SnippetCreateType>({
     defaultValues: {
       name: '',
-      code: '',
-      language: 'typescript',
     },
     resolver: zodResolver(snippetCreateSchema),
     mode: 'onBlur',
@@ -45,7 +47,7 @@ export default function CreateSnippetModal({
           data: {
             name: values.name,
             code: '',
-            language: 'typescript',
+            language: language.toLowerCase(),
           },
         },
         refetchQueries: [GET_ALL_SNIPPETS],
@@ -53,7 +55,7 @@ export default function CreateSnippetModal({
 
       if (snippet.data?.createSnippet) {
         navigate(
-          `/${snippet.data.createSnippet.id}/${snippet.data.createSnippet.slug}`,
+          `/editor/${snippet.data.createSnippet.id}/${snippet.data.createSnippet.slug}`,
         )
       }
 

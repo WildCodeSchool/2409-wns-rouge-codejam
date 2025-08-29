@@ -17,7 +17,7 @@ type Documents = {
     "\n  mutation CreateSnippet($data: SnippetCreateInput!) {\n    createSnippet(data: $data) {\n      id\n      name\n      slug\n    }\n  }\n": typeof types.CreateSnippetDocument,
     "\n  mutation createUser($data: UserCreateInput!) {\n    createUser(data: $data) {\n      email\n      username\n      id\n    }\n  }\n": typeof types.CreateUserDocument,
     "\n  mutation Mutation($data: SnippetCreateInput!, $snippetId: ID) {\n    execute(data: $data, snippetId: $snippetId) {\n      id\n      result\n      status\n      snippet {\n        id\n        name\n        slug\n        language\n        updatedAt\n      }\n    }\n  }\n": typeof types.MutationDocument,
-    "\n  query getSnippet($id: ID!, $limit: Int, $offset: Int) {\n    getSnippet(id: $id, limit: $limit, offset: $offset) {\n      id\n      code\n      language\n      executions {\n        id\n        status\n        result\n        executedAt\n      }\n    }\n  }\n": typeof types.GetSnippetDocument,
+    "\n  query getSnippet($id: ID!, $limit: Int, $offset: Int) {\n    getSnippet(id: $id, limit: $limit, offset: $offset) {\n      id\n      code\n      language\n      slug\n      executions {\n        id\n        status\n        result\n        executedAt\n      }\n    }\n  }\n": typeof types.GetSnippetDocument,
     "\n  query getAllSnippets {\n    getAllSnippets {\n      id\n      name\n      language\n      code\n      slug\n    }\n  }\n": typeof types.GetAllSnippetsDocument,
     "\n  mutation login($data: UserLoginInput!) {\n    login(data: $data) {\n      id\n      username\n    }\n  }\n": typeof types.LoginDocument,
     "\n  mutation logout {\n    logout\n  }\n": typeof types.LogoutDocument,
@@ -27,7 +27,7 @@ const documents: Documents = {
     "\n  mutation CreateSnippet($data: SnippetCreateInput!) {\n    createSnippet(data: $data) {\n      id\n      name\n      slug\n    }\n  }\n": types.CreateSnippetDocument,
     "\n  mutation createUser($data: UserCreateInput!) {\n    createUser(data: $data) {\n      email\n      username\n      id\n    }\n  }\n": types.CreateUserDocument,
     "\n  mutation Mutation($data: SnippetCreateInput!, $snippetId: ID) {\n    execute(data: $data, snippetId: $snippetId) {\n      id\n      result\n      status\n      snippet {\n        id\n        name\n        slug\n        language\n        updatedAt\n      }\n    }\n  }\n": types.MutationDocument,
-    "\n  query getSnippet($id: ID!, $limit: Int, $offset: Int) {\n    getSnippet(id: $id, limit: $limit, offset: $offset) {\n      id\n      code\n      language\n      executions {\n        id\n        status\n        result\n        executedAt\n      }\n    }\n  }\n": types.GetSnippetDocument,
+    "\n  query getSnippet($id: ID!, $limit: Int, $offset: Int) {\n    getSnippet(id: $id, limit: $limit, offset: $offset) {\n      id\n      code\n      language\n      slug\n      executions {\n        id\n        status\n        result\n        executedAt\n      }\n    }\n  }\n": types.GetSnippetDocument,
     "\n  query getAllSnippets {\n    getAllSnippets {\n      id\n      name\n      language\n      code\n      slug\n    }\n  }\n": types.GetAllSnippetsDocument,
     "\n  mutation login($data: UserLoginInput!) {\n    login(data: $data) {\n      id\n      username\n    }\n  }\n": types.LoginDocument,
     "\n  mutation logout {\n    logout\n  }\n": types.LogoutDocument,
@@ -63,7 +63,7 @@ export function gql(source: "\n  mutation Mutation($data: SnippetCreateInput!, $
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "\n  query getSnippet($id: ID!, $limit: Int, $offset: Int) {\n    getSnippet(id: $id, limit: $limit, offset: $offset) {\n      id\n      code\n      language\n      executions {\n        id\n        status\n        result\n        executedAt\n      }\n    }\n  }\n"): (typeof documents)["\n  query getSnippet($id: ID!, $limit: Int, $offset: Int) {\n    getSnippet(id: $id, limit: $limit, offset: $offset) {\n      id\n      code\n      language\n      executions {\n        id\n        status\n        result\n        executedAt\n      }\n    }\n  }\n"];
+export function gql(source: "\n  query getSnippet($id: ID!, $limit: Int, $offset: Int) {\n    getSnippet(id: $id, limit: $limit, offset: $offset) {\n      id\n      code\n      language\n      slug\n      executions {\n        id\n        status\n        result\n        executedAt\n      }\n    }\n  }\n"): (typeof documents)["\n  query getSnippet($id: ID!, $limit: Int, $offset: Int) {\n    getSnippet(id: $id, limit: $limit, offset: $offset) {\n      id\n      code\n      language\n      slug\n      executions {\n        id\n        status\n        result\n        executedAt\n      }\n    }\n  }\n"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
