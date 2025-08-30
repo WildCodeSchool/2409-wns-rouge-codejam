@@ -1,10 +1,4 @@
-import { Button } from '@/shared/components/ui/button'
-import { Spinner } from '@/shared/components/ui/spinner'
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from '@/shared/components/ui/tooltip'
+import { TooltipButton } from '@/shared/components'
 import { Save } from 'lucide-react'
 
 type SaveButtonProps = {
@@ -13,33 +7,21 @@ type SaveButtonProps = {
   disabled: boolean
 }
 
-const SaveButton = ({ onClick, loading, disabled }: SaveButtonProps) => {
+const SaveButton = ({ onClick, disabled }: SaveButtonProps) => {
   return (
-    <Tooltip>
-      <TooltipTrigger asChild>
-        <Button
-          type="button"
-          aria-label={'Execute current snippet'}
-          aria-disabled={disabled}
-          disabled={disabled}
-          onClick={onClick}
-          variant="outline"
-          className="min-w-24"
-        >
-          <span>Save</span>
-          {loading ? (
-            <Spinner size="small" />
-          ) : (
-            <Save aria-hidden="true" role="img" size={15} />
-          )}
-        </Button>
-      </TooltipTrigger>
-      {!loading && (
-        <TooltipContent>
-          <p>Save current snippet</p>
-        </TooltipContent>
-      )}
-    </Tooltip>
+    <TooltipButton
+      type="button"
+      aria-label={'Save current snippet'}
+      variant="outline"
+      aria-disabled={disabled}
+      disabled={disabled}
+      onClick={onClick}
+      className="min-w-24"
+      tooltip={<p>Save current snippet</p>}
+    >
+      <span>Save</span>
+      <Save aria-hidden="true" role="img" size={15} />
+    </TooltipButton>
   )
 }
 

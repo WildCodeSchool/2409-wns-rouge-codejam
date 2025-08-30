@@ -15,16 +15,12 @@ export default function EditorLeftActions({
   language,
   onChangeLanguage,
 }: EditorLeftActionProps) {
-  const { saveSnippet } = useEditorLeftActions()
-
-  const handleSave = async () => {
-    await saveSnippet(code, language)
-  }
+  const { saveSnippet } = useEditorLeftActions(code, language)
 
   return (
     <div className="flex justify-start gap-4">
       <LanguageSelect language={language} onChange={onChangeLanguage} />
-      <SaveButton disabled={!code} loading={false} onClick={handleSave} />
+      <SaveButton disabled={!code} loading={false} onClick={saveSnippet} />
     </div>
   )
 }
