@@ -1,12 +1,12 @@
 import {
   CodeEditor,
   CodeEditorSkeleton,
-  EditorActions,
-  EditorActionsSkeleton,
+  EditorLeftActions,
+  EditorLeftActionsSkeleton,
   EditorOutput,
   EditorOutputSkeleton,
-  LanguageSelect,
-  LanguageSelectSkeleton,
+  EditorRightActions,
+  EditorRightActionsSkeleton,
 } from '@/features/editor/components/editor'
 import { EditorState } from '@/features/editor/reducers'
 import {
@@ -40,27 +40,25 @@ export default function EditorLayout({
           maxSize={75}
           className="grid grid-rows-[auto_1fr] gap-2"
         >
-          <LanguageSelect
+          <EditorLeftActions
+            code={state.code}
             language={state.language}
-            onChange={onChangeLanguage}
+            onChangeLanguage={onChangeLanguage}
           />
-
           <CodeEditor
             code={state.code}
             language={state.language}
             onChange={onChangeCode}
           />
         </ResizablePanel>
-
         <ResizableHandle withHandle className="bg-transparent" />
-
         <ResizablePanel
           defaultSize={50}
           maxSize={75}
           minSize={25}
           className="grid grid-rows-[auto_1fr] gap-2"
         >
-          <EditorActions
+          <EditorRightActions
             code={state.code}
             language={state.language}
             onChangeOutput={onChangeOutput}
@@ -77,12 +75,12 @@ export function EditorPageSkeleton() {
   return (
     <ResizablePanelGroup direction="horizontal" className="h-full">
       <ResizablePanel className="grid grid-rows-[auto_1fr] gap-2">
-        <LanguageSelectSkeleton />
+        <EditorLeftActionsSkeleton />
         <CodeEditorSkeleton />
       </ResizablePanel>
       <ResizableHandle withHandle className="bg-transparent" />
       <ResizablePanel className="grid grid-rows-[auto_1fr] gap-2">
-        <EditorActionsSkeleton />
+        <EditorRightActionsSkeleton />
         <EditorOutputSkeleton />
       </ResizablePanel>
     </ResizablePanelGroup>

@@ -3,4 +3,4 @@ export type EditorUrlParams = {
   snippetSlug: string
 }
 
-export type Status = 'typing' | 'executing' | 'disabled'
+export type Status = 'typing' | 'executing' | 'disabled' | 'saving'
