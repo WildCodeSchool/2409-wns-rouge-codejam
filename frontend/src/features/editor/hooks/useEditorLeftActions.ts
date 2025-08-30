@@ -18,17 +18,17 @@ const baseUniqueNameConfig: Config = {
   separator: ' ',
 }
 
-export default function useEditorLeftActions() {
+export default function useEditorLeftActions(code: string, language: Language) {
   const { snippetId, snippetSlug } = useParams<EditorUrlParams>()
   const [status, setStatus] = useState<Status>('typing')
-  const [saveSnippet] = useMutation(SAVE_SNIPPET)
+  const [saveSnippetMutation] = useMutation(SAVE_SNIPPET)
   const navigate = useNavigate()
 
-  async function handleSaveSnippet(code: string, language: Language) {
+  async function saveSnippet() {
     try {
       setStatus('saving')
 
-      const { data } = await saveSnippet({
+      const { data } = await saveSnippetMutation({
         variables: {
           data: {
             code,
@@ -58,5 +58,5 @@ export default function useEditorLeftActions() {
     }
   }
 
-  return { saveSnippet: handleSaveSnippet, status }
+  return { saveSnippet, status }
 }

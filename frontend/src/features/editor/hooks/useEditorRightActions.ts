@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
 import { EditorUrlParams, Status } from '../types'
 import { toast } from 'sonner'
 import { ExecutionStatus, Language } from '@/shared/gql/graphql'
@@ -20,19 +20,26 @@ const baseUniqueNameConfig: Config = {
 }
 
 export default function useEditorRightActions(
+  code: string,
+  language: Language,
   onChangeOutput: (nextOutput: string) => void,
   onChangeStatus: (nextStatus?: ExecutionStatus) => void,
 ) {
   const { snippetId, snippetSlug } = useParams<EditorUrlParams>()
+  const [showModal, setShowModal] = useState(false)
   const [status, setStatus] = useState<Status>('typing')
   const [execute] = useMutation(EXECUTE)
   const navigate = useNavigate()
+
+  const closeModal = useCallback(() => {
+    setShowModal(false)
+  }, [])
 
   function shareSnippet() {
     alert('🚧 Copy current url to clipboard...')
   }
 
-  async function executeSnippet(code: string, language: Language) {
+  async function executeSnippet() {
     try {
       setStatus('executing')
       const { data } = await execute({
@@ -90,5 +97,5 @@ export default function useEditorRightActions(
     }
   }
 
-  return { executeSnippet, shareSnippet, status }
+  return { executeSnippet, shareSnippet, status, showModal, closeModal }
 }

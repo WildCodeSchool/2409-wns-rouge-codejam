@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import { Subscribe } from '@/features/editor/components/editor'
 import { Modal } from '@/shared/components'
 import { ExecutionStatus, Language } from '@/shared/gql/graphql'
@@ -20,26 +19,16 @@ export default function EditorRightActions({
   onChangeOutput,
   onChangeStatus,
 }: EditorRightActionProps) {
-  const [showModal, setShowModal] = useState(false)
-  const { executeSnippet, shareSnippet, status } = useEditorRightActions(
-    onChangeOutput,
-    onChangeStatus,
-  )
+  const { executeSnippet, shareSnippet, status, showModal, closeModal } =
+    useEditorRightActions(code, language, onChangeOutput, onChangeStatus)
 
   const isExecuting = status === 'executing'
   const disabled = !code || isExecuting || status === 'disabled'
 
-  const handleExecute = async () => {
-    await executeSnippet(code, language)
-  }
-  const handleCloseModal = () => {
-    setShowModal(false)
-  }
-
   return (
     <div className="flex justify-end gap-4">
       <RunButton
-        onClick={handleExecute}
+        onClick={executeSnippet}
         disabled={disabled}
         loading={isExecuting}
       />
@@ -48,9 +37,9 @@ export default function EditorRightActions({
         <Modal
           open
           title="You've reached your daily execution limit!"
-          onOpenChange={handleCloseModal}
+          onOpenChange={closeModal}
         >
-          <Subscribe onRedirect={handleCloseModal} />
+          <Subscribe onRedirect={closeModal} />
         </Modal>
       )}
     </div>
