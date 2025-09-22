@@ -82,11 +82,16 @@ export default function EditorSidebar({ language }: EditorSidebarProps) {
 
   return (
     <>
-      <ResizablePanel id="snippets-panel" order={1} minSize={25}>
+      <ResizablePanel
+        id="snippets-panel"
+        defaultSize={15}
+        minSize={15}
+        maxSize={20}
+      >
         <SidebarProvider defaultOpen={true}>
           <Sidebar
             collapsible="none"
-            className="bg-sidebar-foreground mt-11 mr-0.5 h-screen w-100 rounded-md"
+            className="bg-sidebar-foreground mt-11 mr-0.5 grid h-screen w-100 grid-rows-[auto_1fr] rounded-md"
           >
             <SidebarContent>
               <SidebarGroup className="px-3 py-4">
