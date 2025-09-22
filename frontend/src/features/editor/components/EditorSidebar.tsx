@@ -9,7 +9,7 @@ import { EditorUrlParams } from '@/features/editor/types'
 import { GET_ALL_SNIPPETS } from '@/shared/api/getUserSnippets'
 import { WHO_AM_I } from '@/shared/api/whoAmI'
 import Modal from '@/shared/components/Modal'
-import { ResizablePanel } from '@/shared/components/ui/resizable'
+
 import {
   Sidebar,
   SidebarContent,
@@ -19,6 +19,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarProvider,
+  useSidebar,
 } from '@/shared/components/ui/sidebar'
 import { Spinner } from '@/shared/components/ui/spinner'
 import {
@@ -82,89 +83,78 @@ export default function EditorSidebar({ language }: EditorSidebarProps) {
 
   return (
     <>
-      <ResizablePanel
-        id="snippets-panel"
-        defaultSize={15}
-        minSize={15}
-        maxSize={20}
+      <Sidebar
+        collapsible="none"
+        className="bg-sidebar-foreground mt-11 mr-0.5 grid h-screen w-100 grid-rows-[auto_1fr] rounded-md"
       >
-        <SidebarProvider defaultOpen={true}>
-          <Sidebar
-            collapsible="none"
-            className="bg-sidebar-foreground mt-11 mr-0.5 grid h-screen w-100 grid-rows-[auto_1fr] rounded-md"
-          >
-            <SidebarContent>
-              <SidebarGroup className="px-3 py-4">
-                <SidebarGroupContent>
-                  <SidebarMenu className="gap-3">
-                    <SidebarMenuItem key="add-new-snippet">
-                      <SidebarMenuButton
-                        className="group flex cursor-pointer items-center justify-center"
-                        onClick={() => {
-                          setIsModalOpen(true)
-                        }}
-                      >
-                        <Plus className="h-4 w-4 text-neutral-300 group-hover:text-neutral-100" />
+        <SidebarContent>
+          <SidebarGroup className="px-3 py-4">
+            <SidebarGroupContent>
+              <SidebarMenu className="gap-3">
+                <SidebarMenuItem key="add-new-snippet">
+                  <SidebarMenuButton
+                    className="group flex cursor-pointer items-center justify-center"
+                    onClick={() => {
+                      setIsModalOpen(true)
+                    }}
+                  >
+                    <Plus className="h-4 w-4 text-neutral-300 group-hover:text-neutral-100" />
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+
+                {(snippets ?? []).map((snippet) => (
+                  <SidebarMenuItem
+                    key={snippet.id}
+                    className="flex cursor-pointer justify-between"
+                  >
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <button
+                          onClick={() => {
+                            navigate(`/editor/${snippet.id}/${snippet.slug}`)
+                          }}
+                          className={cn(
+                            'flex-1 cursor-pointer truncate rounded-md px-2 py-1.5 text-left transition-colors',
+                            activeSnippetId === snippet.id
+                              ? 'text-sky-500 hover:text-sky-300'
+                              : hoveredTextStyles,
+                          )}
+                        >
+                          {snippet.name}
+                        </button>
+                      </TooltipTrigger>
+                      <TooltipContent side="right" align="center">
+                        {snippet.name}
+                      </TooltipContent>
+                    </Tooltip>
+                    <div className="flex items-center gap-2 pr-2">
+                      <SidebarMenuButton className="p-0">
+                        <Pencil className={iconsStyles} />
                       </SidebarMenuButton>
-                    </SidebarMenuItem>
+                      <SidebarMenuButton className="p-0">
+                        <Trash className={iconsStyles} />
+                      </SidebarMenuButton>
+                    </div>
+                  </SidebarMenuItem>
+                ))}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        </SidebarContent>
+      </Sidebar>
 
-                    {(snippets ?? []).map((snippet) => (
-                      <SidebarMenuItem
-                        key={snippet.id}
-                        className="flex cursor-pointer justify-between"
-                      >
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <button
-                              onClick={() => {
-                                navigate(
-                                  `/editor/${snippet.id}/${snippet.slug}`,
-                                )
-                              }}
-                              className={cn(
-                                'flex-1 cursor-pointer truncate rounded-md px-2 py-1.5 text-left transition-colors',
-                                activeSnippetId === snippet.id
-                                  ? 'text-sky-500 hover:text-sky-300'
-                                  : hoveredTextStyles,
-                              )}
-                            >
-                              {snippet.name}
-                            </button>
-                          </TooltipTrigger>
-                          <TooltipContent side="right" align="center">
-                            {snippet.name}
-                          </TooltipContent>
-                        </Tooltip>
-                        <div className="flex items-center gap-2 pr-2">
-                          <SidebarMenuButton className="p-0">
-                            <Pencil className={iconsStyles} />
-                          </SidebarMenuButton>
-                          <SidebarMenuButton className="p-0">
-                            <Trash className={iconsStyles} />
-                          </SidebarMenuButton>
-                        </div>
-                      </SidebarMenuItem>
-                    ))}
-                  </SidebarMenu>
-                </SidebarGroupContent>
-              </SidebarGroup>
-            </SidebarContent>
-          </Sidebar>
-
-          <Modal
-            title="Create Snippet"
-            open={isModalOpen}
-            onOpenChange={setIsModalOpen}
-          >
-            <CreateSnippetModal
-              language={language}
-              onClose={() => {
-                setIsModalOpen(false)
-              }}
-            />
-          </Modal>
-        </SidebarProvider>
-      </ResizablePanel>
+      <Modal
+        title="Create Snippet"
+        open={isModalOpen}
+        onOpenChange={setIsModalOpen}
+      >
+        <CreateSnippetModal
+          language={language}
+          onClose={() => {
+            setIsModalOpen(false)
+          }}
+        />
+      </Modal>
     </>
   )
 }

@@ -7,6 +7,7 @@ import {
 } from '@/features/editor/components/editor'
 import { useEditorPage } from '@/features/editor/hooks'
 import { EditorUrlParams } from '@/features/editor/types'
+import { SidebarProvider } from '../components/ui/sidebar'
 
 export default function EditorPage() {
   const { snippetId } = useParams<EditorUrlParams>()
@@ -37,14 +38,16 @@ export default function EditorPage() {
   }
 
   return (
-    <div className="h-full">
-      <EditorLayout
-        state={state}
-        onChangeCode={updateCode}
-        onChangeLanguage={updateLanguage}
-        onChangeOutput={updateOutput}
-        onChangeStatus={updateStatus}
-      />
-    </div>
+    <SidebarProvider>
+      <div className="h-full w-full">
+        <EditorLayout
+          state={state}
+          onChangeCode={updateCode}
+          onChangeLanguage={updateLanguage}
+          onChangeOutput={updateOutput}
+          onChangeStatus={updateStatus}
+        />
+      </div>
+    </SidebarProvider>
   )
 }

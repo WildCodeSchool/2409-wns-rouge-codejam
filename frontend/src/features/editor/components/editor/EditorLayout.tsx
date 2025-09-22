@@ -16,6 +16,11 @@ import {
 } from '@/shared/components/ui/resizable'
 import { ExecutionStatus } from '@/shared/gql/graphql'
 import EditorSidebar from '../EditorSidebar'
+import {
+  SidebarProvider,
+  SidebarTrigger,
+  useSidebar,
+} from '@/shared/components/ui/sidebar'
 
 type EditorLayoutProps = {
   state: EditorState
@@ -32,13 +37,24 @@ export default function EditorLayout({
   onChangeOutput,
   onChangeStatus,
 }: EditorLayoutProps) {
+  // const { open } = useSidebar()
   return (
     <div className="h-full">
       <ResizablePanelGroup direction="horizontal" className="h-full">
-        <EditorSidebar language={state.language} />
+        <ResizablePanel
+          id="snippets-panel"
+          defaultSize={14}
+          minSize={0}
+          maxSize={20}
+          className="relative"
+        >
+          <EditorSidebar language={state.language} />
+          <SidebarTrigger className="bg-accent absolute top-1/2 right-0" />
+        </ResizablePanel>
 
         <ResizablePanel
-          defaultSize={50}
+          id="editor-panel"
+          defaultSize={43}
           minSize={25}
           maxSize={75}
           className="grid grid-rows-[auto_1fr] gap-2"
@@ -58,9 +74,10 @@ export default function EditorLayout({
         <ResizableHandle withHandle className="bg-transparent" />
 
         <ResizablePanel
-          defaultSize={50}
-          maxSize={75}
+          id="output-panel"
+          defaultSize={43}
           minSize={25}
+          maxSize={75}
           className="grid grid-rows-[auto_1fr] gap-2"
         >
           <EditorActions
