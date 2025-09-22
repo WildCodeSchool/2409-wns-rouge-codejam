@@ -29,7 +29,6 @@ export default function CreateSnippetModal({
       name: '',
     },
     resolver: zodResolver(snippetCreateSchema),
-    mode: 'onBlur',
     reValidateMode: 'onBlur',
     shouldFocusError: true,
   })

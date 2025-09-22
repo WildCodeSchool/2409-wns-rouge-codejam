@@ -16,11 +16,7 @@ import {
 } from '@/shared/components/ui/resizable'
 import { ExecutionStatus } from '@/shared/gql/graphql'
 import EditorSidebar from '../EditorSidebar'
-import {
-  SidebarProvider,
-  SidebarTrigger,
-  useSidebar,
-} from '@/shared/components/ui/sidebar'
+import { SidebarProvider } from '@/shared/components/ui/sidebar'
 
 type EditorLayoutProps = {
   state: EditorState
@@ -37,58 +33,52 @@ export default function EditorLayout({
   onChangeOutput,
   onChangeStatus,
 }: EditorLayoutProps) {
-  // const { open } = useSidebar()
   return (
-    <div className="h-full">
-      <ResizablePanelGroup direction="horizontal" className="h-full">
-        <ResizablePanel
-          id="snippets-panel"
-          defaultSize={14}
-          minSize={0}
-          maxSize={20}
-          className="relative"
-        >
-          <EditorSidebar language={state.language} />
-          <SidebarTrigger className="bg-accent absolute top-1/2 right-0" />
-        </ResizablePanel>
+    <div className="flex h-full">
+      <SidebarProvider>
+        <EditorSidebar language={state.language} />
+        <ResizablePanelGroup direction="horizontal" className="h-full">
+          <ResizablePanel
+            id="editor-panel"
+            defaultSize={50}
+            minSize={25}
+            maxSize={75}
+            className="grid grid-rows-[auto_1fr] gap-2"
+          >
+            <LanguageSelect
+              language={state.language}
+              onChange={onChangeLanguage}
+            />
 
-        <ResizablePanel
-          id="editor-panel"
-          defaultSize={43}
-          minSize={25}
-          maxSize={75}
-          className="grid grid-rows-[auto_1fr] gap-2"
-        >
-          <LanguageSelect
-            language={state.language}
-            onChange={onChangeLanguage}
-          />
+            <CodeEditor
+              code={state.code}
+              language={state.language}
+              onChange={onChangeCode}
+            />
+          </ResizablePanel>
 
-          <CodeEditor
-            code={state.code}
-            language={state.language}
-            onChange={onChangeCode}
-          />
-        </ResizablePanel>
+          <ResizableHandle withHandle className="bg-transparent" />
 
-        <ResizableHandle withHandle className="bg-transparent" />
-
-        <ResizablePanel
-          id="output-panel"
-          defaultSize={43}
-          minSize={25}
-          maxSize={75}
-          className="grid grid-rows-[auto_1fr] gap-2"
-        >
-          <EditorActions
-            code={state.code}
-            language={state.language}
-            onChangeOutput={onChangeOutput}
-            onChangeStatus={onChangeStatus}
-          />
-          <EditorOutput output={state.output} status={state.executionStatus} />
-        </ResizablePanel>
-      </ResizablePanelGroup>
+          <ResizablePanel
+            id="output-panel"
+            defaultSize={50}
+            minSize={25}
+            maxSize={75}
+            className="grid grid-rows-[auto_1fr] gap-2"
+          >
+            <EditorActions
+              code={state.code}
+              language={state.language}
+              onChangeOutput={onChangeOutput}
+              onChangeStatus={onChangeStatus}
+            />
+            <EditorOutput
+              output={state.output}
+              status={state.executionStatus}
+            />
+          </ResizablePanel>
+        </ResizablePanelGroup>
+      </SidebarProvider>
     </div>
   )
 }

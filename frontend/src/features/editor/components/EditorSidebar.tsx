@@ -15,10 +15,11 @@ import {
   SidebarContent,
   SidebarGroup,
   SidebarGroupContent,
+  SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarProvider,
+  SidebarTrigger,
   useSidebar,
 } from '@/shared/components/ui/sidebar'
 import { Spinner } from '@/shared/components/ui/spinner'
@@ -35,6 +36,7 @@ type EditorSidebarProps = {
 }
 
 export default function EditorSidebar({ language }: EditorSidebarProps) {
+  const { open } = useSidebar()
   const { data: { whoAmI: user } = {}, loading: loadingUser } =
     useQuery(WHO_AM_I)
 
@@ -84,60 +86,77 @@ export default function EditorSidebar({ language }: EditorSidebarProps) {
   return (
     <>
       <Sidebar
-        collapsible="none"
-        className="bg-sidebar-foreground mt-11 mr-0.5 grid h-screen w-100 grid-rows-[auto_1fr] rounded-md"
+        collapsible="icon"
+        className="bg-sidebar-foreground h-screen w-100 rounded-md"
       >
         <SidebarContent>
-          <SidebarGroup className="px-3 py-4">
+          <SidebarGroup>
             <SidebarGroupContent>
-              <SidebarMenu className="gap-3">
-                <SidebarMenuItem key="add-new-snippet">
-                  <SidebarMenuButton
-                    className="group flex cursor-pointer items-center justify-center"
-                    onClick={() => {
-                      setIsModalOpen(true)
-                    }}
-                  >
-                    <Plus className="h-4 w-4 text-neutral-300 group-hover:text-neutral-100" />
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-
-                {(snippets ?? []).map((snippet) => (
-                  <SidebarMenuItem
-                    key={snippet.id}
-                    className="flex cursor-pointer justify-between"
-                  >
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <button
-                          onClick={() => {
-                            navigate(`/editor/${snippet.id}/${snippet.slug}`)
-                          }}
-                          className={cn(
-                            'flex-1 cursor-pointer truncate rounded-md px-2 py-1.5 text-left transition-colors',
-                            activeSnippetId === snippet.id
-                              ? 'text-sky-500 hover:text-sky-300'
-                              : hoveredTextStyles,
-                          )}
-                        >
-                          {snippet.name}
-                        </button>
-                      </TooltipTrigger>
-                      <TooltipContent side="right" align="center">
-                        {snippet.name}
-                      </TooltipContent>
-                    </Tooltip>
-                    <div className="flex items-center gap-2 pr-2">
-                      <SidebarMenuButton className="p-0">
-                        <Pencil className={iconsStyles} />
-                      </SidebarMenuButton>
-                      <SidebarMenuButton className="p-0">
-                        <Trash className={iconsStyles} />
-                      </SidebarMenuButton>
-                    </div>
+              <SidebarHeader>
+                <div className="flex justify-between">
+                  {open && (
+                    <span
+                      className={cn(
+                        'text-sidebar-foreground/70 ring-sidebar-ring text-md flex h-8 shrink-0 items-center rounded-md px-2 font-medium whitespace-nowrap outline-hidden transition-[margin,opacity] duration-200 ease-linear focus-visible:ring-2 [&>svg]:size-4 [&>svg]:shrink-0',
+                        'group-data-[collapsible=icon]:-mt-8 group-data-[collapsible=icon]:opacity-0',
+                      )}
+                    >
+                      My Snippets
+                    </span>
+                  )}
+                  <SidebarTrigger className="bg-accent" />
+                </div>
+              </SidebarHeader>
+              {open && (
+                <SidebarMenu className="gap-3">
+                  <SidebarMenuItem key="add-new-snippet">
+                    <SidebarMenuButton
+                      className="group flex cursor-pointer items-center justify-center"
+                      onClick={() => {
+                        setIsModalOpen(true)
+                      }}
+                    >
+                      <Plus className="h-4 w-4 text-neutral-300 group-hover:text-neutral-100" />
+                    </SidebarMenuButton>
                   </SidebarMenuItem>
-                ))}
-              </SidebarMenu>
+
+                  {(snippets ?? []).map((snippet) => (
+                    <SidebarMenuItem
+                      key={snippet.id}
+                      className="flex cursor-pointer justify-between"
+                    >
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <button
+                            onClick={() => {
+                              navigate(`/editor/${snippet.id}/${snippet.slug}`)
+                            }}
+                            className={cn(
+                              'flex-1 cursor-pointer truncate rounded-md px-2 py-1.5 text-left transition-colors',
+                              activeSnippetId === snippet.id
+                                ? 'text-sky-500 hover:text-sky-300'
+                                : hoveredTextStyles,
+                            )}
+                          >
+                            {snippet.name}
+                          </button>
+                        </TooltipTrigger>
+                        <TooltipContent side="right" align="center">
+                          {snippet.name}
+                        </TooltipContent>
+                      </Tooltip>
+                      <div className="flex items-center gap-2 pr-2">
+                        <SidebarMenuButton className="p-0">
+                          <Pencil className={iconsStyles} />
+                        </SidebarMenuButton>
+                        <SidebarMenuButton className="p-0">
+                          <Trash className={iconsStyles} />
+                        </SidebarMenuButton>
+                      </div>
+                    </SidebarMenuItem>
+                  ))}
+                </SidebarMenu>
+              )}
             </SidebarGroupContent>
           </SidebarGroup>
         </SidebarContent>
