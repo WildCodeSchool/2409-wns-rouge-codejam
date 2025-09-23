@@ -22,10 +22,10 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/shared/components/ui/tooltip'
+import TooltipButton from '@/shared/TooltipButton'
 
-const SIDEBAR_COOKIE_NAME = 'sidebar_state'
-const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7
-const SIDEBAR_WIDTH = '399px'
+const SIDEBAR_STORAGE_KEY = 'sidebar_is_open'
+const SIDEBAR_WIDTH = '12rem'
 const SIDEBAR_WIDTH_MOBILE = '10rem'
 const SIDEBAR_WIDTH_ICON = '3.5rem'
 const SIDEBAR_KEYBOARD_SHORTCUT = 'b'
@@ -69,8 +69,10 @@ function SidebarProvider({
 
   // This is the internal state of the sidebar.
   // We use openProp and setOpenProp for control from outside the component.
-  const [_open, _setOpen] = React.useState(defaultOpen)
-  console.log('open sidebar ', _open)
+  const [_open, _setOpen] = React.useState(() => {
+    const stored = localStorage.getItem(SIDEBAR_STORAGE_KEY)
+    return (stored !== null ? JSON.parse(stored) : defaultOpen) as boolean
+  })
   const open = openProp ?? _open
   const setOpen = React.useCallback(
     (value: boolean | ((value: boolean) => boolean)) => {
@@ -80,9 +82,8 @@ function SidebarProvider({
       } else {
         _setOpen(openState)
       }
-
-      // This sets the cookie to keep the sidebar state.
-      document.cookie = `${SIDEBAR_COOKIE_NAME}=${String(openState)}; path=/; max-age=${String(SIDEBAR_COOKIE_MAX_AGE)}`
+      // Update localStorage to keep the sidebar state.
+      localStorage.setItem(SIDEBAR_STORAGE_KEY, JSON.stringify(openState))
     },
     [setOpenProp, open],
   )
@@ -266,7 +267,8 @@ function SidebarTrigger({
   const { open, toggleSidebar } = useSidebar()
 
   return (
-    <Button
+    <TooltipButton
+      tooltip={`${open ? 'Hide' : 'Show'} sidebar (⌘${SIDEBAR_KEYBOARD_SHORTCUT.toUpperCase()})`}
       data-sidebar="trigger"
       data-slot="sidebar-trigger"
       variant="ghost"
@@ -279,7 +281,7 @@ function SidebarTrigger({
       {...props}
     >
       {open ? <ArrowLeftToLine /> : <ArrowRightToLine />}
-    </Button>
+    </TooltipButton>
   )
 }
 
@@ -341,7 +343,7 @@ function SidebarHeader({ className, ...props }: React.ComponentProps<'div'>) {
     <div
       data-slot="sidebar-header"
       data-sidebar="header"
-      className={cn(`flex flex-col gap-2 px-2 pt-0 pb-1.5`, className)}
+      className={cn(`flex flex-col gap-2 px-2 pt-0 pb-2`, className)}
       {...props}
     />
   )

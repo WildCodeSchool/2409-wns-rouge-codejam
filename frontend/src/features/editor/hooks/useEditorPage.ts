@@ -86,7 +86,7 @@ export default function useEditorPage(snippetId?: string) {
         code: nextCode,
       })
     },
-    [state.code, state.language],
+    [snippetId, state.code, state.language],
   )
   const updateOutput = useCallback((nextOutput?: string) => {
     dispatch({ type: 'SET_OUTPUT', output: nextOutput ?? '' })

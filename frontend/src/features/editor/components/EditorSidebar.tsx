@@ -87,7 +87,7 @@ export default function EditorSidebar({ language }: EditorSidebarProps) {
     <>
       <Sidebar
         collapsible="icon"
-        className="bg-sidebar-foreground h-screen w-100 rounded-md"
+        className="bg-sidebar-foreground h-screen rounded-md"
       >
         <SidebarContent>
           <SidebarGroup>

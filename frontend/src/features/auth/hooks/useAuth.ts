@@ -29,7 +29,7 @@ export default function useAuth() {
         description: 'Oops! Something went wrong.',
       })
     }
-  }, [logoutMutation])
+  }, [logoutMutation, navigate])
 
   return { user: data?.whoAmI, loading, logout }
 }
