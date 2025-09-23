@@ -56,9 +56,9 @@ export default function EditorSidebar({ language }: EditorSidebarProps) {
     let nextActiveSnippetId: string | undefined
 
     if (snippetId) {
-      nextActiveSnippetId = (
-        snippets?.find((s) => s.id === snippetId) ?? snippets?.[0]
-      )?.id
+      const matchSnippet = snippets?.find((s) => s.id === snippetId)
+      nextActiveSnippetId =
+        matchSnippet !== undefined ? matchSnippet.id : undefined
     } else {
       nextActiveSnippetId = snippets?.[0]?.id
       // Load first snippet (if any) when user signned in and there is no snippet in the url
@@ -118,12 +118,11 @@ export default function EditorSidebar({ language }: EditorSidebarProps) {
                   >
                     <TooltipButton
                       tooltip="Create snippet"
-                      variant={null}
                       onClick={() => {
                         setIsModalOpen(true)
                       }}
-                      size="icon"
-                      className="rounded-full"
+                      variant={null}
+                      className="w-full rounded"
                     >
                       <Plus className="h-4 w-4 text-neutral-300 group-hover:text-neutral-100" />
                     </TooltipButton>
