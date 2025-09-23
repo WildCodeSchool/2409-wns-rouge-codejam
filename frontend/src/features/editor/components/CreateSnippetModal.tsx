@@ -4,7 +4,7 @@ import { Form } from '@/shared/components/ui/form'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Input } from '@/shared/components/ui/input'
-import { GET_ALL_SNIPPETS } from '../../../shared/api/getUserSnippets'
+import { GET_ALL_SNIPPETS } from '@/shared/api/getUserSnippets'
 import { Spinner } from '@/shared/components/ui/spinner'
 import { Button } from '@/shared/components/ui/button'
 import {

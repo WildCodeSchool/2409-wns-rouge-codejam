@@ -25,7 +25,7 @@ import {
 import TooltipButton from '@/shared/TooltipButton'
 
 const SIDEBAR_STORAGE_KEY = 'sidebar_is_open'
-const SIDEBAR_WIDTH = '12rem'
+const SIDEBAR_WIDTH = '16rem'
 const SIDEBAR_WIDTH_MOBILE = '10rem'
 const SIDEBAR_WIDTH_ICON = '3.5rem'
 const SIDEBAR_KEYBOARD_SHORTCUT = 'b'

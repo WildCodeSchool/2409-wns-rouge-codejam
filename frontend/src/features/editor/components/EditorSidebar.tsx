@@ -17,7 +17,6 @@ import {
   SidebarGroupContent,
   SidebarHeader,
   SidebarMenu,
-  SidebarMenuButton,
   SidebarMenuItem,
   SidebarTrigger,
   useSidebar,
@@ -30,6 +29,7 @@ import {
 } from '@/shared/components/ui/tooltip'
 import { Snippet } from '@/shared/gql/graphql'
 import { cn } from '@/shared/lib/utils'
+import TooltipButton from '@/shared/TooltipButton'
 
 type EditorSidebarProps = {
   language: Snippet['language']
@@ -104,26 +104,35 @@ export default function EditorSidebar({ language }: EditorSidebarProps) {
                       My Snippets
                     </span>
                   )}
-                  <SidebarTrigger className="bg-accent" />
+                  <SidebarTrigger
+                    className="bg-accent size-9 rounded-full"
+                    size="icon"
+                  />
                 </div>
               </SidebarHeader>
               {open && (
                 <SidebarMenu className="gap-3">
-                  <SidebarMenuItem key="add-new-snippet">
-                    <SidebarMenuButton
-                      className="group flex cursor-pointer items-center justify-center"
+                  <SidebarMenuItem
+                    key="add-new-snippet"
+                    className="flex justify-center py-1 text-sm"
+                  >
+                    <TooltipButton
+                      tooltip="Create snippet"
+                      variant={null}
                       onClick={() => {
                         setIsModalOpen(true)
                       }}
+                      size="icon"
+                      className="rounded-full"
                     >
                       <Plus className="h-4 w-4 text-neutral-300 group-hover:text-neutral-100" />
-                    </SidebarMenuButton>
+                    </TooltipButton>
                   </SidebarMenuItem>
 
                   {(snippets ?? []).map((snippet) => (
                     <SidebarMenuItem
                       key={snippet.id}
-                      className="flex cursor-pointer justify-between"
+                      className="flex cursor-pointer justify-between gap-0.5 py-1"
                     >
                       <Tooltip>
                         <TooltipTrigger asChild>
@@ -132,7 +141,7 @@ export default function EditorSidebar({ language }: EditorSidebarProps) {
                               navigate(`/editor/${snippet.id}/${snippet.slug}`)
                             }}
                             className={cn(
-                              'flex-1 cursor-pointer truncate rounded-md px-2 py-1.5 text-left transition-colors',
+                              'flex-1 cursor-pointer justify-start truncate rounded-md px-2 py-1.5 text-left transition-colors',
                               activeSnippetId === snippet.id
                                 ? 'text-sky-500 hover:text-sky-300'
                                 : hoveredTextStyles,
@@ -145,13 +154,24 @@ export default function EditorSidebar({ language }: EditorSidebarProps) {
                           {snippet.name}
                         </TooltipContent>
                       </Tooltip>
-                      <div className="flex items-center gap-2 pr-2">
-                        <SidebarMenuButton className="p-0">
+                      <div className="flex items-center pr-2">
+                        <TooltipButton
+                          tooltip="Rename snippet"
+                          variant={null}
+                          size="icon"
+                          className="min-w-0 rounded-full px-0"
+                        >
                           <Pencil className={iconsStyles} />
-                        </SidebarMenuButton>
-                        <SidebarMenuButton className="p-0">
+                        </TooltipButton>
+
+                        <TooltipButton
+                          tooltip="Delete snippet"
+                          variant={null}
+                          size="icon"
+                          className="rounded-full px-0"
+                        >
                           <Trash className={iconsStyles} />
-                        </SidebarMenuButton>
+                        </TooltipButton>
                       </div>
                     </SidebarMenuItem>
                   ))}
