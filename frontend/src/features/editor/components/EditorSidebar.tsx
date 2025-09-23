@@ -8,8 +8,8 @@ import { EditorUrlParams } from '@/features/editor/types'
 
 import { GET_ALL_SNIPPETS } from '@/shared/api/getUserSnippets'
 import { WHO_AM_I } from '@/shared/api/whoAmI'
+import { TooltipButton } from '@/shared/components'
 import Modal from '@/shared/components/Modal'
-
 import {
   Sidebar,
   SidebarContent,
@@ -29,7 +29,6 @@ import {
 } from '@/shared/components/ui/tooltip'
 import { Snippet } from '@/shared/gql/graphql'
 import { cn } from '@/shared/lib/utils'
-import TooltipButton from '@/shared/TooltipButton'
 
 type EditorSidebarProps = {
   language: Snippet['language']
@@ -90,26 +89,22 @@ export default function EditorSidebar({ language }: EditorSidebarProps) {
         className="bg-sidebar-foreground h-screen rounded-md"
       >
         <SidebarContent>
-          <SidebarGroup>
+          <SidebarGroup className="justify-center-center">
             <SidebarGroupContent>
               <SidebarHeader>
-                <div className="flex justify-between">
+                <div className="text-sidebar-foreground/70 flex items-center justify-between">
                   {open && (
-                    <span
-                      className={cn(
-                        'text-sidebar-foreground/70 ring-sidebar-ring text-md flex h-8 shrink-0 items-center rounded-md px-2 font-medium whitespace-nowrap outline-hidden transition-[margin,opacity] duration-200 ease-linear focus-visible:ring-2 [&>svg]:size-4 [&>svg]:shrink-0',
-                        'group-data-[collapsible=icon]:-mt-8 group-data-[collapsible=icon]:opacity-0',
-                      )}
-                    >
+                    <span className="font-medium -tracking-tighter whitespace-nowrap">
                       My Snippets
                     </span>
                   )}
                   <SidebarTrigger
-                    className="bg-accent size-9 rounded-full"
                     size="icon"
+                    className="bg-accent size-9 rounded-full"
                   />
                 </div>
               </SidebarHeader>
+
               {open && (
                 <SidebarMenu className="gap-3">
                   <SidebarMenuItem
@@ -118,11 +113,11 @@ export default function EditorSidebar({ language }: EditorSidebarProps) {
                   >
                     <TooltipButton
                       tooltip="Create snippet"
+                      variant={null}
+                      className="w-full rounded"
                       onClick={() => {
                         setIsModalOpen(true)
                       }}
-                      variant={null}
-                      className="w-full rounded"
                     >
                       <Plus className="h-4 w-4 text-neutral-300 group-hover:text-neutral-100" />
                     </TooltipButton>
@@ -153,6 +148,7 @@ export default function EditorSidebar({ language }: EditorSidebarProps) {
                           {snippet.name}
                         </TooltipContent>
                       </Tooltip>
+
                       <div className="flex items-center pr-2">
                         <TooltipButton
                           tooltip="Rename snippet"

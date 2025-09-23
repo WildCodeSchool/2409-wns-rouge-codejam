@@ -1,9 +1,5 @@
-import { Button } from './components/ui/button'
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from './components/ui/tooltip'
+import { Button } from './ui/button'
+import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip'
 
 type TooltipButtonProps = React.ComponentProps<typeof Button> & {
   tooltip: React.ReactNode

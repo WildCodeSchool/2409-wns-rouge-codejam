@@ -1,10 +1,9 @@
-import * as React from 'react'
 import { Slot } from '@radix-ui/react-slot'
 import { cva, VariantProps } from 'class-variance-authority'
 import { ArrowLeftToLine, ArrowRightToLine } from 'lucide-react'
+import * as React from 'react'
 
-import { useIsMobile } from '@/shared/hooks/use-mobile'
-import { cn } from '@/shared/lib/utils'
+import { TooltipButton } from '@/shared/components'
 import { Button } from '@/shared/components/ui/button'
 import { Input } from '@/shared/components/ui/input'
 import { Separator } from '@/shared/components/ui/separator'
@@ -22,7 +21,8 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/shared/components/ui/tooltip'
-import TooltipButton from '@/shared/TooltipButton'
+import { useIsMobile } from '@/shared/hooks/use-mobile'
+import { cn } from '@/shared/lib/utils'
 
 const SIDEBAR_STORAGE_KEY = 'sidebar_is_open'
 const SIDEBAR_WIDTH = '16rem'
