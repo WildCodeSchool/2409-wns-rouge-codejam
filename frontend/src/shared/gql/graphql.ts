@@ -61,6 +61,7 @@ export type Mutation = {
   execute: Execution
   login?: Maybe<User>
   logout: Scalars['Boolean']['output']
+  saveSnippet?: Maybe<Snippet>
   updateSnippet: Snippet
   updateUser?: Maybe<User>
 }
@@ -88,6 +89,11 @@ export type MutationExecuteArgs = {
 
 export type MutationLoginArgs = {
   data: UserLoginInput
+}
+
+export type MutationSaveSnippetArgs = {
+  data: SnippetCreateInput
+  id?: InputMaybe<Scalars['ID']['input']>
 }
 
 export type MutationUpdateSnippetArgs = {
@@ -134,7 +140,7 @@ export type Snippet = {
 
 export type SnippetCreateInput = {
   code: Scalars['String']['input']
-  language: Scalars['String']['input']
+  language: Language
   name: Scalars['String']['input']
 }
 
@@ -280,6 +286,26 @@ export type LoginMutation = {
 export type LogoutMutationVariables = Exact<{ [key: string]: never }>
 
 export type LogoutMutation = { __typename?: 'Mutation'; logout: boolean }
+
+export type SaveSnippetMutationVariables = Exact<{
+  data: SnippetCreateInput
+  id: Scalars['ID']['input']
+}>
+
+export type SaveSnippetMutation = {
+  __typename?: 'Mutation'
+  saveSnippet?: { __typename?: 'Snippet'; id: string; slug: string } | null
+}
+
+export type UpdateSnippetMutationVariables = Exact<{
+  data: SnippetUpdateInput
+  updateSnippetId: Scalars['ID']['input']
+}>
+
+export type UpdateSnippetMutation = {
+  __typename?: 'Mutation'
+  updateSnippet: { __typename?: 'Snippet'; id: string }
+}
 
 export type WhoAmIQueryVariables = Exact<{ [key: string]: never }>
 
@@ -678,6 +704,141 @@ export const LogoutDocument = {
     },
   ],
 } as unknown as DocumentNode<LogoutMutation, LogoutMutationVariables>
+export const SaveSnippetDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'mutation',
+      name: { kind: 'Name', value: 'saveSnippet' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'data' } },
+          type: {
+            kind: 'NonNullType',
+            type: {
+              kind: 'NamedType',
+              name: { kind: 'Name', value: 'SnippetCreateInput' },
+            },
+          },
+        },
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'id' } },
+          type: {
+            kind: 'NonNullType',
+            type: { kind: 'NamedType', name: { kind: 'Name', value: 'ID' } },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'saveSnippet' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'data' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'data' },
+                },
+              },
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'id' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'id' },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'slug' } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<SaveSnippetMutation, SaveSnippetMutationVariables>
+export const UpdateSnippetDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'mutation',
+      name: { kind: 'Name', value: 'UpdateSnippet' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'data' } },
+          type: {
+            kind: 'NonNullType',
+            type: {
+              kind: 'NamedType',
+              name: { kind: 'Name', value: 'SnippetUpdateInput' },
+            },
+          },
+        },
+        {
+          kind: 'VariableDefinition',
+          variable: {
+            kind: 'Variable',
+            name: { kind: 'Name', value: 'updateSnippetId' },
+          },
+          type: {
+            kind: 'NonNullType',
+            type: { kind: 'NamedType', name: { kind: 'Name', value: 'ID' } },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'updateSnippet' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'data' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'data' },
+                },
+              },
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'id' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'updateSnippetId' },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  UpdateSnippetMutation,
+  UpdateSnippetMutationVariables
+>
 export const WhoAmIDocument = {
   kind: 'Document',
   definitions: [

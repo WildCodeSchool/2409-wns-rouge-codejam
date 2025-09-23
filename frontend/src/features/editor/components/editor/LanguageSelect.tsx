@@ -7,7 +7,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/shared/components/ui/select'
-import { Skeleton } from '@/shared/components/ui/skeleton'
 import { Language } from '@/shared/gql/graphql'
 import { getLanguageIcon, getObjectKeys } from '@/shared/lib/utils'
 
@@ -54,8 +53,4 @@ export default function LanguageSelect({
       </Select>
     </div>
   )
-}
-
-export function LanguageSelectSkeleton() {
-  return <Skeleton className="h-9 w-40" />
 }

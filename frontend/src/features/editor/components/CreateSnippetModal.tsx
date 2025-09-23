@@ -46,7 +46,7 @@ export default function CreateSnippetModal({
           data: {
             name: values.name,
             code: '',
-            language: language.toLowerCase(),
+            language,
           },
         },
         refetchQueries: [GET_ALL_SNIPPETS],
