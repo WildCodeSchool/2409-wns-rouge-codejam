@@ -1,13 +1,10 @@
 import { TooltipButton } from '@/shared/components'
 import { PlayIcon } from 'lucide-react'
 
-type RunButtonProps = {
-  onClick: (_e: React.MouseEvent<HTMLButtonElement>) => void
-  loading: boolean
-  disabled: boolean
-}
-
-const RunButton = ({ onClick, disabled }: RunButtonProps) => {
+const RunButton = ({
+  onClick,
+  disabled,
+}: React.ComponentProps<typeof TooltipButton>) => {
   return (
     <TooltipButton
       type="button"

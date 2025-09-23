@@ -2,7 +2,7 @@ import { LanguageSelect } from '@/features/editor/components/editor'
 import { Language } from '@/shared/gql/graphql'
 import { Skeleton } from '@/shared/components/ui/skeleton'
 import SaveButton from './SaveButton'
-import useEditorLeftActions from '../../hooks/useEditorLeftActions'
+import { useEditorLeftActions } from '@/features/editor/hooks'
 
 type EditorLeftActionProps = {
   code: string

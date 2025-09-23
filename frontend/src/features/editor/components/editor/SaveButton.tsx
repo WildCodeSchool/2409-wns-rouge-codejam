@@ -1,13 +1,10 @@
 import { TooltipButton } from '@/shared/components'
 import { Save } from 'lucide-react'
 
-type SaveButtonProps = {
-  onClick: (_e: React.MouseEvent<HTMLButtonElement>) => void
-  loading: boolean
-  disabled: boolean
-}
-
-const SaveButton = ({ onClick, disabled }: SaveButtonProps) => {
+const SaveButton = ({
+  onClick,
+  disabled,
+}: React.ComponentProps<typeof TooltipButton>) => {
   return (
     <TooltipButton
       type="button"

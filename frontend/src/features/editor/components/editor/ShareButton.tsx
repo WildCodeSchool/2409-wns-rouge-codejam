@@ -1,12 +1,10 @@
 import TooltipButton from '@/shared/components/TooltipButton'
 import { Share2Icon } from 'lucide-react'
 
-type ShareButtonProps = {
-  onClick: () => void
-  disabled: boolean
-}
-
-const ShareButton = ({ onClick, disabled }: ShareButtonProps) => {
+const ShareButton = ({
+  onClick,
+  disabled,
+}: React.ComponentProps<typeof TooltipButton>) => {
   return (
     <TooltipButton
       type="button"

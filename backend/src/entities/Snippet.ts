@@ -52,7 +52,7 @@ export class Snippet extends BaseEntity {
 
   @Column({ type: 'enum', enum: Language, default: Language.TYPESCRIPT })
   @Field(() => Language)
-  language!: string
+  language!: Language
 
   @CreateDateColumn()
   @Field(() => GraphQLDateTime)
@@ -85,7 +85,6 @@ export class SnippetCreateInput {
   name!: string
 
   @Field(() => String)
-  @IsNotEmpty()
   code!: string
 
   @Field(() => Language)

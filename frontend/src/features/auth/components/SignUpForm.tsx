@@ -131,8 +131,8 @@ export default function SignUpForm({
           }}
         />
         <Button
-          data-testid="submit-signup"
           id="signup-submit"
+          data-testid="submit-signup"
           className="w-full"
           type="submit"
           disabled={isSubmitting || isSubmittingError.length > 0}

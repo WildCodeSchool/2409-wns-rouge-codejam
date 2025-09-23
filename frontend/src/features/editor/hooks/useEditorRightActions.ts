@@ -13,6 +13,7 @@ import {
 } from 'unique-names-generator'
 import { useNavigate, useParams } from 'react-router-dom'
 import { GET_SNIPPET } from '@/shared/api/getSnippet'
+import { GET_ALL_SNIPPETS } from '@/shared/api/getUserSnippets'
 
 const baseUniqueNameConfig: Config = {
   dictionaries: [adjectives, colors, animals],
@@ -51,7 +52,13 @@ export default function useEditorRightActions(
           },
           snippetId: snippetId,
         },
-        refetchQueries: [{ query: GET_SNIPPET, variables: { id: snippetId } }],
+        refetchQueries: [
+          { query: GET_SNIPPET, variables: { id: snippetId } },
+          // !TODO: refetch only when user is logged in and run code without any existing snippet...
+          {
+            query: GET_ALL_SNIPPETS,
+          },
+        ],
       })
       if (data) {
         const {

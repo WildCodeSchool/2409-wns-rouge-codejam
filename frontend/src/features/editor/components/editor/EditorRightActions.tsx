@@ -4,7 +4,7 @@ import { ExecutionStatus, Language } from '@/shared/gql/graphql'
 import { Skeleton } from '@/shared/components/ui/skeleton'
 import RunButton from './RunButton'
 import ShareButton from './ShareButton'
-import useEditorRightActions from '../../hooks/useEditorRightActions'
+import { useEditorRightActions } from '@/features/editor/hooks'
 
 type EditorRightActionProps = {
   code: string

@@ -12,6 +12,7 @@ import {
 } from 'unique-names-generator'
 import { useNavigate, useParams } from 'react-router-dom'
 import { SAVE_SNIPPET } from '@/shared/api/saveSnippet'
+import { GET_ALL_SNIPPETS } from '@/shared/api/getUserSnippets'
 
 const baseUniqueNameConfig: Config = {
   dictionaries: [adjectives, colors, animals],
@@ -37,6 +38,7 @@ export default function useEditorLeftActions(code: string, language: Language) {
           },
           id: snippetId ?? '',
         },
+        refetchQueries: [{ query: GET_ALL_SNIPPETS }],
       })
       if (data?.saveSnippet) {
         const { id, slug } = data.saveSnippet
