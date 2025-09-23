@@ -15,9 +15,11 @@ import { Subscribe } from '@/features/editor/components/editor'
 import { EditorUrlParams, Status } from '@/features/editor/types'
 
 import { EXECUTE } from '@/shared/api/execute'
+import { GET_ALL_SNIPPETS } from '@/shared/api/getUserSnippets'
 import { GET_SNIPPET } from '@/shared/api/getSnippet'
 import { Modal } from '@/shared/components'
 import { Button } from '@/shared/components/ui/button'
+import { Skeleton } from '@/shared/components/ui/skeleton'
 import { Spinner } from '@/shared/components/ui/spinner'
 import {
   Tooltip,
@@ -25,7 +27,6 @@ import {
   TooltipTrigger,
 } from '@/shared/components/ui/tooltip'
 import { ExecutionStatus, Language } from '@/shared/gql/graphql'
-import { Skeleton } from '@/shared/components/ui/skeleton'
 
 type EditorActionProps = {
   code: string
@@ -66,7 +67,13 @@ export default function EditorActions({
           },
           snippetId: snippetId,
         },
-        refetchQueries: [{ query: GET_SNIPPET, variables: { id: snippetId } }],
+        refetchQueries: [
+          { query: GET_SNIPPET, variables: { id: snippetId } },
+          // !TODO: refetch only when user is logged in and run code without any existing snippet...
+          {
+            query: GET_ALL_SNIPPETS,
+          },
+        ],
       })
       if (data) {
         const {
@@ -80,7 +87,6 @@ export default function EditorActions({
           navigate(`/editor/${id}/${slug}`, {
             replace: true,
           })
-
           setStatus('typing')
         }
         // Update state with the result and status

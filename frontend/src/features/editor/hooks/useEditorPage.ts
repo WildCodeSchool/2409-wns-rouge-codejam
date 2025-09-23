@@ -3,19 +3,17 @@ import { toast } from 'sonner'
 
 import { STARTER_SNIPPET } from '@/features/editor/components/editor'
 import { useSnippet } from '@/features/editor/hooks'
-import { editorReducer, EditorState } from '@/features/editor/reducers'
+import {
+  editorReducer,
+  EditorState,
+  initialEditorState,
+} from '@/features/editor/reducers'
+
 import {
   ExecutionStatus,
   GetSnippetQuery,
   Language,
 } from '@/shared/gql/graphql'
-
-const initialEditorState: EditorState = {
-  code: STARTER_SNIPPET.JAVASCRIPT,
-  language: Language.Javascript,
-  output: '',
-  executionStatus: undefined,
-}
 
 const initializeEditorState = (
   snippet: GetSnippetQuery['getSnippet'] | null | undefined,
@@ -40,19 +38,18 @@ export default function useEditorPage(snippetId?: string) {
   // Initialize from snippet or starter code
   useEffect(() => {
     if (!snippetId) {
-      return
+      dispatch({ type: 'RESET' })
     }
 
-    const lastExecution = snippet?.executions?.[0]
-
-    if (lastExecution) {
+    if (snippet) {
+      const lastExecution = snippet.executions?.[0]
       dispatch({
         type: 'SET_INITIAL_VALUES',
         payload: {
           language: snippet.language,
           code: snippet.code,
-          output: lastExecution.result,
-          executionStatus: lastExecution.status,
+          output: lastExecution?.result,
+          executionStatus: lastExecution?.status,
         },
       })
     }
@@ -89,7 +86,7 @@ export default function useEditorPage(snippetId?: string) {
         code: nextCode,
       })
     },
-    [state.code, state.language],
+    [snippetId, state.code, state.language],
   )
   const updateOutput = useCallback((nextOutput?: string) => {
     dispatch({ type: 'SET_OUTPUT', output: nextOutput ?? '' })

@@ -179,6 +179,20 @@ export type UserUpdateInput = {
   username?: InputMaybe<Scalars['String']['input']>
 }
 
+export type CreateSnippetMutationVariables = Exact<{
+  data: SnippetCreateInput
+}>
+
+export type CreateSnippetMutation = {
+  __typename?: 'Mutation'
+  createSnippet: {
+    __typename?: 'Snippet'
+    id: string
+    name: string
+    slug: string
+  }
+}
+
 export type CreateUserMutationVariables = Exact<{
   data: UserCreateInput
 }>
@@ -229,6 +243,7 @@ export type GetSnippetQuery = {
     id: string
     code: string
     language: Language
+    slug: string
     executions?: Array<{
       __typename?: 'Execution'
       id: string
@@ -237,6 +252,20 @@ export type GetSnippetQuery = {
       executedAt: any
     }> | null
   } | null
+}
+
+export type GetAllSnippetsQueryVariables = Exact<{ [key: string]: never }>
+
+export type GetAllSnippetsQuery = {
+  __typename?: 'Query'
+  getAllSnippets: Array<{
+    __typename?: 'Snippet'
+    id: string
+    name: string
+    language: Language
+    code: string
+    slug: string
+  }>
 }
 
 export type LoginMutationVariables = Exact<{
@@ -264,6 +293,59 @@ export type WhoAmIQuery = {
   } | null
 }
 
+export const CreateSnippetDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'mutation',
+      name: { kind: 'Name', value: 'CreateSnippet' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'data' } },
+          type: {
+            kind: 'NonNullType',
+            type: {
+              kind: 'NamedType',
+              name: { kind: 'Name', value: 'SnippetCreateInput' },
+            },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'createSnippet' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'data' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'data' },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'slug' } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  CreateSnippetMutation,
+  CreateSnippetMutationVariables
+>
 export const CreateUserDocument = {
   kind: 'Document',
   definitions: [
@@ -471,6 +553,7 @@ export const GetSnippetDocument = {
                 { kind: 'Field', name: { kind: 'Name', value: 'id' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'code' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'language' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'slug' } },
                 {
                   kind: 'Field',
                   name: { kind: 'Name', value: 'executions' },
@@ -501,6 +584,35 @@ export const GetSnippetDocument = {
     },
   ],
 } as unknown as DocumentNode<GetSnippetQuery, GetSnippetQueryVariables>
+export const GetAllSnippetsDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'query',
+      name: { kind: 'Name', value: 'getAllSnippets' },
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'getAllSnippets' },
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'language' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'code' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'slug' } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<GetAllSnippetsQuery, GetAllSnippetsQueryVariables>
 export const LoginDocument = {
   kind: 'Document',
   definitions: [

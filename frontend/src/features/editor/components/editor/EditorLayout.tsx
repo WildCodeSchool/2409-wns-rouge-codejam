@@ -15,6 +15,8 @@ import {
   ResizablePanelGroup,
 } from '@/shared/components/ui/resizable'
 import { ExecutionStatus } from '@/shared/gql/graphql'
+import EditorSidebar from '../EditorSidebar'
+import { SidebarProvider } from '@/shared/components/ui/sidebar'
 
 type EditorLayoutProps = {
   state: EditorState
@@ -32,43 +34,51 @@ export default function EditorLayout({
   onChangeStatus,
 }: EditorLayoutProps) {
   return (
-    <div className="h-full">
-      <ResizablePanelGroup direction="horizontal" className="h-full">
-        <ResizablePanel
-          defaultSize={50}
-          minSize={25}
-          maxSize={75}
-          className="grid grid-rows-[auto_1fr] gap-2"
-        >
-          <LanguageSelect
-            language={state.language}
-            onChange={onChangeLanguage}
-          />
+    <div className="flex h-full">
+      <SidebarProvider>
+        <EditorSidebar language={state.language} />
+        <ResizablePanelGroup direction="horizontal" className="h-full">
+          <ResizablePanel
+            id="editor-panel"
+            defaultSize={50}
+            minSize={25}
+            maxSize={75}
+            className="grid grid-rows-[auto_1fr] gap-2"
+          >
+            <LanguageSelect
+              language={state.language}
+              onChange={onChangeLanguage}
+            />
 
-          <CodeEditor
-            code={state.code}
-            language={state.language}
-            onChange={onChangeCode}
-          />
-        </ResizablePanel>
+            <CodeEditor
+              code={state.code}
+              language={state.language}
+              onChange={onChangeCode}
+            />
+          </ResizablePanel>
 
-        <ResizableHandle withHandle className="bg-transparent" />
+          <ResizableHandle withHandle className="bg-transparent" />
 
-        <ResizablePanel
-          defaultSize={50}
-          maxSize={75}
-          minSize={25}
-          className="grid grid-rows-[auto_1fr] gap-2"
-        >
-          <EditorActions
-            code={state.code}
-            language={state.language}
-            onChangeOutput={onChangeOutput}
-            onChangeStatus={onChangeStatus}
-          />
-          <EditorOutput output={state.output} status={state.executionStatus} />
-        </ResizablePanel>
-      </ResizablePanelGroup>
+          <ResizablePanel
+            id="output-panel"
+            defaultSize={50}
+            minSize={25}
+            maxSize={75}
+            className="grid grid-rows-[auto_1fr] gap-2"
+          >
+            <EditorActions
+              code={state.code}
+              language={state.language}
+              onChangeOutput={onChangeOutput}
+              onChangeStatus={onChangeStatus}
+            />
+            <EditorOutput
+              output={state.output}
+              status={state.executionStatus}
+            />
+          </ResizablePanel>
+        </ResizablePanelGroup>
+      </SidebarProvider>
     </div>
   )
 }

@@ -6,6 +6,7 @@ export const GET_SNIPPET = gql(/* GraphQL */ `
       id
       code
       language
+      slug
       executions {
         id
         status

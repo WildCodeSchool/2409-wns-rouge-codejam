@@ -85,7 +85,6 @@ export class SnippetCreateInput {
   name!: string
 
   @Field(() => String)
-  @IsNotEmpty()
   code!: string
 
   @Field(() => String)
