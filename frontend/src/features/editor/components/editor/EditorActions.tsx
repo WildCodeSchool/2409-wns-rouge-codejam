@@ -1,6 +1,7 @@
 import { useMutation } from '@apollo/client'
-import { PlayIcon, Share2Icon } from 'lucide-react'
-import { useState } from 'react'
+import { debounce } from 'lodash'
+import { Share2Icon, PlayIcon } from 'lucide-react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { toast } from 'sonner'
 import {
@@ -18,15 +19,11 @@ import { EXECUTE } from '@/shared/api/execute'
 import { GET_ALL_SNIPPETS } from '@/shared/api/getUserSnippets'
 import { GET_SNIPPET } from '@/shared/api/getSnippet'
 import { Modal } from '@/shared/components'
-import { Button } from '@/shared/components/ui/button'
 import { Skeleton } from '@/shared/components/ui/skeleton'
 import { Spinner } from '@/shared/components/ui/spinner'
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from '@/shared/components/ui/tooltip'
+import { toastOptions } from '@/shared/config'
 import { ExecutionStatus, Language } from '@/shared/gql/graphql'
+import TooltipButton from '@/shared/TooltipButton'
 
 type EditorActionProps = {
   code: string
@@ -50,10 +47,74 @@ export default function EditorActions({
   const { snippetId, snippetSlug } = useParams<EditorUrlParams>()
   const [showModal, setShowModal] = useState(false)
   const [status, setStatus] = useState<Status>('typing')
+  const [copiedUrl, setCopiedUrl] = useState(false)
   const [execute] = useMutation(EXECUTE)
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null)
 
-  const isExecuting = status === 'executing'
-  const disabled = !code || isExecuting || status === 'disabled'
+  const copyUrl = useCallback(
+    async (_e: React.MouseEvent<HTMLButtonElement>) => {
+      console.log('clicked')
+      setCopiedUrl(true)
+
+      if (!snippetId) {
+        toast.error('You need to execute the code first to share it.', {
+          ...toastOptions.base,
+          icon: toastOptions.error.Icon,
+        })
+        return
+      }
+
+      const url = window.location.href
+      await navigator.clipboard.writeText(url)
+
+      toast.success('URL copied to clipboard', {
+        ...toastOptions.base,
+        icon: toastOptions.success.Icon,
+      })
+    },
+    [snippetId],
+  )
+  const handleCopyUrl = useMemo(
+    () =>
+      debounce(copyUrl, 1000, {
+        leading: true,
+        trailing: false,
+      }),
+    [copyUrl],
+  )
+
+  useEffect(() => {
+    if (copiedUrl && code) {
+      // Clear any existing timeout to avoid overlapping resets
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current)
+      }
+
+      // Set a new timeout to reset `copiedUrl` after the toast duration
+      timeoutRef.current = setTimeout(() => {
+        setCopiedUrl(false)
+        timeoutRef.current = null // clear the ref
+      }, toastOptions.base.duration)
+    }
+
+    // Clear the timeout if component unmounts or dependencies change
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current)
+        timeoutRef.current = null
+      }
+    }
+  }, [copiedUrl, code])
+
+  // Cleanup on unmount the lodash debounce function to avoid memory leaks
+  useEffect(() => {
+    return () => {
+      handleCopyUrl.cancel()
+    }
+  }, [handleCopyUrl])
+
+  const executing = status === 'executing'
+  const disabled = !code || executing || status === 'disabled'
 
   const handleExecute = async (_e: React.MouseEvent<HTMLButtonElement>) => {
     try {
@@ -104,72 +165,53 @@ export default function EditorActions({
         } else {
           console.error('Error executing code:', error.message)
           toast.error(`Error executing code: ${error.message}`, {
-            description: 'Please try again later.',
+            ...toastOptions.base,
+            ...toastOptions.error,
           })
         }
       } else {
         console.error('Unexpected error:', error)
         toast.error('Execution service temporarily unavailable', {
-          description: 'Please try again later.',
+          ...toastOptions.base,
+          ...toastOptions.error,
         })
       }
     } finally {
       setStatus('typing')
     }
   }
-
   const handleCloseModal = () => {
     setShowModal(false)
   }
 
   return (
     <div className="flex justify-end gap-4">
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <Button
-            type="button"
-            aria-label={'Execute current snippet'}
-            aria-disabled={disabled}
-            disabled={disabled}
-            onClick={handleExecute}
-            className="min-w-24"
-          >
-            <span>Run</span>
-            {isExecuting ? (
-              <Spinner size="small" />
-            ) : (
-              <PlayIcon aria-hidden="true" role="img" size={15} />
-            )}
-          </Button>
-        </TooltipTrigger>
-        {!isExecuting && (
-          <TooltipContent>
-            <p>Execute current snippet</p>
-          </TooltipContent>
+      <TooltipButton
+        tooltip="Execute current snippet"
+        aria-disabled={disabled}
+        disabled={disabled}
+        onClick={handleExecute}
+        className="min-w-24"
+      >
+        <span>Run</span>
+        {executing ? (
+          <Spinner size="small" />
+        ) : (
+          <PlayIcon aria-hidden="true" role="img" size={15} />
         )}
-      </Tooltip>
+      </TooltipButton>
 
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <Button
-            type="button"
-            aria-label={'Copy url to clipboard'}
-            variant="outline"
-            aria-disabled={!code}
-            disabled={!code}
-            onClick={() => {
-              alert('🚧 Copy current url to clipboard...')
-            }}
-            className="min-w-24"
-          >
-            <span>Share</span>
-            <Share2Icon aria-hidden="true" role="img" size={15} />
-          </Button>
-        </TooltipTrigger>
-        <TooltipContent>
-          <p>Copy url to clipboard</p>
-        </TooltipContent>
-      </Tooltip>
+      <TooltipButton
+        tooltip="Copy url to clipboard"
+        variant="outline"
+        aria-disabled={!code}
+        disabled={!code || !snippetId}
+        onClick={handleCopyUrl}
+        className="min-w-24"
+      >
+        <span>Share</span>
+        <Share2Icon aria-hidden="true" role="img" size={15} />
+      </TooltipButton>
 
       {showModal && (
         <Modal
