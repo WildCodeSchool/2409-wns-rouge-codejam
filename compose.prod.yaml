@@ -20,6 +20,15 @@ services:
       db:
         condition: service_started
 
+  code-execution:
+    container_name: codejam-code-execution
+    image: codejam2025proton/code-execution:latest
+    volumes:
+      # Use the host's docker daemon (DooD)
+      - /var/run/docker.sock:/var/run/docker.sock
+    env_file:
+      - codeExecution.env
+
   frontend:
     image: codejam2025proton/frontend:latest
     command: sh -c "pnpm run dev"

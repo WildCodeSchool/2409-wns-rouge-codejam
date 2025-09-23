@@ -73,3 +73,19 @@ jobs:
           docker-username: ${{ vars.DOCKERHUB_USERNAME }}
           docker-token: ${{ secrets.DOCKERHUB_TOKEN }}
           docker-repository: ${{ vars.DOCKERHUB_REPO_BACKEND }}
+
+  build-code-execution:
+    # Run job only if:
+    # - the commit is tagged starting with v
+    runs-on: ubuntu-latest
+    steps:
+      # Retrieve code from the repository (mandatory prior to using the custom local action)
+      - name: Check out code
+        uses: actions/checkout@v4
+      # Custom action to login to Docker Hub, build and push the Docker image
+      - uses: ./.github/actions/build-common-steps
+        with:
+          directory: "code-execution"
+          docker-username: ${{ vars.DOCKERHUB_USERNAME }}
+          docker-token: ${{ secrets.DOCKERHUB_TOKEN }}
+          docker-repository: ${{ vars.DOCKERHUB_REPO_CODE_EXECUTION }}
