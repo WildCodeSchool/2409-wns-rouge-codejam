@@ -1,4 +1,4 @@
-import { useQuery } from '@apollo/client'
+import { useQuery, useMutation } from '@apollo/client'
 import { PanelRightCloseIcon, Pencil, Plus, Trash } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
@@ -8,6 +8,7 @@ import { EditorUrlParams } from '@/features/editor/types'
 
 import { GET_ALL_SNIPPETS } from '@/shared/api/getUserSnippets'
 import { WHO_AM_I } from '@/shared/api/whoAmI'
+import { DELETE_SNIPPET } from '@/shared/api/deleteSnippet'
 import { TooltipButton } from '@/shared/components'
 import Modal from '@/shared/components/Modal'
 import {
@@ -27,12 +28,21 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from '@/shared/components/ui/tooltip'
-import { Snippet } from '@/shared/gql/graphql'
+import { Button } from '@/shared/components/ui/button'
+import { toast } from 'sonner'
+import {
+  Snippet,
+  type DeleteSnippetMutation,
+  type DeleteSnippetMutationVariables,
+} from '@/shared/gql/graphql'
 import { cn } from '@/shared/lib/utils'
 
 type EditorSidebarProps = {
   language: Snippet['language']
 }
+
+// Minimal UI shape used by the delete flow
+type SnippetLite = Pick<Snippet, 'id' | 'name' | 'slug'>
 
 export default function EditorSidebar({ language }: EditorSidebarProps) {
   const { open } = useSidebar()
@@ -50,6 +60,9 @@ export default function EditorSidebar({ language }: EditorSidebarProps) {
     snippetId,
   )
   const [isModalOpen, setIsModalOpen] = useState(false)
+
+  // Controlled modal: delete — stores the target snippet
+  const [deleteTarget, setDeleteTarget] = useState<SnippetLite | null>(null)
 
   useEffect(() => {
     let nextActiveSnippetId: string | undefined
@@ -72,6 +85,54 @@ export default function EditorSidebar({ language }: EditorSidebarProps) {
 
   const hoveredTextStyles = 'text-neutral-300 hover:text-neutral-100'
   const iconsStyles = `cursor-pointer h-4 w-4 ${hoveredTextStyles}`
+
+  // Helper: open the delete modal with a sanitized UI shape
+  const openDelete = (s: SnippetLite) => {
+    setDeleteTarget({ id: s.id, name: s.name, slug: s.slug })
+  }
+
+  // Helper: close the delete modal (separate function to satisfy lint rules)
+  const handleCancelDelete = () => {
+    setDeleteTarget(null)
+  }
+
+  // Close modal when Modal's open state becomes false
+  const handleDeleteOpenChange = (isOpen: boolean) => {
+    if (!isOpen) {
+      setDeleteTarget(null)
+    }
+  }
+
+  // Delete mutation — refetch list (same approach as edit)
+  const [deleteSnippet] = useMutation<
+    DeleteSnippetMutation,
+    DeleteSnippetMutationVariables // if missing after rebase, replace with { id: string }
+  >(DELETE_SNIPPET, {
+    refetchQueries: [{ query: GET_ALL_SNIPPETS }],
+    awaitRefetchQueries: true,
+  })
+
+  // Execute deletion then navigate if necessary; close modal and notify.
+  // Returns true on success, false otherwise.
+  const confirmDelete = async (): Promise<boolean> => {
+    if (!deleteTarget) return false
+    try {
+      await deleteSnippet({ variables: { id: deleteTarget.id } })
+
+      // If the deleted item was the active one -> go to /editor
+      // The effect above will then load the next available snippet if any
+      if (activeSnippetId === deleteTarget.id) {
+        navigate('/editor', { replace: true })
+      }
+
+      toast.success(`“${deleteTarget.name}” was deleted.`)
+      setDeleteTarget(null) // close modal
+      return true
+    } catch {
+      toast.error('An error occurred while deleting the snippet.')
+      return false
+    }
+  }
 
   if (loadingUser || loadingSnippets) {
     return <Spinner />
@@ -174,11 +235,15 @@ export default function EditorSidebar({ language }: EditorSidebarProps) {
                           />
                         </TooltipButton>
 
+                        {/* Delete action opens the controlled modal */}
                         <TooltipButton
                           tooltip="Delete snippet"
                           variant={null}
                           size="icon"
                           className="rounded-full px-0"
+                          onClick={() => {
+                            openDelete(snippet)
+                          }}
                         >
                           <Trash
                             aria-hidden="true"
@@ -207,6 +272,24 @@ export default function EditorSidebar({ language }: EditorSidebarProps) {
             setIsModalOpen(false)
           }}
         />
+      </Modal>
+      {/* Delete confirmation modal (controlled) */}
+      <Modal
+        title={deleteTarget ? `Delete snippet “${deleteTarget.name}”?` : ''}
+        open={!!deleteTarget}
+        onOpenChange={handleDeleteOpenChange}
+      >
+        <div className="space-y-4">
+          <p>This action is irreversible.</p>
+          <div className="flex justify-end gap-2">
+            <Button variant="outline" onClick={handleCancelDelete}>
+              Cancel
+            </Button>
+            <Button variant="destructive" onClick={confirmDelete}>
+              Delete
+            </Button>
+          </div>
+        </div>
       </Modal>
     </>
   )
