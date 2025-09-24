@@ -1,8 +1,11 @@
+import { Save } from 'lucide-react'
+
 import { LanguageSelect } from '@/features/editor/components/editor'
-import { Language } from '@/shared/gql/graphql'
-import { Skeleton } from '@/shared/components/ui/skeleton'
-import SaveButton from './SaveButton'
 import { useEditorLeftActions } from '@/features/editor/hooks'
+import { TooltipButton } from '@/shared/components'
+import { Skeleton } from '@/shared/components/ui/skeleton'
+import { Spinner } from '@/shared/components/ui/spinner'
+import { Language } from '@/shared/gql/graphql'
 
 type EditorLeftActionProps = {
   code: string
@@ -15,12 +18,27 @@ export default function EditorLeftActions({
   language,
   onChangeLanguage,
 }: EditorLeftActionProps) {
-  const { saveSnippet } = useEditorLeftActions(code, language)
+  const { saveSnippet, status } = useEditorLeftActions(code, language)
 
   return (
     <div className="flex justify-start gap-4">
       <LanguageSelect language={language} onChange={onChangeLanguage} />
-      <SaveButton disabled={!code} loading={false} onClick={saveSnippet} />
+
+      <TooltipButton
+        tooltip="Save current snippet"
+        variant="outline"
+        aria-disabled={!code}
+        disabled={!code}
+        onClick={saveSnippet}
+        className="min-w-24"
+      >
+        <span>Save</span>
+        {status === 'saving' ? (
+          <Spinner show size="small" />
+        ) : (
+          <Save aria-hidden="true" role="img" size={15} />
+        )}
+      </TooltipButton>
     </div>
   )
 }

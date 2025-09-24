@@ -1,9 +1,7 @@
-import { useCallback, useState } from 'react'
-import { EditorUrlParams, Status } from '../types'
-import { toast } from 'sonner'
-import { ExecutionStatus, Language } from '@/shared/gql/graphql'
 import { useMutation } from '@apollo/client'
-import { EXECUTE } from '@/shared/api/execute'
+import { debounce } from 'lodash'
+import { useCallback, useMemo, useState } from 'react'
+import { useNavigate, useParams } from 'react-router-dom'
 import {
   adjectives,
   animals,
@@ -11,9 +9,14 @@ import {
   Config,
   uniqueNamesGenerator,
 } from 'unique-names-generator'
-import { useNavigate, useParams } from 'react-router-dom'
+import { toast } from 'sonner'
+
+import { EditorUrlParams, Status } from '@/features/editor/types'
+import { EXECUTE } from '@/shared/api/execute'
 import { GET_SNIPPET } from '@/shared/api/getSnippet'
 import { GET_ALL_SNIPPETS } from '@/shared/api/getUserSnippets'
+import { toastOptions } from '@/shared/config'
+import { ExecutionStatus, Language } from '@/shared/gql/graphql'
 
 const baseUniqueNameConfig: Config = {
   dictionaries: [adjectives, colors, animals],
@@ -36,9 +39,25 @@ export default function useEditorRightActions(
     setShowModal(false)
   }, [])
 
-  function shareSnippet() {
-    alert('🚧 Copy current url to clipboard...')
-  }
+  const shareUrl = useCallback(
+    async (_e: React.MouseEvent<HTMLButtonElement>) => {
+      const url = window.location.href
+      await navigator.clipboard.writeText(url)
+      toast.success('URL copied to clipboard', {
+        ...toastOptions.base,
+        icon: toastOptions.success.Icon,
+      })
+    },
+    [],
+  )
+  const debouncedShareUrl = useMemo(
+    () =>
+      debounce(shareUrl, 1000, {
+        leading: true,
+        trailing: false,
+      }),
+    [shareUrl],
+  )
 
   async function executeSnippet() {
     try {
@@ -85,7 +104,7 @@ export default function useEditorRightActions(
           'Execution limit exceeded',
         )
         if (executionCountExceeded) {
-          // setShowModal(true)
+          setShowModal(true)
           setStatus('disabled')
         } else {
           console.error('Error executing code:', error.message)
@@ -104,5 +123,12 @@ export default function useEditorRightActions(
     }
   }
 
-  return { executeSnippet, shareSnippet, status, showModal, closeModal }
+  return {
+    executeSnippet,
+    debouncedShareUrl,
+    status,
+    showModal,
+    closeModal,
+    snippetId,
+  }
 }

@@ -2,7 +2,7 @@ import { Button } from './ui/button'
 import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip'
 
 type TooltipButtonProps = React.ComponentProps<typeof Button> & {
-  tooltip: React.ReactNode
+  tooltip: string
 }
 
 const TooltipButton = ({
@@ -13,7 +13,9 @@ const TooltipButton = ({
   return (
     <Tooltip>
       <TooltipTrigger asChild>
-        <Button {...restProps}>{children}</Button>
+        <Button {...restProps} aria-label={tooltip}>
+          {children}
+        </Button>
       </TooltipTrigger>
       <TooltipContent>{tooltip}</TooltipContent>
     </Tooltip>
