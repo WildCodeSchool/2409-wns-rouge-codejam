@@ -10,12 +10,14 @@ import {
   UserIDJwtPayload,
 } from '../types'
 import { Execution } from '../entities/Execution'
-import { MoreThan } from 'typeorm'
+import { MoreThan, Not } from 'typeorm'
 import {
   Snippet,
   SnippetCreateInput,
   SnippetUpdateInput,
 } from '../entities/Snippet'
+import { UserSubscription } from '../entities/UserSubscription'
+import { Plan } from '../entities/Plan'
 
 /**
  * Extracts the user ID from a JWT token.
@@ -197,9 +199,13 @@ export async function getUserSnippetCount(userId: string): Promise<number> {
  * @param userId - The user id
  * @param context - The context of the request
  */
-export function createCookieWithJwt(userId: string, context: ContextType) {
+export function createCookieWithJwt(
+  userId: string,
+  context: ContextType,
+  expiresIn: number = 24 * 60 * 60,
+) {
   const token = jwt.sign({ userId }, process.env.JWT_SECRET || '', {
-    expiresIn: '24h',
+    expiresIn: expiresIn,
   })
   new Cookies(context.req, context.res).set('access_token', token, {
     httpOnly: true,
@@ -248,4 +254,71 @@ function isCodeExecutionResponse(res: unknown): res is CodeExecutionResponse {
     'status' in res &&
     'result' in res
   )
+}
+
+export async function findActiveSubscription(
+  targetUserId: string,
+): Promise<UserSubscription | null> {
+  // can be null if premium subscription is expired and user hasn't logged in since its expiration
+
+  let activeSubscription = await UserSubscription.findOne({
+    where: {
+      user: { id: targetUserId },
+    },
+    relations: ['plan', 'user'],
+    order: { subscribedAt: 'DESC' },
+  })
+
+  if (activeSubscription?.expiresAt) {
+    const isExpired = activeSubscription.expiresAt < new Date()
+
+    if (isExpired) {
+      return null
+    }
+    return activeSubscription
+  }
+
+  return activeSubscription
+}
+
+export async function createDefaultSubscription(user: User): Promise<Boolean> {
+  const defaultPlan = await Plan.findOne({
+    where: { name: Not('guest'), price: 0 },
+  })
+
+  if (defaultPlan) {
+    const newUserSubscription = new UserSubscription()
+    Object.assign(newUserSubscription, {
+      user: user,
+      plan: defaultPlan,
+    })
+    await newUserSubscription.save()
+    return true
+  }
+  return false
+}
+
+export async function subscribeGuest(
+  userId: string,
+): Promise<UserSubscription> {
+  const [user, guestPlan] = await Promise.all([
+    User.findOne({ where: { id: userId } }),
+    Plan.findOne({ where: { name: 'guest' } }),
+  ])
+
+  if (!guestPlan) {
+    throw new Error('Guest plan not found')
+  }
+
+  if (!user) {
+    throw new Error('User not found')
+  }
+
+  const newUserSubscription = new UserSubscription()
+  Object.assign(newUserSubscription, {
+    user: user,
+    plan: guestPlan,
+    subscribedAt: new Date(),
+  })
+  return await UserSubscription.save(newUserSubscription)
 }
