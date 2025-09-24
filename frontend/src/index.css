@@ -110,6 +110,8 @@
 
 /* Use the @custom-variant directive to add a custom variant to the project */
 @custom-variant dark (&:is(.dark *));
+@custom-variant dark-only (&:is(.dark:not(.system) *));
+@custom-variant system (&:is(.system *));
 
 :root {
   --background: oklch(1 0 0);

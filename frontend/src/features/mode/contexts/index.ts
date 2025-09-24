@@ -1,1 +1,1 @@
-export { ModeContext, type Mode } from './ModeContext'
+export { type Mode, ModeContext, modeOptions } from './ModeContext'
