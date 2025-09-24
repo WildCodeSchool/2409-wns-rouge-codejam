@@ -1,6 +1,5 @@
 import { Slot } from '@radix-ui/react-slot'
 import { cva, VariantProps } from 'class-variance-authority'
-import { ArrowLeftToLine, ArrowRightToLine } from 'lucide-react'
 import * as React from 'react'
 
 import { TooltipButton } from '@/shared/components'
@@ -27,7 +26,7 @@ import { cn } from '@/shared/lib/utils'
 const SIDEBAR_STORAGE_KEY = 'sidebar_is_open'
 const SIDEBAR_WIDTH = '16rem'
 const SIDEBAR_WIDTH_MOBILE = '10rem'
-const SIDEBAR_WIDTH_ICON = '3.5rem'
+const SIDEBAR_WIDTH_ICON = '3.25rem'
 const SIDEBAR_KEYBOARD_SHORTCUT = 'b'
 
 type SidebarContextProps = {
@@ -235,14 +234,14 @@ function Sidebar({
       <div
         data-slot="sidebar-container"
         className={cn(
-          'fixed z-10 hidden h-svh w-(--sidebar-width) transition-[left,right,width] duration-200 ease-linear md:flex',
+          'z-10 hidden w-(--sidebar-width) transition-[left,right,width] duration-200 ease-linear md:flex',
           side === 'left'
             ? 'left-0 group-data-[collapsible=offcanvas]:left-[calc(var(--sidebar-width)*-1)]'
             : 'right-0 group-data-[collapsible=offcanvas]:right-[calc(var(--sidebar-width)*-1)]',
           // Adjust the padding for floating and inset variants.
           variant === 'floating' || variant === 'inset'
             ? 'p-2 group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon)+(--spacing(4))+2px)]'
-            : 'group-data-[collapsible=icon]:w-(--sidebar-width-icon)',
+            : 'group-data-[collapsible=icon]:w-(--sidebar-width-icon) group-data-[side=left]:border-r group-data-[side=right]:border-l',
           className,
         )}
         {...props}
@@ -262,6 +261,7 @@ function Sidebar({
 function SidebarTrigger({
   className,
   onClick,
+  children,
   ...props
 }: React.ComponentProps<typeof Button>) {
   const { open, toggleSidebar } = useSidebar()
@@ -280,7 +280,7 @@ function SidebarTrigger({
       }}
       {...props}
     >
-      {open ? <ArrowLeftToLine /> : <ArrowRightToLine />}
+      {children}
     </TooltipButton>
   )
 }
@@ -343,7 +343,7 @@ function SidebarHeader({ className, ...props }: React.ComponentProps<'div'>) {
     <div
       data-slot="sidebar-header"
       data-sidebar="header"
-      className={cn(`flex flex-col gap-2 px-2 pt-0 pb-2`, className)}
+      className={cn(`flex flex-col gap-2`, className)}
       {...props}
     />
   )

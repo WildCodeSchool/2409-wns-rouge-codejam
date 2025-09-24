@@ -1,5 +1,5 @@
 import { useQuery } from '@apollo/client'
-import { Pencil, Plus, Trash } from 'lucide-react'
+import { PanelRightCloseIcon, Pencil, Plus, Trash } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 
@@ -86,27 +86,32 @@ export default function EditorSidebar({ language }: EditorSidebarProps) {
     <>
       <Sidebar
         collapsible="icon"
-        className="bg-sidebar-foreground h-screen rounded-md"
+        className={cn(
+          'bg-background ml-2 h-full rounded-none pt-1',
+          open && 'border-0 shadow-[6px_6px_6px_0px_rgba(0,_0,_0,_0.1)]',
+        )}
       >
-        <SidebarContent>
-          <SidebarGroup className="justify-center-center">
+        <SidebarContent className="bg-background">
+          <SidebarGroup className="justify-center px-0">
             <SidebarGroupContent>
-              <SidebarHeader>
-                <div className="text-sidebar-foreground/70 flex items-center justify-between">
-                  {open && (
-                    <span className="font-medium -tracking-tighter whitespace-nowrap">
-                      My Snippets
-                    </span>
+              <SidebarHeader className="text-sidebar-foreground/70 flex flex-row items-center pt-0 pr-2 pb-2">
+                <span
+                  className={cn(
+                    'font-medium -tracking-tighter whitespace-nowrap',
+                    open ? 'w-full pl-2' : 'w-0 overflow-hidden',
                   )}
-                  <SidebarTrigger
-                    size="icon"
-                    className="bg-accent size-9 rounded-full"
+                >
+                  My Snippets
+                </span>
+                <SidebarTrigger size="icon" className="size-9 rounded-full">
+                  <PanelRightCloseIcon
+                    className={cn('transition-all', open && 'rotate-180')}
                   />
-                </div>
+                </SidebarTrigger>
               </SidebarHeader>
 
               {open && (
-                <SidebarMenu className="gap-3">
+                <SidebarMenu className="gap-2.5 px-4 pt-0.5">
                   <SidebarMenuItem
                     key="add-new-snippet"
                     className="flex justify-center py-1 text-sm"
