@@ -53,7 +53,6 @@ export class UserSubscriptionsResolver {
     }
 
     const activeSubscription = await findActiveSubscription(targetUserId)
-    // console.log('Expired ====> ',activeSubscription?.expiresAt activeSubscription?.expiresAt < new Date())
     return activeSubscription
   }
 

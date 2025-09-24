@@ -27,8 +27,6 @@ async function createEssentialPlans() {
     executionLimit: 50,
   })
   await defaultPlan.save()
-
-  console.log('✅ Essential plans created for testing')
 }
 
 // Create DB connection and empty all tables before running tests
