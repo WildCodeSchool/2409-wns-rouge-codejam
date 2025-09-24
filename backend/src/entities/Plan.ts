@@ -25,7 +25,6 @@ const PRICE_CONSTRAINTS = {
 
 const EXECUTION_LIMIT_CONSTRAINTS = {
   min: 0,
-  max: 999999,
 }
 
 @Entity()
@@ -47,8 +46,8 @@ export class Plan extends BaseEntity {
   @Field(() => Int)
   price!: number
 
-  @Column({ type: 'smallint' })
-  @Field(() => Int)
+  @Column({ type: 'smallint', nullable: true, default: 50 })
+  @Field(() => Int, { nullable: true })
   executionLimit!: number
 
   @CreateDateColumn()
@@ -75,9 +74,8 @@ export class PlanCreateInput {
   @Max(PRICE_CONSTRAINTS.max)
   price!: number
 
-  @Field(() => Int)
+  @Field(() => Int, { nullable: true, defaultValue: 50 })
   @Min(EXECUTION_LIMIT_CONSTRAINTS.min)
-  @Max(EXECUTION_LIMIT_CONSTRAINTS.max)
   executionLimit!: number
 }
 
@@ -94,6 +92,5 @@ export class PlanUpdateInput {
 
   @Field(() => Int)
   @Min(EXECUTION_LIMIT_CONSTRAINTS.min)
-  @Max(EXECUTION_LIMIT_CONSTRAINTS.max)
   executionLimit?: number
 }

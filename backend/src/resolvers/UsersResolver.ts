@@ -130,7 +130,6 @@ export class UsersResolver {
           }
           // If the subscription is already expired, set a very short token life
           else if (remainingTime <= 0) {
-            tokenExpirationInSeconds = 5 * 60 // 5 minutes
             await createDefaultSubscription(user) // Downgrade the user
           }
         }

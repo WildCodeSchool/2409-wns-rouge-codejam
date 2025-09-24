@@ -49,7 +49,10 @@ export class ExecutionResolver {
       const currentExecutionCount = await getUserExecutionCount(currentUser.id)
 
       // Check if execution limit is exceeded based on user's plan
-      if (currentExecutionCount >= activeSubscription.plan.executionLimit) {
+      if (
+        activeSubscription.plan.executionLimit !== null &&
+        currentExecutionCount >= activeSubscription.plan.executionLimit
+      ) {
         throw new Error('Execution limit exceeded for your current plan')
       }
 
