@@ -14,7 +14,13 @@ import {
   SnippetUpdateInput,
 } from '../entities/Snippet'
 import { AuthContextType, UserRole } from '../types'
-import { getUserFromContext } from './utils'
+import {
+  createCookieWithJwt,
+  createGuestUser,
+  createSnippet,
+  getUserFromContext,
+  updateSnippet,
+} from './utils'
 
 @Resolver()
 export class SnippetsResolver {
@@ -39,9 +45,7 @@ export class SnippetsResolver {
     if (isAdmin) {
       qb.leftJoinAndSelect('snippet.user', 'user')
     }
-
     const snippet = await qb.getOne()
-
     return snippet
   }
 
@@ -55,7 +59,55 @@ export class SnippetsResolver {
     return Snippet.find({
       where,
       relations,
+      order: { updatedAt: 'DESC' },
     })
+  }
+
+  /**
+   * Mutation to save a snippet.
+   *
+   * It will create a new guest user if user context is null,
+   * create a new snippet attached to the user if the snippet is not own by him or
+   * if the snippet not exist yet.
+   * Otherwise it will update the snippet.
+   * @param context the request context
+   * @param data the snippet
+   * @param id the id of the snippet
+   * @returns the created or updated snippet
+   */
+  @Mutation(() => Snippet, { nullable: true })
+  async saveSnippet(
+    @Ctx() context: AuthContextType,
+    @Arg('data', () => SnippetCreateInput) data: SnippetCreateInput,
+    @Arg('id', () => ID, { nullable: true }) id?: string,
+  ): Promise<Snippet> {
+    let currentUser = await getUserFromContext(context)
+
+    // If user does not exist, create a new guest user
+    if (!currentUser) {
+      const newGuestUser = await createGuestUser()
+      createCookieWithJwt(newGuestUser.id, context)
+      currentUser = newGuestUser
+    }
+    context.user = currentUser
+
+    // If an id is provided, find the associated snippet
+    let snippet =
+      id &&
+      (await Snippet.findOne({
+        where: { id },
+        relations: ['user'],
+      }))
+
+    // If the snippet is null (first time saving a snippet or not able to find an existing one)
+    // Or if a snippet exists but not own by the current user, so we have to create a new snippet.
+    if (!snippet || snippet.user.id !== currentUser.id) {
+      snippet = await createSnippet(data, currentUser)
+    } else {
+      snippet = await updateSnippet(snippet, data)
+    }
+
+    return snippet
   }
 
   // Mutation to create a new snippet
@@ -66,8 +118,7 @@ export class SnippetsResolver {
     @Arg('data', () => SnippetCreateInput) data: SnippetCreateInput,
   ): Promise<Snippet> {
     const newSnippet = new Snippet()
-    Object.assign(newSnippet, data, { user: context.user })
-
+    Object.assign(newSnippet, data, { user: { id: context.user.id } })
     return await Snippet.save(newSnippet)
   }
 
@@ -83,9 +134,7 @@ export class SnippetsResolver {
       where: { id, user: context.user },
     })
     if (!snippet) throw new Error('Snippet not found or not owned by user')
-
     Object.assign(snippet, data)
-
     return await Snippet.save(snippet)
   }
 
@@ -97,7 +146,7 @@ export class SnippetsResolver {
     @Arg('id', () => ID) id: string,
   ): Promise<boolean> {
     const isAdmin = context.user.role === UserRole.ADMIN
-    const where = isAdmin ? {} : { user: { id: context.user.id }, id }
+    const where = isAdmin ? {} : { id, user: context.user }
     const snippet = await Snippet.findOne({
       where,
     })

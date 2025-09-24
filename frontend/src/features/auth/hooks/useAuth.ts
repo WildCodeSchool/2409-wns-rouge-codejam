@@ -1,11 +1,13 @@
 import { useQuery, useMutation } from '@apollo/client'
+import { useCallback } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
 
 import { LOGOUT } from '@/shared/api/logout'
 import { WHO_AM_I } from '@/shared/api/whoAmI'
-import { useCallback } from 'react'
 
 export default function useAuth() {
+  const navigate = useNavigate()
   const { data, loading } = useQuery(WHO_AM_I)
   const [logoutMutation] = useMutation(LOGOUT)
 
@@ -13,9 +15,13 @@ export default function useAuth() {
     try {
       await logoutMutation({
         refetchQueries: [{ query: WHO_AM_I }],
+        awaitRefetchQueries: true,
       })
       toast.success('Successful logout', {
         description: '👋 Hope to see you soon!',
+      })
+      navigate('/editor', {
+        replace: true,
       })
     } catch (error: unknown) {
       console.error(error)
@@ -23,7 +29,7 @@ export default function useAuth() {
         description: 'Oops! Something went wrong.',
       })
     }
-  }, [logoutMutation])
+  }, [logoutMutation, navigate])
 
   return { user: data?.whoAmI, loading, logout }
 }

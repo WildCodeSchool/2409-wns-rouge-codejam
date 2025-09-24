@@ -179,6 +179,22 @@ export async function getUserExecutionCount(
 }
 
 /**
+ * Function to get the count of snippets own by a user.
+ * @param userId - The user id
+ * @returns The number of snippets
+ */
+export async function getUserSnippetCount(userId: string): Promise<number> {
+  const snippets = await Snippet.find({
+    where: {
+      user: {
+        id: userId,
+      },
+    },
+  })
+  return snippets.length
+}
+
+/**
  * Function to generate a cookie with a jwt.
  * @param userId - The user id
  * @param context - The context of the request

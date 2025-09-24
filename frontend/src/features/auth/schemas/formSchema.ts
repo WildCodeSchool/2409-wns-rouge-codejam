@@ -30,6 +30,21 @@ export const signUpFormSchema = signInFormSchema
     path: ['confirmPassword'],
   })
 
+// Zod schema for snippet creation
+export const snippetCreateSchema = z.object({
+  name: z
+    .string()
+    .min(1, 'Name is required')
+    .regex(
+      /^[A-Za-z0-9_\- ]+$/,
+      'Only letters, numbers, underscores, spaces, and dashes are allowed',
+    ),
+  code: z.string().optional(),
+  language: z.string().default('typescript'),
+})
+
 export type SignInFormType = z.infer<typeof signInFormSchema>
 
 export type SignUpFormType = z.infer<typeof signUpFormSchema>
+
+export type SnippetCreateType = z.infer<typeof snippetCreateSchema>
