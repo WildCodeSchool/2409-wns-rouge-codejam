@@ -1,10 +1,18 @@
-import Editor from '@monaco-editor/react'
-import { editor } from 'monaco-editor'
-import { useRef } from 'react'
+import MonacoEditor from '@monaco-editor/react'
+import { useEffect, useRef, useState } from 'react'
 
-import { BASE_EDITOR_OPTIONS } from '@/features/editor/components/editor'
+import { BASE_OPTIONS, CUSTOM_THEMES } from '@/features/editor/config'
+import { MonacoEditorInstance, MonacoTheme } from '@/features/editor/types'
+import {
+  defineTheme,
+  initializeCursorPosition,
+  resolveEditorTheme,
+} from '@/features/editor/utils'
+import { useMode } from '@/features/mode/hooks'
+
 import { Skeleton } from '@/shared/components/ui/skeleton'
 import { Language } from '@/shared/gql/graphql'
+import { cn } from '@/shared/lib/utils'
 
 type CodeEditorProps = {
   code: string
@@ -12,62 +20,89 @@ type CodeEditorProps = {
   onChange: (nextCode?: string) => void
 }
 
+const baseEditorClasses =
+  'absolute h-full w-full rounded-md border border-transparent [&_.monaco-editor]:rounded-md [&_.overflow-guard]:rounded-md'
+
+const prefersDarkMediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
+
 export default function CodeEditor({
   code,
   language,
   onChange,
 }: CodeEditorProps) {
-  const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null)
+  const editorRef = useRef<MonacoEditorInstance | null>(null)
+  const [editorTheme, setEditorTheme] = useState<MonacoTheme | null>(null)
+  const [loadingThemes, setLoadingThemes] = useState(true)
+  const { mode } = useMode()
 
-  // Focus the editor when it mounts and set the cursor position at the end of the code
-  const handleOnEditorMount = (
-    editorInstance: editor.IStandaloneCodeEditor,
-  ) => {
-    editorRef.current = editorInstance
+  const isDarkMode =
+    mode === 'system' ? prefersDarkMediaQuery.matches : mode === 'dark'
 
-    // Focus the editor and
-    editorInstance.focus()
+  /*
+    Initialize custom themes once and in parallel.
+    Also, if mode is `system`, listen for system mode changes.
+  */
+  useEffect(() => {
+    async function initCustomThemes() {
+      await Promise.all(CUSTOM_THEMES.map(defineTheme))
+      setLoadingThemes(false)
+    }
 
-    // Set the cursor position at the end of the code
-    const model = editorInstance.getModel()
-    if (!model) {
+    void initCustomThemes()
+
+    if (mode !== 'system') {
       return
     }
-    const lastLine = model.getLineCount()
-    const position = editorInstance.getPosition()
-    if (position) {
-      const nextLinePosition = lastLine - 1
-      const nextColumnPosition = code.length > 0 ? code.length + 1 : 0
-      editorInstance.setPosition({
-        lineNumber: nextLinePosition,
-        column: nextColumnPosition,
-      })
+
+    const listener = (e: MediaQueryListEvent) => {
+      const nextTheme = resolveEditorTheme(e.matches ? 'dark' : 'light')
+      setEditorTheme(nextTheme)
     }
+    prefersDarkMediaQuery.addEventListener('change', listener)
+
+    return () => {
+      prefersDarkMediaQuery.removeEventListener('change', listener)
+    }
+  }, [])
+
+  // Update editor theme when mode changes
+  useEffect(() => {
+    const nextTheme = resolveEditorTheme(mode)
+    setEditorTheme(nextTheme)
+  }, [mode])
+
+  const handleOnEditorMount = (editor: MonacoEditorInstance) => {
+    editorRef.current = editor
+    initializeCursorPosition(editor, code)
+    // Set the initial editor theme only after custom themes are loaded
+    if (!loadingThemes) {
+      setEditorTheme(resolveEditorTheme(mode))
+    }
+  }
+
+  if (loadingThemes || !editorTheme) {
+    return <EditorLoadingSkeleton />
   }
 
   return (
     <div className="relative">
-      <Editor
+      <MonacoEditor
         defaultLanguage="javascript"
         language={language.toLowerCase()}
         value={code}
         onChange={onChange}
         onMount={handleOnEditorMount}
         loading={<EditorLoadingSkeleton />} // 👈 prevent displaying default loader and layout flickering
-        theme="vs-dark"
-        options={{
-          ...BASE_EDITOR_OPTIONS,
-          wrappingIndent: 'indent',
-          renderLineHighlight: 'gutter',
-        }}
-        className="absolute h-full w-full [&_.monaco-editor]:rounded-md [&_.overflow-guard]:rounded-md"
+        theme={editorTheme}
+        options={BASE_OPTIONS}
+        className={cn(baseEditorClasses, !isDarkMode && 'border-input')}
       />
     </div>
   )
 }
 
 function EditorLoadingSkeleton() {
-  return <div className="h-full w-full rounded-md bg-[#1e1e1e]" />
+  return <div className="bg-background h-full w-full rounded-md" />
 }
 
 export function CodeEditorSkeleton() {

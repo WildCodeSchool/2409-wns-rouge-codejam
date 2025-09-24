@@ -4,8 +4,8 @@ import {
 } from '@radix-ui/react-dropdown-menu'
 import { LucideProps, MoonIcon, SunIcon, CogIcon } from 'lucide-react'
 
-import { Mode, modeOptions } from '@/features/mode/contexts'
 import { useMode } from '@/features/mode/hooks'
+import { Mode, MODE_OPTIONS } from '@/features/mode/types'
 
 import { TooltipButton } from '@/shared/components'
 import {
@@ -72,7 +72,7 @@ export default function ModeToggle() {
         sideOffset={6}
         className="border-input bg-background min-w-[128px] rounded-md border p-1 shadow-xs"
       >
-        {modeOptions.map((mode, index) => (
+        {MODE_OPTIONS.map((mode, index) => (
           <DropdownMenuItem
             key={index}
             className={baseItemClasses}

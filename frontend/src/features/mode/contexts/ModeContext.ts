@@ -1,8 +1,6 @@
 import { createContext } from 'react'
 
-export const modeOptions = ['dark', 'light', 'system'] as const
-
-export type Mode = (typeof modeOptions)[number]
+import { Mode } from '@/features/mode/types'
 
 type ModeContextValue = {
   mode: Mode

@@ -1,4 +1,3 @@
-export * from './config'
 export { default as CodeEditor, CodeEditorSkeleton } from './CodeEditor'
 export {
   default as EditorLeftActions,

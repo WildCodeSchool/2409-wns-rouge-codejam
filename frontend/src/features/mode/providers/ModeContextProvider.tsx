@@ -1,36 +1,14 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 
-import { ModeContext, type Mode } from '@/features/mode/contexts'
+import { ModeContext } from '@/features/mode/contexts'
+import { Mode } from '@/features/mode/types'
+import { applyMode, prefersDarkMediaQuery } from '@/features/mode/utils'
 
 type ModeContextProviderProps = React.PropsWithChildren & {
   /** The default mode to use if nothing is found in localStorage. Defaults to `"system"`. */
   defaultMode?: Mode
   /** The localStorage key under which the mode preference will be persisted. Defaults to `"mode"`. */
   storageKey?: string
-}
-
-/**
- * Applies the given mode to the document root element (`<html>`).
- *
- * - Removes any existing `light`, `dark` or `system` classes.
- * - If mode is `"system"`, applies both `system` and the resolved mode.
- * - Otherwise applies only `light` or `dark`.
- *
- * @param mode - The mode to apply (`"light"`, `"dark"`, or `"system"`).
- */
-function applyMode(mode: Mode) {
-  const root = window.document.documentElement
-  root.classList.remove('light', 'dark', 'system')
-
-  if (mode === 'system') {
-    const resolved = window.matchMedia('(prefers-color-scheme: dark)').matches
-      ? 'dark'
-      : 'light'
-    // Add both 'system' and the resolved mode class (allow the dropdown mode select to also support system)
-    root.classList.add('system', resolved)
-  } else {
-    root.classList.add(mode)
-  }
 }
 
 /**
@@ -66,10 +44,10 @@ export default function ModeContextProvider({
     return (localStorage.getItem(storageKey) as Mode | null) ?? defaultMode
   })
 
-  /**
-   * Applies the current mode and, if using `"system"`, sets up a listener
-   * for system mode changes (`prefers-color-scheme`).
-   */
+  /*
+    Applies the current mode.
+    Also, if mode is `system`, listen for system mode changes.
+  */
   useEffect(() => {
     applyMode(mode)
 
@@ -77,14 +55,13 @@ export default function ModeContextProvider({
       return
     }
 
-    const media = window.matchMedia('(prefers-color-scheme: dark)')
     const listener = () => {
       applyMode('system')
     }
-    media.addEventListener('change', listener)
+    prefersDarkMediaQuery.addEventListener('change', listener)
 
     return () => {
-      media.removeEventListener('change', listener)
+      prefersDarkMediaQuery.removeEventListener('change', listener)
     }
   }, [mode])
 
