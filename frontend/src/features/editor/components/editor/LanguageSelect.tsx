@@ -48,7 +48,13 @@ export default function LanguageSelect({
               >
                 <div className="flex cursor-pointer items-center gap-4">
                   <span>{language.label}</span>
-                  <img src={language.icon} alt="" width={18} height={18} />
+                  <img
+                    src={language.icon}
+                    alt=""
+                    aria-hidden="true"
+                    width={18}
+                    height={18}
+                  />
                 </div>
               </SelectItem>
             ))}
