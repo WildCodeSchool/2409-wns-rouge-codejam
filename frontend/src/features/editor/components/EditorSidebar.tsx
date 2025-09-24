@@ -105,6 +105,8 @@ export default function EditorSidebar({ language }: EditorSidebarProps) {
                 </span>
                 <SidebarTrigger size="icon" className="size-9 rounded-full">
                   <PanelRightCloseIcon
+                    aria-hidden="true"
+                    role="img"
                     className={cn('transition-all', open && 'rotate-180')}
                   />
                 </SidebarTrigger>
@@ -124,7 +126,11 @@ export default function EditorSidebar({ language }: EditorSidebarProps) {
                         setIsModalOpen(true)
                       }}
                     >
-                      <Plus className="h-4 w-4 text-neutral-300 group-hover:text-neutral-100" />
+                      <Plus
+                        aria-hidden="true"
+                        role="img"
+                        className="h-4 w-4 text-neutral-300 group-hover:text-neutral-100"
+                      />
                     </TooltipButton>
                   </SidebarMenuItem>
 
@@ -161,7 +167,11 @@ export default function EditorSidebar({ language }: EditorSidebarProps) {
                           size="icon"
                           className="min-w-0 rounded-full px-0"
                         >
-                          <Pencil className={iconsStyles} />
+                          <Pencil
+                            aria-hidden="true"
+                            role="img"
+                            className={iconsStyles}
+                          />
                         </TooltipButton>
 
                         <TooltipButton
@@ -170,7 +180,11 @@ export default function EditorSidebar({ language }: EditorSidebarProps) {
                           size="icon"
                           className="rounded-full px-0"
                         >
-                          <Trash className={iconsStyles} />
+                          <Trash
+                            aria-hidden="true"
+                            role="img"
+                            className={iconsStyles}
+                          />
                         </TooltipButton>
                       </div>
                     </SidebarMenuItem>
