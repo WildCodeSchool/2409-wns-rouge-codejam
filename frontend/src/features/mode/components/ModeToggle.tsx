@@ -12,7 +12,6 @@ import {
   DropdownMenu,
   DropdownMenuTrigger,
 } from '@/shared/components/ui/dropdown-menu'
-import { Skeleton } from '@/shared/components/ui/skeleton'
 import { cn } from '@/shared/lib/utils'
 
 const baseIconClasses = 'h-[1.2rem] w-[1.2rem] transition-all'
@@ -86,8 +85,4 @@ export default function ModeToggle() {
       </DropdownMenuContent>
     </DropdownMenu>
   )
-}
-
-export function ModeToggleSkeleton() {
-  return <Skeleton className="h-9 w-9 rounded-full" />
 }

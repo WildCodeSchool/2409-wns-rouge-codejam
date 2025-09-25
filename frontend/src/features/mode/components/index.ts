@@ -1,1 +1,1 @@
-export { default as ModeToggle, ModeToggleSkeleton } from './ModeToggle'
+export { default as ModeToggle } from './ModeToggle'

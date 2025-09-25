@@ -1,33 +1,38 @@
 import {
+  AccountSettings,
+  AccountSettingsSkeleton,
   NavActions,
   NavActionsSkeleton,
-  UserInfo,
-  UserInfoSkeleton,
 } from '@/features/auth/components'
 import { useAuth } from '@/features/auth/hooks'
-import { ModeToggle, ModeToggleSkeleton } from '@/features/mode/components'
+import { ModeToggle } from '@/features/mode/components'
 
 export default function NavBar() {
   const { user, loading, logout } = useAuth()
 
   const navContent = (() => {
     if (loading) {
-      return user?.username ? (
-        <UserInfoSkeleton />
-      ) : (
+      return (
         <>
-          <ModeToggleSkeleton />
-          <NavActionsSkeleton />
+          {user?.username ? (
+            <AccountSettingsSkeleton />
+          ) : (
+            <NavActionsSkeleton />
+          )}
         </>
       )
     }
-    return user?.username ? (
-      <UserInfo userName={user.username} onSignOut={logout} />
-    ) : (
-      <>
-        <ModeToggle />
-        <NavActions />
-      </>
+
+    if (!user) {
+      return <NavActions />
+    }
+
+    return (
+      <AccountSettings
+        username={user.username}
+        email={user.email}
+        onLogout={logout}
+      />
     )
   })()
 
@@ -38,7 +43,10 @@ export default function NavBar() {
           CodeJam
         </h1>
 
-        <div className="flex flex-row items-center gap-4">{navContent}</div>
+        <div className="flex flex-row items-center gap-4">
+          <ModeToggle />
+          {navContent}
+        </div>
       </header>
     </div>
   )
