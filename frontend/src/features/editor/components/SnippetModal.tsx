@@ -1,4 +1,5 @@
 import { CREATE_SNIPPET } from '@/shared/api/createSnippet'
+import { UPDATE_SNIPPET } from '@/shared/api/updateSnippet'
 import { useMutation } from '@apollo/client'
 import { Form } from '@/shared/components/ui/form'
 import { useForm } from 'react-hook-form'
@@ -10,18 +11,29 @@ import { Button } from '@/shared/components/ui/button'
 import {
   snippetCreateSchema,
   SnippetCreateType,
+  SnippetRenameType,
 } from '@/features/auth/schemas/formSchema'
 import { toast } from 'sonner'
 import { useNavigate } from 'react-router-dom'
-import { CreateSnippetMutation, Snippet } from '@/shared/gql/graphql'
+import {
+  CreateSnippetMutation,
+  Snippet,
+  UpdateSnippetMutation,
+} from '@/shared/gql/graphql'
 
 type CreateSnippetModalProps = {
   language: Snippet['language']
+  isSnippetCreation: boolean
+  currentName: string | undefined
+  selectedSnippetId: string | undefined
   onClose: () => void
 }
 
 export default function CreateSnippetModal({
   language,
+  isSnippetCreation,
+  currentName,
+  selectedSnippetId,
   onClose,
 }: CreateSnippetModalProps) {
   const form = useForm<SnippetCreateType>({
@@ -38,6 +50,7 @@ export default function CreateSnippetModal({
   const navigate = useNavigate()
 
   const [createSnippet] = useMutation<CreateSnippetMutation>(CREATE_SNIPPET)
+  const [renameSnippet] = useMutation<UpdateSnippetMutation>(UPDATE_SNIPPET)
 
   const handleCreateSnippet = async (values: SnippetCreateType) => {
     try {
@@ -67,17 +80,39 @@ export default function CreateSnippetModal({
       })
     }
   }
+  const handleRenameSnippet = async (values: SnippetRenameType) => {
+    try {
+      await renameSnippet({
+        variables: {
+          data: {
+            name: values.name,
+          },
+          updateSnippetId: selectedSnippetId,
+        },
+        refetchQueries: [GET_ALL_SNIPPETS],
+      })
+
+      toast.success(`Snippet ${values.name} renamed successfully`)
+      onClose()
+    } catch (err) {
+      toast.error(`Error while renaming your snippet`, {
+        description: err instanceof Error ? err.message : JSON.stringify(err),
+      })
+    }
+  }
 
   return (
     <Form {...form}>
       <form
-        aria-label="create snippet form"
-        onSubmit={form.handleSubmit(handleCreateSnippet)}
+        aria-label={` ${isSnippetCreation ? 'create ' : 'rename '} snippet form'`}
+        onSubmit={form.handleSubmit(
+          isSnippetCreation ? handleCreateSnippet : handleRenameSnippet,
+        )}
       >
         <Input
           className="text-foreground bg-input mb-2 w-full rounded border p-2"
           {...form.register('name')}
-          placeholder="Snippet name"
+          placeholder={isSnippetCreation ? 'Snippet name' : currentName}
           autoFocus
           disabled={isSubmitting}
         />
@@ -89,7 +124,7 @@ export default function CreateSnippetModal({
         <div className="mt-4 flex justify-end gap-2">
           <Button
             type="button"
-            id="create-snippet-cancel"
+            id={'cancel-operation'}
             className={`bg-foreground rounded ${isSubmitting ? 'cursor-not-allowed' : 'cursor-pointer'}`}
             disabled={isSubmitting || isSubmittingError.length > 0}
             onClick={onClose}
@@ -98,7 +133,7 @@ export default function CreateSnippetModal({
           </Button>
           <Button
             type="submit"
-            id="create-snippet-submit"
+            id={`${isSnippetCreation ? 'create' : 'rename'}-snippet-submit`}
             className={`bg-foreground rounded ${isSubmitting ? 'cursor-not-allowed' : 'cursor-pointer'}`}
             disabled={
               !form.formState.isValid ||
@@ -106,7 +141,11 @@ export default function CreateSnippetModal({
               isSubmittingError.length > 0
             }
           >
-            {isSubmitting ? <Spinner show size="small" /> : 'Create Snippet'}
+            {isSubmitting ? (
+              <Spinner show size="small" />
+            ) : (
+              `${isSnippetCreation ? 'Create' : 'Rename'} Snippet`
+            )}
           </Button>
         </div>
       </form>

@@ -304,7 +304,7 @@ export type UpdateSnippetMutationVariables = Exact<{
 
 export type UpdateSnippetMutation = {
   __typename?: 'Mutation'
-  updateSnippet: { __typename?: 'Snippet'; id: string }
+  updateSnippet: { __typename?: 'Snippet'; id: string; slug: string }
 }
 
 export type WhoAmIQueryVariables = Exact<{ [key: string]: never }>
@@ -828,6 +828,7 @@ export const UpdateSnippetDocument = {
               kind: 'SelectionSet',
               selections: [
                 { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'slug' } },
               ],
             },
           },

@@ -22,7 +22,7 @@ type Documents = {
   '\n  mutation login($data: UserLoginInput!) {\n    login(data: $data) {\n      id\n      username\n    }\n  }\n': typeof types.LoginDocument
   '\n  mutation logout {\n    logout\n  }\n': typeof types.LogoutDocument
   '\n  mutation saveSnippet($data: SnippetCreateInput!, $id: ID!) {\n    saveSnippet(data: $data, id: $id) {\n      id\n      slug\n    }\n  }\n': typeof types.SaveSnippetDocument
-  '\n  mutation UpdateSnippet($data: SnippetUpdateInput!, $updateSnippetId: ID!) {\n    updateSnippet(data: $data, id: $updateSnippetId) {\n      id\n    }\n  }\n': typeof types.UpdateSnippetDocument
+  '\n  mutation UpdateSnippet($data: SnippetUpdateInput!, $updateSnippetId: ID!) {\n    updateSnippet(data: $data, id: $updateSnippetId) {\n      id\n      slug\n    }\n  }\n': typeof types.UpdateSnippetDocument
   '\n  query whoAmI {\n    whoAmI {\n      id\n      username\n      email\n    }\n  }\n': typeof types.WhoAmIDocument
 }
 const documents: Documents = {
@@ -41,7 +41,7 @@ const documents: Documents = {
   '\n  mutation logout {\n    logout\n  }\n': types.LogoutDocument,
   '\n  mutation saveSnippet($data: SnippetCreateInput!, $id: ID!) {\n    saveSnippet(data: $data, id: $id) {\n      id\n      slug\n    }\n  }\n':
     types.SaveSnippetDocument,
-  '\n  mutation UpdateSnippet($data: SnippetUpdateInput!, $updateSnippetId: ID!) {\n    updateSnippet(data: $data, id: $updateSnippetId) {\n      id\n    }\n  }\n':
+  '\n  mutation UpdateSnippet($data: SnippetUpdateInput!, $updateSnippetId: ID!) {\n    updateSnippet(data: $data, id: $updateSnippetId) {\n      id\n      slug\n    }\n  }\n':
     types.UpdateSnippetDocument,
   '\n  query whoAmI {\n    whoAmI {\n      id\n      username\n      email\n    }\n  }\n':
     types.WhoAmIDocument,
@@ -113,8 +113,8 @@ export function gql(
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function gql(
-  source: '\n  mutation UpdateSnippet($data: SnippetUpdateInput!, $updateSnippetId: ID!) {\n    updateSnippet(data: $data, id: $updateSnippetId) {\n      id\n    }\n  }\n',
-): (typeof documents)['\n  mutation UpdateSnippet($data: SnippetUpdateInput!, $updateSnippetId: ID!) {\n    updateSnippet(data: $data, id: $updateSnippetId) {\n      id\n    }\n  }\n']
+  source: '\n  mutation UpdateSnippet($data: SnippetUpdateInput!, $updateSnippetId: ID!) {\n    updateSnippet(data: $data, id: $updateSnippetId) {\n      id\n      slug\n    }\n  }\n',
+): (typeof documents)['\n  mutation UpdateSnippet($data: SnippetUpdateInput!, $updateSnippetId: ID!) {\n    updateSnippet(data: $data, id: $updateSnippetId) {\n      id\n      slug\n    }\n  }\n']
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

@@ -3,7 +3,7 @@ import { PanelRightCloseIcon, Pencil, Plus, Trash } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 
-import CreateSnippetModal from '@/features/editor/components/CreateSnippetModal'
+import SnippetModal from '@/features/editor/components/SnippetModal'
 import { EditorUrlParams } from '@/features/editor/types'
 
 import { GET_ALL_SNIPPETS } from '@/shared/api/getUserSnippets'
@@ -49,7 +49,14 @@ export default function EditorSidebar({ language }: EditorSidebarProps) {
   const [activeSnippetId, setActiveSnippetId] = useState<string | undefined>(
     snippetId,
   )
-  const [isModalOpen, setIsModalOpen] = useState(false)
+
+  const [currentName, setCurrentName] = useState<string | undefined>('')
+  const [selectedSnippetId, setSelectedSnippetID] = useState<
+    string | undefined
+  >()
+
+  const [isModalCreate, setIsModalCreate] = useState(false)
+  const [isModalRename, setIsModalRename] = useState(false)
 
   useEffect(() => {
     let nextActiveSnippetId: string | undefined
@@ -113,7 +120,7 @@ export default function EditorSidebar({ language }: EditorSidebarProps) {
               </SidebarHeader>
 
               {open && (
-                <SidebarMenu className="gap-2.5 px-4 pt-0.5">
+                <SidebarMenu className="gap-2.5 pt-0.5 pr-2">
                   <SidebarMenuItem
                     key="add-new-snippet"
                     className="flex justify-center py-1 text-sm"
@@ -123,7 +130,7 @@ export default function EditorSidebar({ language }: EditorSidebarProps) {
                       variant={null}
                       className="w-full rounded"
                       onClick={() => {
-                        setIsModalOpen(true)
+                        setIsModalCreate(true)
                       }}
                     >
                       <Plus
@@ -165,6 +172,11 @@ export default function EditorSidebar({ language }: EditorSidebarProps) {
                           tooltip="Rename snippet"
                           variant={null}
                           size="icon"
+                          onClick={() => {
+                            setIsModalRename(true)
+                            setCurrentName(snippet.name)
+                            setSelectedSnippetID(snippet.id)
+                          }}
                           className="min-w-0 rounded-full px-0"
                         >
                           <Pencil
@@ -198,13 +210,31 @@ export default function EditorSidebar({ language }: EditorSidebarProps) {
 
       <Modal
         title="Create Snippet"
-        open={isModalOpen}
-        onOpenChange={setIsModalOpen}
+        open={isModalCreate}
+        onOpenChange={setIsModalCreate}
       >
-        <CreateSnippetModal
+        <SnippetModal
           language={language}
+          isSnippetCreation={true}
+          currentName=""
+          selectedSnippetId=""
           onClose={() => {
-            setIsModalOpen(false)
+            setIsModalCreate(false)
+          }}
+        />
+      </Modal>
+      <Modal
+        title="Rename Snippet"
+        open={isModalRename}
+        onOpenChange={setIsModalRename}
+      >
+        <SnippetModal
+          language={language}
+          isSnippetCreation={false}
+          currentName={currentName}
+          selectedSnippetId={selectedSnippetId}
+          onClose={() => {
+            setIsModalRename(false)
           }}
         />
       </Modal>
