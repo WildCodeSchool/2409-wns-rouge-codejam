@@ -65,6 +65,11 @@ export default function ModeContextProvider({
     }
   }, [mode])
 
+  const isDarkMode = useMemo(
+    () => (mode === 'system' ? prefersDarkMediaQuery.matches : mode === 'dark'),
+    [mode],
+  )
+
   /**
    * Changes the current mode and persists it in localStorage.
    *
@@ -81,6 +86,7 @@ export default function ModeContextProvider({
   const ctx = useMemo(
     () => ({
       mode,
+      isDarkMode,
       changeMode,
     }),
     [mode, changeMode],

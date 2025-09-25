@@ -14,7 +14,7 @@ export default function useEditor() {
   const editorRef = useRef<MonacoEditorInstance | null>(null)
   const [editorTheme, setEditorTheme] = useState<MonacoTheme | null>(null)
   const [loadingThemes, setLoadingThemes] = useState(true)
-  const { mode } = useMode()
+  const { mode, isDarkMode } = useMode()
 
   // Initialize custom themes once and in parallel
   useEffect(() => {
@@ -56,11 +56,6 @@ export default function useEditor() {
       }
     },
     [loadingThemes, mode],
-  )
-
-  const isDarkMode = useMemo(
-    () => (mode === 'system' ? prefersDarkMediaQuery.matches : mode === 'dark'),
-    [mode],
   )
 
   return useMemo(

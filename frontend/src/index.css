@@ -148,6 +148,9 @@
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
   --link: oklch(54.6% 0.245 262.881);
+  --success: oklch(0.7263 0.21 148.03);
+  --error: oklch(0.6378 0.2373 25.44);
+  --warning: oklch(0.7712 0.1721 65.68);
 }
 
 .dark {
@@ -184,6 +187,9 @@
   --sidebar-border: oklch(0.269 0 0);
   --sidebar-ring: oklch(0.439 0 0);
   --link: oklch(54.6% 0.245 262.881);
+  --success: oklch(0.7915 0.2089 151.62);
+  --error: oklch(0.7007 0.1882 22.19);
+  --warning: oklch(0.8309 0.171389 81.5486);
 }
 
 @theme inline {
@@ -224,6 +230,9 @@
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-link: var(--link);
+  --color-success: var(--success);
+  --color-error: var(--error);
+  --color-warning: var(--warning);
 
   --font-main: 'Inter VF', 'Inter', sans-serif;
   --font-editor: 'Fira Code VF', 'Fira Code', monospace;

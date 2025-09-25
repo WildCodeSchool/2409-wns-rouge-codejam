@@ -8,14 +8,14 @@ import { Skeleton } from '@/shared/components/ui/skeleton'
 import { Language } from '@/shared/gql/graphql'
 import { cn } from '@/shared/lib/utils'
 
+const baseEditorClasses =
+  'absolute h-full w-full rounded-md border border-transparent [&_.monaco-editor]:rounded-md [&_.overflow-guard]:rounded-md'
+
 type CodeEditorProps = {
   code: string
   language: Language
   onChange: (nextCode?: string) => void
 }
-
-const baseEditorClasses =
-  'absolute h-full w-full rounded-md border border-transparent [&_.monaco-editor]:rounded-md [&_.overflow-guard]:rounded-md'
 
 export default function CodeEditor({
   code,

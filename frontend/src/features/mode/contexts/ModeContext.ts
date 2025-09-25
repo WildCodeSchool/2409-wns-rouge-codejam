@@ -4,6 +4,7 @@ import { Mode } from '@/features/mode/types'
 
 type ModeContextValue = {
   mode: Mode
+  isDarkMode: boolean
   changeMode: (theme: ModeContextValue['mode']) => void
 }
 

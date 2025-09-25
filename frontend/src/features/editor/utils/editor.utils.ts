@@ -10,6 +10,9 @@ import {
 import { Mode } from '@/features/mode/types'
 import { prefersDarkMediaQuery } from '@/features/mode/utils'
 
+import DarkTheme from '../themes/github-dark.json'
+import LightTheme from '../themes/dreamweaver.json'
+
 /**
  * Dynamically loads and registers a Monaco Editor theme from a JSON file.
  *
@@ -66,4 +69,20 @@ export function resolveEditorTheme(mode: Mode): MonacoTheme {
     return prefersDarkMediaQuery.matches ? THEME_MAP.dark : THEME_MAP.light
   }
   return THEME_MAP[mode] ?? THEME_MAP.dark
+}
+
+/**
+ * Resolves the appropriate background color for the output panel
+ * based on the current theme mode.
+ *
+ * @param isDarkMode - Whether dark mode is currently active.
+ * @returns The background color value from the corresponding theme.
+ *
+ */
+export function resolveOutputBackgroundColor(isDarkMode: boolean): string {
+  return `bg-[${
+    isDarkMode
+      ? DarkTheme.colors['editor.background']
+      : LightTheme.colors['editor.background']
+  }]`
 }
