@@ -103,6 +103,23 @@ export default function EditorSidebar({ language }: EditorSidebarProps) {
     }
   }
 
+  // Helper: choose neighbor (prefer previous, otherwise next) from the current list
+  const pickNeighborBeforeDelete = (toDeleteId: string): SnippetLite | null => {
+    // Normalize list to avoid repeating null checks
+    const list = snippets ?? []
+    if (list.length === 0) return null
+
+    const idx = list.findIndex((s) => s.id === toDeleteId)
+    if (idx === -1) return null
+
+    // `.at()` returns `T | undefined`, which plays well with the linter
+    const prev = list.at(idx - 1)
+    const next = list.at(idx + 1)
+    const chosen = prev ?? next
+
+    if (!chosen) return null
+    return { id: chosen.id, name: chosen.name, slug: chosen.slug }
+  }
   // Delete mutation — refetch list (same approach as edit)
   const [deleteSnippet] = useMutation<
     DeleteSnippetMutation,
@@ -116,13 +133,20 @@ export default function EditorSidebar({ language }: EditorSidebarProps) {
   // Returns true on success, false otherwise.
   const confirmDelete = async (): Promise<boolean> => {
     if (!deleteTarget) return false
+
+    // Compute the neighbor BEFORE the list changes (based on current query result)
+    const neighbor = pickNeighborBeforeDelete(deleteTarget.id)
+
     try {
       await deleteSnippet({ variables: { id: deleteTarget.id } })
 
-      // If the deleted item was the active one -> go to /editor
-      // The effect above will then load the next available snippet if any
+      // If the deleted item was the active one -> activate neighbor if any, else go to /editor
       if (activeSnippetId === deleteTarget.id) {
-        navigate('/editor', { replace: true })
+        if (neighbor) {
+          navigate(`/editor/${neighbor.id}/${neighbor.slug}`, { replace: true })
+        } else {
+          navigate('/editor', { replace: true })
+        }
       }
 
       toast.success(`“${deleteTarget.name}” was deleted.`)
@@ -242,7 +266,7 @@ export default function EditorSidebar({ language }: EditorSidebarProps) {
                           size="icon"
                           className="rounded-full px-0"
                           onClick={() => {
-                            openDelete(snippet)
+                            openDelete(snippet as SnippetLite)
                           }}
                         >
                           <Trash
