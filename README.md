@@ -1,19 +1,24 @@
-# 🚧 CodeJam
+# CodeJam
 
 Welcome to CodeJam!
 
-## 🚧 The project
+## 🚧 About the project
 
-### 🚧 Docker containers
+### 🚧 Screenshots
 
-- client (frontend)
-- server (backend)
-- db (postgres database)
-- nginx (api gateway)
+...
 
-## 🚧 Screenshots
+### 🚧 Architecture & Stack
 
-## 🚧 Get Started
+Docker containers/services:
+
+- frontend (client, React + Vite + TS + Apollo Client)
+- backend (GraphQL API, TS + TypeORM + TypeGraphQL + Apollo Server)
+- code-execution (API REST, Express)
+- db (database, Postgres SQL)
+- nginx (Gateway API)
+
+## 🏁 Get Started
 
 First make sur the Docker engine (daemon) is running in the background by opening Docker Desktop.
 
@@ -36,6 +41,8 @@ docker compose down
 ```
 
 or simply press <kbd>Ctrl</kbd>+<kbd>C</kbd> for a graceful stop.
+
+## 🧪 Testing
 
 ### Run backend tests
 
@@ -68,7 +75,9 @@ To run frontend unit & integration tests:
   pnpm run test:watch
   ```
 
-### 🚧 Reset the database
+## 🚧⛁ Database
+
+### Reset the database
 
 1. Stop the container (see [step #1](#🚧Populate-the-database-with-initial-data)).
 
@@ -85,9 +94,9 @@ docker volume ls
 docker volume rm codejam_dbdata
 ```
 
-4. Initialize the database from a SQL dump file (see [next section](#🚧Populate-the-database-with-initial-data)).
+4. Initialize the database from a SQL dump file (see [next section](#Populate-the-database-with-initial-data)).
 
-### 🚧 Populate the database with initial data
+### Populate the database with initial data
 
 1. First, make sure the application is up and running (see [Run the application](#Run-the-application)).
 
@@ -98,7 +107,55 @@ cd ./backend
 pnpm run seed:db
 ```
 
-## 🚧 Built with 💖 and
+3. Connect to the application with one of the following user credentials (⚠️ for development only!):
+
+- _user (free):_
+
+  ```
+  username: codejamer
+  email: codejamer@email.com
+  password: My-Super-Password-123
+  ```
+
+- _user (premium):_
+
+  ```
+  username: codejamer+
+  email: codejamer-premium@email.com
+  password: My-Super-Premium-Password-123
+  ```
+
+- _admin (premium):_
+
+  ```
+  username: admin
+  email: admin@email.com
+  password: Root_123_codejam
+  ```
+
+### 🚧 Migrations
+
+...
+
+## 🚧🚀 Deploy
+
+### 🚧 Configuration
+
+...
+
+### 🚧 Add a new service
+
+...
+
+### 🚧 Data backup
+
+...
+
+### 🚧 Data migration
+
+...
+
+## Built with 💖 and
 
 ![html5](https://img.shields.io/badge/HTML5-E34F26.svg?style=for-the-badge&logo=HTML5&logoColor=white)
 ![css3](https://img.shields.io/badge/CSS3-1572B6.svg?style=for-the-badge&logo=CSS3&logoColor=white)
