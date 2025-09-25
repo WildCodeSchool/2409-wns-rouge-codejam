@@ -302,6 +302,12 @@ export type CreateUserMutation = {
   }
 }
 
+export type DeletUserMutationVariables = Exact<{
+  deleteUserId?: InputMaybe<Scalars['ID']['input']>
+}>
+
+export type DeletUserMutation = { __typename?: 'Mutation'; deleteUser: boolean }
+
 export type MutationMutationVariables = Exact<{
   data: SnippetCreateInput
   snippetId?: InputMaybe<Scalars['ID']['input']>
@@ -511,6 +517,45 @@ export const CreateUserDocument = {
     },
   ],
 } as unknown as DocumentNode<CreateUserMutation, CreateUserMutationVariables>
+export const DeletUserDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'mutation',
+      name: { kind: 'Name', value: 'deletUser' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: {
+            kind: 'Variable',
+            name: { kind: 'Name', value: 'deleteUserId' },
+          },
+          type: { kind: 'NamedType', name: { kind: 'Name', value: 'ID' } },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'deleteUser' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'id' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'deleteUserId' },
+                },
+              },
+            ],
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<DeletUserMutation, DeletUserMutationVariables>
 export const MutationDocument = {
   kind: 'Document',
   definitions: [

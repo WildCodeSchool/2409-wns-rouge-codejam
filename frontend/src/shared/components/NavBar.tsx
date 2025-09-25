@@ -7,14 +7,18 @@ import {
 import { useAuth } from '@/features/auth/hooks'
 
 export default function NavBar() {
-  const { user, loading, logout } = useAuth()
+  const { user, loading, logout, deleteAccount } = useAuth()
 
   const navContent = (() => {
     if (loading) {
       return user?.username ? <UserInfoSkeleton /> : <NavActionsSkeleton />
     }
     return user?.username ? (
-      <UserInfo userName={user.username} onSignOut={logout} />
+      <UserInfo
+        userName={user.username}
+        onSignOut={logout}
+        onDeleteAccount={deleteAccount}
+      />
     ) : (
       <NavActions />
     )
