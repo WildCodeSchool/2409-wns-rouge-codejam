@@ -55,9 +55,7 @@ export default function useEditorRightActions(
         refetchQueries: [
           { query: GET_SNIPPET, variables: { id: snippetId } },
           // !TODO: refetch only when user is logged in and run code without any existing snippet...
-          {
-            query: GET_ALL_SNIPPETS,
-          },
+          GET_ALL_SNIPPETS,
         ],
       })
       if (data) {
@@ -85,12 +83,12 @@ export default function useEditorRightActions(
           'Execution limit exceeded',
         )
         if (executionCountExceeded) {
-          // setShowModal(true)
+          setShowModal(true)
           setStatus('disabled')
         } else {
           console.error('Error executing code:', error.message)
-          toast.error(`Error executing code: ${error.message}`, {
-            description: 'Please try again later.',
+          toast.error('Error executing code:', {
+            description: error.message,
           })
         }
       } else {

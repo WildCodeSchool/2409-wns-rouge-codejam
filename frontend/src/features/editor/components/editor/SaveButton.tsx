@@ -1,10 +1,11 @@
 import { TooltipButton } from '@/shared/components'
+import { Button } from '@/shared/components/ui/button'
 import { Save } from 'lucide-react'
 
 const SaveButton = ({
   onClick,
   disabled,
-}: React.ComponentProps<typeof TooltipButton>) => {
+}: React.ComponentProps<typeof Button>) => {
   return (
     <TooltipButton
       type="button"

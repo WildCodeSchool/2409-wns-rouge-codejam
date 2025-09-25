@@ -20,7 +20,7 @@ export type ContextType = {
 export type Nullable<T> = T | null | undefined
 
 export type UserIDJwtPayload = jwt.JwtPayload & {
-  id: string
+  userId: string
 }
 
 export type CodeExecutionResponse = {

@@ -13,6 +13,7 @@ import {
 } from './utils'
 import { ContextType, UserRole } from '../types'
 import { SnippetCreateInput } from '../entities/Snippet'
+import { GraphQLError } from 'graphql'
 
 const EXECUTION_LIMIT = 50
 
@@ -83,7 +84,12 @@ export class ExecutionResolver {
       const savedExecution = await Execution.save(execution)
       return savedExecution
     } catch (err) {
-      throw new Error(err instanceof Error ? err.message : JSON.stringify(err))
+      if (err instanceof GraphQLError) {
+        throw err
+      } else if (err instanceof Error) {
+        throw err.message
+      }
+      throw JSON.stringify(err)
     }
   }
 }

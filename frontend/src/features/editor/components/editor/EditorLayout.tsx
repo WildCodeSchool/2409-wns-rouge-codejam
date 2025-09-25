@@ -17,6 +17,8 @@ import {
 import { ExecutionStatus } from '@/shared/gql/graphql'
 import EditorSidebar from '../EditorSidebar'
 import { SidebarProvider } from '@/shared/components/ui/sidebar'
+import { useAuth } from '@/features/auth/hooks'
+import { Spinner } from '@/shared/components/ui/spinner'
 
 type EditorLayoutProps = {
   state: EditorState
@@ -33,10 +35,16 @@ export default function EditorLayout({
   onChangeOutput,
   onChangeStatus,
 }: EditorLayoutProps) {
+  const { isGuest, loading } = useAuth()
+
   return (
     <div className="flex h-full">
       <SidebarProvider>
-        <EditorSidebar language={state.language} />
+        {loading ? (
+          <Spinner />
+        ) : (
+          !isGuest && <EditorSidebar language={state.language} />
+        )}
         <ResizablePanelGroup direction="horizontal" className="h-full">
           <ResizablePanel
             id="editor-panel"

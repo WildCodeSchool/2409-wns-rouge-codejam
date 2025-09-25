@@ -1,7 +1,7 @@
 import { gql } from '../gql'
 
 export const EXECUTE = gql(/* GraphQL */ `
-  mutation Mutation($data: SnippetCreateInput!, $snippetId: ID) {
+  mutation execute($data: SnippetCreateInput!, $snippetId: ID) {
     execute(data: $data, snippetId: $snippetId) {
       id
       result

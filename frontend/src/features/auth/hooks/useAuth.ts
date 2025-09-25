@@ -31,5 +31,5 @@ export default function useAuth() {
     }
   }, [logoutMutation, navigate])
 
-  return { user: data?.whoAmI, loading, logout }
+  return { user: data?.whoAmI, isGuest: !data?.whoAmI?.email, loading, logout }
 }

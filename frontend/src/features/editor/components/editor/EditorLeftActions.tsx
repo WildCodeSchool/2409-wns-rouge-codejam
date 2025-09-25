@@ -20,7 +20,7 @@ export default function EditorLeftActions({
   return (
     <div className="flex justify-start gap-4">
       <LanguageSelect language={language} onChange={onChangeLanguage} />
-      <SaveButton disabled={!code} loading={false} onClick={saveSnippet} />
+      <SaveButton disabled={!code} onClick={saveSnippet} />
     </div>
   )
 }

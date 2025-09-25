@@ -2,14 +2,10 @@ import { useQuery } from '@apollo/client'
 import { Pencil, Plus, Trash } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-
 import CreateSnippetModal from '@/features/editor/components/CreateSnippetModal'
 import { EditorUrlParams } from '@/features/editor/types'
-
 import { GET_ALL_SNIPPETS } from '@/shared/api/getUserSnippets'
-import { WHO_AM_I } from '@/shared/api/whoAmI'
 import Modal from '@/shared/components/Modal'
-
 import {
   Sidebar,
   SidebarContent,
@@ -21,7 +17,6 @@ import {
   SidebarTrigger,
   useSidebar,
 } from '@/shared/components/ui/sidebar'
-import { Spinner } from '@/shared/components/ui/spinner'
 import {
   Tooltip,
   TooltipContent,
@@ -37,13 +32,7 @@ type EditorSidebarProps = {
 
 export default function EditorSidebar({ language }: EditorSidebarProps) {
   const { open } = useSidebar()
-  const { data: { whoAmI: user } = {}, loading: loadingUser } =
-    useQuery(WHO_AM_I)
-
-  const { data: { getAllSnippets: snippets } = {}, loading: loadingSnippets } =
-    useQuery(GET_ALL_SNIPPETS, {
-      skip: !user,
-    })
+  const { data: { getAllSnippets: snippets } = {} } = useQuery(GET_ALL_SNIPPETS)
 
   const { snippetId } = useParams<EditorUrlParams>()
   const navigate = useNavigate()
@@ -73,15 +62,6 @@ export default function EditorSidebar({ language }: EditorSidebarProps) {
 
   const hoveredTextStyles = 'text-neutral-300 hover:text-neutral-100'
   const iconsStyles = `cursor-pointer h-4 w-4 ${hoveredTextStyles}`
-
-  if (loadingUser || loadingSnippets) {
-    return <Spinner />
-  }
-
-  //  If user is guest
-  if (!user?.email) {
-    return null
-  }
 
   return (
     <>

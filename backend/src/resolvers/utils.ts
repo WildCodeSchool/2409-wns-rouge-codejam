@@ -8,6 +8,7 @@ import {
   CodeExecutionResponse,
   ContextType,
   UserIDJwtPayload,
+  UserRole,
 } from '../types'
 import { Execution } from '../entities/Execution'
 import { MoreThan } from 'typeorm'
@@ -16,26 +17,23 @@ import {
   SnippetCreateInput,
   SnippetUpdateInput,
 } from '../entities/Snippet'
+import { GraphQLError } from 'graphql'
 
 /**
  * Extracts the user ID from a JWT token.
  * @param token - The JWT token from which to extract the user ID.
- * @throws Will throw an error if the token is invalid or expired.
  * @returns The user ID extracted from the token.
  */
 export function getUserIdFromToken(token: string): string {
-  const payload = jwt.verify(
-    token,
-    process.env.JWT_SECRET || '',
-  ) as UserIDJwtPayload
-  return payload.userId
+  const jwtToken = jwt.decode(token) as UserIDJwtPayload
+  return jwtToken.userId
 }
 
 /**
  * Retrieve current user from context (if authenticated).
  * @param context - The context object that contains the request and response objects.
- * @returns The user object if found (authenticated user), otherwise null.
- *
+ * @returns The user object if found (authenticated user), null if the user is guest and his token invalid.
+ * @throws An error if the user is authenticated and his token is invalid
  */
 export async function getUserFromContext(
   context: ContextType,
@@ -43,13 +41,29 @@ export async function getUserFromContext(
   if (context.user) return context.user
 
   const cookies = new Cookies(context.req, context.res)
-  const token = cookies.get('access_token')
-  if (!token) return null
+  const cookieValue = cookies.get('access_token')
+  if (!cookieValue) return null
 
-  const userId = getUserIdFromToken(token)
+  const userId = getUserIdFromToken(cookieValue)
   const user = await User.findOne({ where: { id: userId } })
   if (!user) return null
-  return user
+
+  try {
+    jwt.verify(cookieValue, process.env.JWT_SECRET || '')
+    return user
+  } catch (e: unknown) {
+    // Delete the cookie
+    cookies.set('access_token', '', { maxAge: 0 })
+
+    // If the user is guest and his token is expired, we don't want to cancel the request
+    // But simply create a new guest account for the user. So return null and not an error.
+    if (user.role === UserRole.GUEST) return null
+
+    // If the user is registered, throw an error and cancel the request.
+    throw new GraphQLError('Session expired. Please log in again.', {
+      extensions: { code: 'JWT_EXPIRED' },
+    })
+  }
 }
 
 /**
