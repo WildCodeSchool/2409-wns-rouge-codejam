@@ -8,7 +8,6 @@ import {
   EditorState,
   initialEditorState,
 } from '@/features/editor/reducers'
-
 import {
   ExecutionStatus,
   GetSnippetQuery,

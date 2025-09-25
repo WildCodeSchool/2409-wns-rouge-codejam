@@ -11,7 +11,7 @@ import {
 } from 'unique-names-generator'
 import { toast } from 'sonner'
 
-import { EditorUrlParams, Status } from '@/features/editor/types'
+import { EditorUrlParams, EditorStatus } from '@/features/editor/types'
 import { EXECUTE } from '@/shared/api/execute'
 import { GET_SNIPPET } from '@/shared/api/getSnippet'
 import { GET_ALL_SNIPPETS } from '@/shared/api/getUserSnippets'
@@ -31,7 +31,7 @@ export default function useEditorRightActions(
 ) {
   const { snippetId, snippetSlug } = useParams<EditorUrlParams>()
   const [showModal, setShowModal] = useState(false)
-  const [status, setStatus] = useState<Status>('typing')
+  const [status, setStatus] = useState<EditorStatus>('typing')
   const [execute] = useMutation(EXECUTE)
   const navigate = useNavigate()
 
@@ -108,14 +108,14 @@ export default function useEditorRightActions(
           setStatus('disabled')
         } else {
           console.error('Error executing code:', error.message)
-          toast.error(`Error executing code: ${error.message}`, {
-            description: 'Please try again later.',
+          toast.error("Oops! We couldn't run your code...", {
+            ...toastOptions.error,
           })
         }
       } else {
         console.error('Unexpected error:', error)
-        toast.error('Execution service temporarily unavailable', {
-          description: 'Please try again later.',
+        toast.error('Oops! Our service is temporarily unavailable...', {
+          ...toastOptions.error,
         })
       }
     } finally {

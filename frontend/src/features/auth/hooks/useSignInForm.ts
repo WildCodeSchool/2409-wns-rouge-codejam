@@ -10,6 +10,7 @@ import {
 } from '@/features/auth/schemas/formSchema'
 import { LOGIN } from '@/shared/api/login'
 import { WHO_AM_I } from '@/shared/api/whoAmI'
+import { toastOptions } from '@/shared/config'
 
 export default function useSignInForm(cbFn?: () => void) {
   const [loginMutation] = useMutation(LOGIN)
@@ -70,15 +71,18 @@ export default function useSignInForm(cbFn?: () => void) {
         }
 
         toast.success('Successful login', {
-          description: `Welcome back ${data.login.username ?? 'Codejamer'}!`,
+          ...toastOptions.success,
+          description: `Welcome back ${data.login.username ?? 'Codejamer'} 👋`,
         })
+
         if (cbFn) {
           form.reset()
           cbFn()
         }
       } catch (err: unknown) {
-        toast.error(`Failed to login`, {
-          description: err instanceof Error ? err.message : JSON.stringify(err),
+        console.error(err)
+        toast.error('Oops! We couldn’t log you in...', {
+          ...toastOptions.error,
         })
       }
     },

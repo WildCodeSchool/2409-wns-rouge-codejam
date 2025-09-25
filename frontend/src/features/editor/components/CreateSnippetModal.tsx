@@ -1,18 +1,20 @@
-import { CREATE_SNIPPET } from '@/shared/api/createSnippet'
 import { useMutation } from '@apollo/client'
-import { Form } from '@/shared/components/ui/form'
-import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Input } from '@/shared/components/ui/input'
-import { GET_ALL_SNIPPETS } from '@/shared/api/getUserSnippets'
-import { Spinner } from '@/shared/components/ui/spinner'
-import { Button } from '@/shared/components/ui/button'
+import { useForm } from 'react-hook-form'
+import { useNavigate } from 'react-router-dom'
+import { toast } from 'sonner'
+
 import {
   snippetCreateSchema,
   SnippetCreateType,
 } from '@/features/auth/schemas/formSchema'
-import { toast } from 'sonner'
-import { useNavigate } from 'react-router-dom'
+import { CREATE_SNIPPET } from '@/shared/api/createSnippet'
+import { GET_ALL_SNIPPETS } from '@/shared/api/getUserSnippets'
+import { Button } from '@/shared/components/ui/button'
+import { Form } from '@/shared/components/ui/form'
+import { Input } from '@/shared/components/ui/input'
+import { Spinner } from '@/shared/components/ui/spinner'
+import { toastOptions } from '@/shared/config'
 import { CreateSnippetMutation, Snippet } from '@/shared/gql/graphql'
 
 type CreateSnippetModalProps = {
@@ -58,12 +60,15 @@ export default function CreateSnippetModal({
         )
       }
 
-      toast.success(`Snippet ${values.name} created successfully`)
+      toast.success('Snippet created successfully', {
+        ...toastOptions.success,
+      })
 
       onClose()
-    } catch (err) {
-      toast.error(`Error while creating your snippet`, {
-        description: err instanceof Error ? err.message : JSON.stringify(err),
+    } catch (err: unknown) {
+      console.error(err)
+      toast.error("Oops! We couldn't create your snippet...", {
+        ...toastOptions.error,
       })
     }
   }
