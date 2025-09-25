@@ -8,32 +8,23 @@ import {
   CodeExecutionResponse,
   ContextType,
   UserIDJwtPayload,
-  UserRole,
 } from '../types'
 import { Execution } from '../entities/Execution'
-import { MoreThan } from 'typeorm'
+import { MoreThan, Not } from 'typeorm'
 import {
   Snippet,
   SnippetCreateInput,
   SnippetUpdateInput,
 } from '../entities/Snippet'
 import { GraphQLError } from 'graphql'
-
-/**
- * Extracts the user ID from a JWT token.
- * @param token - The JWT token from which to extract the user ID.
- * @returns The user ID extracted from the token.
- */
-export function getUserIdFromToken(token: string): string {
-  const jwtToken = jwt.decode(token) as UserIDJwtPayload
-  return jwtToken.userId
-}
+import { UserSubscription } from '../entities/UserSubscription'
+import { Plan } from '../entities/Plan'
 
 /**
  * Retrieve current user from context (if authenticated).
  * @param context - The context object that contains the request and response objects.
- * @returns The user object if found (authenticated user), null if the user is guest and his token invalid.
- * @throws An error if the user is authenticated and his token is invalid
+ * @returns The user object if found (authenticated user), otherwise null
+ * @throws An error if the jwt is invalid
  */
 export async function getUserFromContext(
   context: ContextType,
@@ -44,24 +35,20 @@ export async function getUserFromContext(
   const cookieValue = cookies.get('access_token')
   if (!cookieValue) return null
 
-  const userId = getUserIdFromToken(cookieValue)
-  const user = await User.findOne({ where: { id: userId } })
-  if (!user) return null
-
   try {
-    jwt.verify(cookieValue, process.env.JWT_SECRET || '')
+    const jwtToken = jwt.verify(
+      cookieValue,
+      process.env.JWT_SECRET || '',
+    ) as UserIDJwtPayload
+
+    const user = await User.findOne({ where: { id: jwtToken.userId } })
     return user
   } catch (e: unknown) {
     // Delete the cookie
     cookies.set('access_token', '', { maxAge: 0 })
 
-    // If the user is guest and his token is expired, we don't want to cancel the request
-    // But simply create a new guest account for the user. So return null and not an error.
-    if (user.role === UserRole.GUEST) return null
-
-    // If the user is registered, throw an error and cancel the request.
     throw new GraphQLError('Session expired. Please log in again.', {
-      extensions: { code: 'JWT_EXPIRED' },
+      extensions: { code: 'INVALID_JWT' },
     })
   }
 }
@@ -211,10 +198,16 @@ export async function getUserSnippetCount(userId: string): Promise<number> {
  * @param userId - The user id
  * @param context - The context of the request
  */
-export function createCookieWithJwt(userId: string, context: ContextType) {
+export function createCookieWithJwt(
+  userId: string,
+  context: ContextType,
+  expiresIn: number | null = 24 * 60 * 60,
+) {
   const token = jwt.sign({ userId }, process.env.JWT_SECRET || '', {
-    expiresIn: '24h',
+    // If expiresIn is explicitly set to null, we omit the parameter. This makes the JWT imperishable.
+    ...(expiresIn !== null && { expiresIn }),
   })
+
   new Cookies(context.req, context.res).set('access_token', token, {
     httpOnly: true,
     secure: false,
@@ -262,4 +255,71 @@ function isCodeExecutionResponse(res: unknown): res is CodeExecutionResponse {
     'status' in res &&
     'result' in res
   )
+}
+
+export async function findActiveSubscription(
+  targetUserId: string,
+): Promise<UserSubscription | null> {
+  // can be null if premium subscription is expired and user hasn't logged in since its expiration
+
+  let activeSubscription = await UserSubscription.findOne({
+    where: {
+      user: { id: targetUserId },
+    },
+    relations: ['plan', 'user'],
+    order: { subscribedAt: 'DESC' },
+  })
+
+  if (activeSubscription?.expiresAt) {
+    const isExpired = activeSubscription.expiresAt < new Date()
+
+    if (isExpired) {
+      return null
+    }
+    return activeSubscription
+  }
+
+  return activeSubscription
+}
+
+export async function createDefaultSubscription(user: User): Promise<Boolean> {
+  const defaultPlan = await Plan.findOne({
+    where: { name: Not('guest'), price: 0 },
+  })
+
+  if (defaultPlan) {
+    const newUserSubscription = new UserSubscription()
+    Object.assign(newUserSubscription, {
+      user: user,
+      plan: defaultPlan,
+    })
+    await newUserSubscription.save()
+    return true
+  }
+  return false
+}
+
+export async function subscribeGuest(
+  userId: string,
+): Promise<UserSubscription> {
+  const [user, guestPlan] = await Promise.all([
+    User.findOne({ where: { id: userId } }),
+    Plan.findOne({ where: { name: 'guest' } }),
+  ])
+
+  if (!guestPlan) {
+    throw new Error('Guest plan not found')
+  }
+
+  if (!user) {
+    throw new Error('User not found')
+  }
+
+  const newUserSubscription = new UserSubscription()
+  Object.assign(newUserSubscription, {
+    user: user,
+    plan: guestPlan,
+    subscribedAt: new Date(),
+  })
+  return await UserSubscription.save(newUserSubscription)
 }

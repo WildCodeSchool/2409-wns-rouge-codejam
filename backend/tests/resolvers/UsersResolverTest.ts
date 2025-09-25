@@ -212,7 +212,7 @@ export async function UsersResolverTest(testArgs: TestArgs) {
       expect(data.login).toBeNull()
     })
 
-    it('should succeed login user ', async () => {
+    it('should succeed login user with default plan', async () => {
       if (!testArgs.server) {
         throw new Error('Test server is not initialized')
       }

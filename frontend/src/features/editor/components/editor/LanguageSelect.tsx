@@ -41,7 +41,11 @@ export default function LanguageSelect({
           <SelectGroup>
             <SelectLabel>Languages</SelectLabel>
             {languages.map((language) => (
-              <SelectItem key={language.id} value={language.value}>
+              <SelectItem
+                key={language.id}
+                value={language.value}
+                aria-label={language.label}
+              >
                 <div className="flex cursor-pointer items-center gap-4">
                   <span>{language.label}</span>
                   <img src={language.icon} alt="" width={18} height={18} />

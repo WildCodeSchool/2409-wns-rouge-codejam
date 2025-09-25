@@ -11,7 +11,8 @@ import { Toaster } from '@/shared/components/ui/sonner'
 import { EditorPage } from '@/shared/pages'
 import { ErrorLink } from '@apollo/client/link/error'
 import { LOGOUT } from '@/shared/api/logout'
-import { WHO_AM_I } from './shared/api/whoAmI'
+import { WHO_AM_I } from '@/shared/api/whoAmI'
+import { GET_SNIPPET } from '@/shared/api/getSnippet'
 
 const httpLink = new HttpLink({ uri: '/api' })
 
@@ -21,10 +22,10 @@ const httpLink = new HttpLink({ uri: '/api' })
 // eslint-disable-next-line @typescript-eslint/no-deprecated
 const logoutLink = new ErrorLink(({ graphQLErrors }) => {
   graphQLErrors?.map((error) => {
-    if (error.extensions?.code === 'JWT_EXPIRED') {
+    if (error.extensions?.code === 'INVALID_JWT') {
       void client.mutate({
         mutation: LOGOUT,
-        refetchQueries: [{ query: WHO_AM_I }],
+        refetchQueries: [WHO_AM_I, GET_SNIPPET],
         awaitRefetchQueries: true,
       })
       return

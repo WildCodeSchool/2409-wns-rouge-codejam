@@ -48,3 +48,11 @@ export enum Language {
   JAVASCRIPT = 'javascript',
   TYPESCRIPT = 'typescript',
 }
+
+export enum CancellationReason {
+  EXPIRED = 'expired',
+  SUBSCRIBED = 'subscribed to premium',
+  CANCELLED = 'cancelled by user',
+  CANCELEDADMIN = 'canceled by admin',
+  UNPAID = 'unpaid',
+}

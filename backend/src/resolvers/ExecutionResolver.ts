@@ -4,18 +4,18 @@ import {
   createCookieWithJwt,
   createGuestUser,
   createSnippet,
+  findActiveSubscription,
   getFirstSnippet,
   getSnippet,
   getUserExecutionCount,
   getUserFromContext,
   sendCodeToExecute,
+  subscribeGuest,
   updateSnippet,
 } from './utils'
 import { ContextType, UserRole } from '../types'
 import { SnippetCreateInput } from '../entities/Snippet'
 import { GraphQLError } from 'graphql'
-
-const EXECUTION_LIMIT = 50
 
 @Resolver()
 export class ExecutionResolver {
@@ -31,18 +31,31 @@ export class ExecutionResolver {
 
       if (!currentUser) {
         const newGuestUser = await createGuestUser()
-        createCookieWithJwt(newGuestUser.id, context)
+        // Subscribe user with role guest to the guest free plan
+        await subscribeGuest(newGuestUser.id)
+
+        // Create a cookie with a jwt that does not expire (Prevent a guest account from getting an "INVALID_JWT" error)
+        createCookieWithJwt(newGuestUser.id, context, null)
 
         currentUser = newGuestUser
-      } else {
-        // If user exist, check if the execution number related to the user is less than 50 for this day
-        const currentExecutionCount = await getUserExecutionCount(
-          currentUser.id,
-        )
+      }
 
-        if (currentExecutionCount >= EXECUTION_LIMIT) {
-          throw new Error('Execution limit exceeded')
-        }
+      /* Get user's active subscription to check execution limit
+       => we could use redis cache to avoid fetching subscription for each execution */
+
+      const activeSubscription = await findActiveSubscription(currentUser.id)
+      if (!activeSubscription) {
+        throw new Error('No active subscription found')
+      }
+      // Get current execution count for the user
+      const currentExecutionCount = await getUserExecutionCount(currentUser.id)
+
+      // Check if execution limit is exceeded based on user's plan
+      if (
+        activeSubscription.plan.executionLimit !== null &&
+        currentExecutionCount >= activeSubscription.plan.executionLimit
+      ) {
+        throw new Error('Execution limit exceeded for your current plan')
       }
 
       /*
@@ -84,12 +97,11 @@ export class ExecutionResolver {
       const savedExecution = await Execution.save(execution)
       return savedExecution
     } catch (err) {
-      if (err instanceof GraphQLError) {
+      if (err instanceof GraphQLError || err instanceof Error) {
         throw err
-      } else if (err instanceof Error) {
-        throw err.message
+      } else {
+        throw new Error(JSON.stringify(err))
       }
-      throw JSON.stringify(err)
     }
   }
 }

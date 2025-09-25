@@ -17,7 +17,12 @@ import {
   UserUpdateInput,
 } from '../entities/User'
 import { AuthContextType, ContextType, UserRole } from '../types'
-import { createCookieWithJwt, getUserFromContext } from './utils'
+import {
+  createCookieWithJwt,
+  createDefaultSubscription,
+  findActiveSubscription,
+  getUserFromContext,
+} from './utils'
 
 @Resolver()
 export class UsersResolver {
@@ -49,21 +54,23 @@ export class UsersResolver {
   ): Promise<User> {
     try {
       // Verify if user already exists (email and username should both be unique)
-      const existingUserByEmail = await User.findOne({
-        where: { email: data.email },
-      })
-      const existingUserByUsername = await User.findOne({
-        where: { username: data.username },
+      const existingUser = await User.findOne({
+        where: [{ email: data.email }, { username: data.username }],
       })
 
-      if (existingUserByEmail && existingUserByUsername) {
-        throw new Error(
-          'A user with this email and this username already exists',
-        )
-      } else if (existingUserByEmail) {
-        throw new Error('A user with this email already exists')
-      } else if (existingUserByUsername) {
-        throw new Error('A user with username already exists')
+      if (existingUser) {
+        if (
+          existingUser.email === data.email &&
+          existingUser.username === data.username
+        ) {
+          throw new Error(
+            'A user with this email and this username already exists',
+          )
+        } else if (existingUser.email === data.email) {
+          throw new Error('A user with this email already exists')
+        } else {
+          throw new Error('A user with this username already exists')
+        }
       }
       const newUser = new User()
       const hashedPassword = await argon2.hash(data.password)
@@ -76,6 +83,10 @@ export class UsersResolver {
       })
 
       const createdUser = await newUser.save()
+
+      // Assign a default free plan to the user
+      await createDefaultSubscription(createdUser)
+
       return createdUser
     } catch (err) {
       throw new Error((err as Error).message)
@@ -88,7 +99,7 @@ export class UsersResolver {
     @Ctx() context: ContextType,
   ): Promise<User | null> {
     try {
-      if (context.user) throw new Error('Already logged in')
+      // if (context.user) throw new Error('Already logged in')
 
       const user = await User.findOne({
         where: { email: data.email },
@@ -98,8 +109,34 @@ export class UsersResolver {
       const valid = await argon2.verify(user.hashedPassword, data.password)
       if (!valid) return null
 
+      let tokenExpirationInSeconds = 24 * 60 * 60 // Default 24 hours
+
+      // Get active subscription
+      const activeSubscription = await findActiveSubscription(user.id)
+      if (!activeSubscription) {
+        await createDefaultSubscription(user)
+      } else {
+        // Check if the subscription has an expiration date
+        const now = new Date()
+        if (activeSubscription.expiresAt) {
+          const remainingTime = Math.floor(
+            (activeSubscription.expiresAt.getTime() - now.getTime()) / 1000,
+          )
+          const oneDayInSeconds = 24 * 60 * 60
+
+          // If remaining time is positive and less than a day, use that value
+          if (remainingTime > 0 && remainingTime < oneDayInSeconds) {
+            tokenExpirationInSeconds = remainingTime
+          }
+          // If the subscription is already expired, set a very short token life
+          else if (remainingTime <= 0) {
+            await createDefaultSubscription(user) // Downgrade the user
+          }
+        }
+      }
+
       if (process.env.NODE_ENV !== 'test') {
-        createCookieWithJwt(user.id, context)
+        createCookieWithJwt(user.id, context, tokenExpirationInSeconds)
       }
       return user
     } catch (err) {

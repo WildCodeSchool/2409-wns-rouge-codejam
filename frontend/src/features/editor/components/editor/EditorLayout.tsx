@@ -51,7 +51,7 @@ export default function EditorLayout({
             defaultSize={50}
             minSize={25}
             maxSize={75}
-            className="grid grid-rows-[auto_1fr] gap-2"
+            className="grid grid-rows-[auto_1fr] gap-2 pt-2 pl-2"
           >
             <EditorLeftActions
               code={state.code}
@@ -73,7 +73,7 @@ export default function EditorLayout({
             defaultSize={50}
             minSize={25}
             maxSize={75}
-            className="grid grid-rows-[auto_1fr] gap-2"
+            className="grid grid-rows-[auto_1fr] gap-2 pt-2 pr-2"
           >
             <EditorRightActions
               code={state.code}

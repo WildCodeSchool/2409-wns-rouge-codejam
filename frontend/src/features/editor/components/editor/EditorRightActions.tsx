@@ -1,10 +1,11 @@
+import { PlayIcon, Share2Icon } from 'lucide-react'
+
 import { Subscribe } from '@/features/editor/components/editor'
-import { Modal } from '@/shared/components'
+import { Modal, TooltipButton } from '@/shared/components'
 import { ExecutionStatus, Language } from '@/shared/gql/graphql'
 import { Skeleton } from '@/shared/components/ui/skeleton'
-import RunButton from './RunButton'
-import ShareButton from './ShareButton'
 import { useEditorRightActions } from '@/features/editor/hooks'
+import { Spinner } from '@/shared/components/ui/spinner'
 
 type EditorRightActionProps = {
   code: string
@@ -19,20 +20,47 @@ export default function EditorRightActions({
   onChangeOutput,
   onChangeStatus,
 }: EditorRightActionProps) {
-  const { executeSnippet, shareSnippet, status, showModal, closeModal } =
-    useEditorRightActions(code, language, onChangeOutput, onChangeStatus)
+  const {
+    executeSnippet,
+    debouncedShareUrl,
+    status,
+    showModal,
+    closeModal,
+    snippetId,
+  } = useEditorRightActions(code, language, onChangeOutput, onChangeStatus)
 
   const isExecuting = status === 'executing'
   const disabled = !code || isExecuting || status === 'disabled'
 
   return (
     <div className="flex justify-end gap-4">
-      <RunButton
-        onClick={executeSnippet}
+      <TooltipButton
+        tooltip="Execute current snippet"
+        aria-disabled={disabled}
         disabled={disabled}
-        loading={isExecuting}
-      />
-      <ShareButton disabled={!code} onClick={shareSnippet} />
+        onClick={executeSnippet}
+        className="min-w-24"
+      >
+        <span>Run</span>
+        {isExecuting ? (
+          <Spinner show size="small" />
+        ) : (
+          <PlayIcon aria-hidden="true" role="img" size={15} />
+        )}
+      </TooltipButton>
+
+      <TooltipButton
+        tooltip="Copy url to clipboard"
+        variant="outline"
+        aria-disabled={!code}
+        disabled={!code || !snippetId}
+        onClick={debouncedShareUrl}
+        className="min-w-24"
+      >
+        <span>Share</span>
+        <Share2Icon aria-hidden="true" role="img" size={15} />
+      </TooltipButton>
+
       {showModal && (
         <Modal
           open

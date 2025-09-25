@@ -22,7 +22,7 @@ export default function NavBar() {
 
   return (
     <div className="gradient-accent flex justify-between rounded-xs pb-0.5">
-      <header className="bg-background flex h-full w-full flex-row items-center justify-between pb-3">
+      <header className="bg-background flex h-full w-full flex-row items-center justify-between px-2 pb-3">
         <h1 className="gradient-accent bg-clip-text text-3xl font-bold tracking-wide text-transparent">
           CodeJam
         </h1>

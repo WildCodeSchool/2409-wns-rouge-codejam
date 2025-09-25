@@ -98,6 +98,12 @@ export default function useEditorPage(snippetId?: string) {
     })
   }, [])
 
+  if (error) {
+    toast.error('Error getting snippet', {
+      description: error.message,
+    })
+  }
+
   return {
     snippet,
     loading,
