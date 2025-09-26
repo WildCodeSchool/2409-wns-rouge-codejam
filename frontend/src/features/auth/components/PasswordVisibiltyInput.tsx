@@ -41,9 +41,9 @@ const PasswordVisibiltyInput = ({
         }}
       >
         {isVisible ? (
-          <Eye aria-hidden="true" role="img" size={15} />
+          <Eye aria-hidden="true" size={15} />
         ) : (
-          <EyeClosed aria-hidden="true" role="img" size={15} />
+          <EyeClosed aria-hidden="true" size={15} />
         )}
       </Button>
     </div>

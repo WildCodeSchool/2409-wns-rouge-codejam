@@ -36,7 +36,7 @@ export default function EditorLeftActions({
         {status === 'saving' ? (
           <Spinner show size="small" />
         ) : (
-          <Save aria-hidden="true" role="img" size={15} />
+          <Save aria-hidden="true" size={15} />
         )}
       </TooltipButton>
     </div>

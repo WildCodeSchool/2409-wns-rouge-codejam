@@ -102,7 +102,6 @@ export default function EditorSidebar({ language }: EditorSidebarProps) {
                 <SidebarTrigger size="icon" className="size-9 rounded-full">
                   <PanelRightCloseIcon
                     aria-hidden="true"
-                    role="img"
                     className={cn('transition-all', open && 'rotate-180')}
                   />
                 </SidebarTrigger>
@@ -121,7 +120,7 @@ export default function EditorSidebar({ language }: EditorSidebarProps) {
                         setIsModalOpen(true)
                       }}
                     >
-                      <Plus aria-hidden="true" role="img" className="h-4 w-4" />
+                      <Plus aria-hidden="true" className="h-4 w-4" />
                     </TooltipButton>
                   </SidebarMenuItem>
 
@@ -150,7 +149,7 @@ export default function EditorSidebar({ language }: EditorSidebarProps) {
                             alert(`🚧 Rename snippet ${snippet.id}...`)
                           }}
                         >
-                          <Pencil aria-hidden="true" role="img" />
+                          <Pencil aria-hidden="true" />
                         </TooltipButton>
 
                         <TooltipButton
@@ -163,7 +162,7 @@ export default function EditorSidebar({ language }: EditorSidebarProps) {
                             alert(`🚧 Delete snippet ${snippet.id}...`)
                           }}
                         >
-                          <Trash aria-hidden="true" role="img" />
+                          <Trash aria-hidden="true" />
                         </TooltipButton>
                       </div>
                     </SidebarMenuItem>

@@ -60,7 +60,6 @@ export default function ModeToggle() {
           <span>{mode.slice(0, 1).toUpperCase() + mode.slice(1)}</span>
           <ToggleIcon
             aria-hidden="true"
-            role="img"
             size={15}
             className="relative transition-all"
           />

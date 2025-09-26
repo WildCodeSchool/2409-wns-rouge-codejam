@@ -45,7 +45,7 @@ export default function EditorRightActions({
         {isExecuting ? (
           <Spinner show size="small" />
         ) : (
-          <PlayIcon aria-hidden="true" role="img" size={15} />
+          <PlayIcon aria-hidden="true" size={15} />
         )}
       </TooltipButton>
 
@@ -58,7 +58,7 @@ export default function EditorRightActions({
         className="min-w-24"
       >
         <span>Share</span>
-        <Share2Icon aria-hidden="true" role="img" size={15} />
+        <Share2Icon aria-hidden="true" size={15} />
       </TooltipButton>
 
       {showModal && (

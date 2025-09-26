@@ -45,7 +45,6 @@ export default function AccountSettings({
           <span className="max-w-40 truncate text-right">{username}</span>
           <ChevronDownIcon
             aria-hidden="true"
-            role="img"
             size={15}
             className="transition-transform group-data-[state=open]:rotate-180"
           />
@@ -74,12 +73,7 @@ export default function AccountSettings({
             onClick={onLogout}
             className="w-full cursor-pointer justify-start px-2! py-1.5"
           >
-            <LogOutIcon
-              aria-hidden="true"
-              role="img"
-              size={15}
-              className="rotate-180"
-            />
+            <LogOutIcon aria-hidden="true" size={15} className="rotate-180" />
             <span>Sign Out</span>
           </Button>
         </DropdownMenuItem>
