@@ -47,7 +47,9 @@ export class Execution extends BaseEntity {
   @Field(() => GraphQLDateTime)
   executedAt!: Date
 
-  @ManyToOne(() => Snippet, (Snippet) => Snippet.executions)
+  @ManyToOne(() => Snippet, (Snippet) => Snippet.executions, {
+    onDelete: 'CASCADE',
+  })
   @Field(() => Snippet)
   snippet!: Snippet
 }
