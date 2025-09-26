@@ -7,7 +7,9 @@ import {
   EditorOutputSkeleton,
   EditorRightActions,
   EditorRightActionsSkeleton,
-} from '@/features/editor/components/editor'
+  EditorSidebar,
+  EditorSidebarSkeleton,
+} from '@/features/editor/components'
 import { EditorState } from '@/features/editor/reducers'
 import {
   ResizableHandle,
@@ -15,7 +17,6 @@ import {
   ResizablePanelGroup,
 } from '@/shared/components/ui/resizable'
 import { ExecutionStatus } from '@/shared/gql/graphql'
-import EditorSidebar, { EditorSidebarSkeleton } from '../EditorSidebar'
 import { SidebarProvider } from '@/shared/components/ui/sidebar'
 
 type EditorLayoutProps = {

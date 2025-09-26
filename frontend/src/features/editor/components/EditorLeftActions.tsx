@@ -1,6 +1,6 @@
 import { Save } from 'lucide-react'
 
-import { LanguageSelect } from '@/features/editor/components/editor'
+import { LanguageSelect } from '@/features/editor/components'
 import { useEditorLeftActions } from '@/features/editor/hooks'
 import { TooltipButton } from '@/shared/components'
 import { Skeleton } from '@/shared/components/ui/skeleton'

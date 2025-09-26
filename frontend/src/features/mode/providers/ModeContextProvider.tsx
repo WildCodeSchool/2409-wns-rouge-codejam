@@ -89,7 +89,7 @@ export default function ModeContextProvider({
       isDarkMode,
       changeMode,
     }),
-    [mode, changeMode],
+    [mode, isDarkMode, changeMode],
   )
 
   return <ModeContext.Provider value={ctx}>{children}</ModeContext.Provider>

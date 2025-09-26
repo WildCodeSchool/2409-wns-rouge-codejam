@@ -40,9 +40,9 @@ export default function CodeEditor({
         theme={editorTheme}
         className={cn(baseEditorClasses, !isDarkMode && 'border-input')}
         onChange={onChange}
-        onMount={(editor: MonacoEditorInstance) =>
+        onMount={(editor: MonacoEditorInstance) => {
           handleOnEditorMount(editor, code)
-        }
+        }}
       />
     </div>
   )

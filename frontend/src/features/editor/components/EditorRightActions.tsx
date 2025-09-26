@@ -1,11 +1,11 @@
 import { PlayIcon, Share2Icon } from 'lucide-react'
 
-import { Subscribe } from '@/features/editor/components/editor'
-import { Modal, TooltipButton } from '@/shared/components'
-import { ExecutionStatus, Language } from '@/shared/gql/graphql'
-import { Skeleton } from '@/shared/components/ui/skeleton'
+import { Subscribe } from '@/features/editor/components'
 import { useEditorRightActions } from '@/features/editor/hooks'
+import { Modal, TooltipButton } from '@/shared/components'
+import { Skeleton } from '@/shared/components/ui/skeleton'
 import { Spinner } from '@/shared/components/ui/spinner'
+import { ExecutionStatus, Language } from '@/shared/gql/graphql'
 
 type EditorRightActionProps = {
   code: string

@@ -7,7 +7,7 @@ type TooltipButtonProps = React.ComponentProps<typeof Button> & {
 }
 
 const TooltipButton = forwardRef<HTMLButtonElement, TooltipButtonProps>(
-  function ({ children, tooltip, ...restProps }, ref) {
+  function TooltipButton({ children, tooltip, ...restProps }, ref) {
     return (
       <Tooltip>
         <TooltipTrigger asChild>

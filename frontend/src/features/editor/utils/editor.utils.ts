@@ -68,7 +68,10 @@ export function resolveEditorTheme(mode: Mode): MonacoTheme {
   if (mode === 'system') {
     return prefersDarkMediaQuery.matches ? THEME_MAP.dark : THEME_MAP.light
   }
-  return THEME_MAP[mode] ?? THEME_MAP.dark
+  if (!(mode in THEME_MAP)) {
+    throw new Error(`No theme available for the selected mode ${mode}`)
+  }
+  return THEME_MAP[mode]
 }
 
 /**
