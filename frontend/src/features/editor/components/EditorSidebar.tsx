@@ -22,13 +22,14 @@ import {
   useSidebar,
 } from '@/shared/components/ui/sidebar'
 import { Skeleton } from '@/shared/components/ui/skeleton'
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from '@/shared/components/ui/tooltip'
 import { Snippet } from '@/shared/gql/graphql'
 import { cn } from '@/shared/lib/utils'
+
+const baseMenuItemClasses =
+  'border-input bg-snippet-card-background flex min-h-10 cursor-pointer items-center justify-center border pl-4 pr-2 text-sm transition-colors'
+
+const activeMenuItemClasses =
+  'outline-codejam-accent-300 text-codejam-accent outline-2'
 
 type EditorSidebarProps = {
   language: Snippet['language']
@@ -71,9 +72,6 @@ export default function EditorSidebar({ language }: EditorSidebarProps) {
     setActiveSnippetId(nextActiveSnippetId)
   }, [snippetId, snippets, navigate])
 
-  const hoveredTextStyles = 'text-neutral-300 hover:text-neutral-100'
-  const iconsStyles = `cursor-pointer h-4 w-4 ${hoveredTextStyles}`
-
   //  If user is guest
   if (!user?.email) {
     return null
@@ -85,13 +83,14 @@ export default function EditorSidebar({ language }: EditorSidebarProps) {
         collapsible="icon"
         className={cn(
           'bg-background ml-2 h-full rounded-none pt-1',
-          open && 'border-0 shadow-[6px_6px_6px_0px_rgba(0,_0,_0,_0.1)]',
+          open &&
+            'rounded-md border-0 shadow-[6px_6px_6px_0px_rgba(0,_0,_0,_0.1)]',
         )}
       >
         <SidebarContent className="bg-background">
           <SidebarGroup className="justify-center px-0">
             <SidebarGroupContent>
-              <SidebarHeader className="text-sidebar-foreground/70 flex flex-row items-center pt-0 pr-2 pb-2">
+              <SidebarHeader className="flex flex-row items-center pt-0 pr-2 pb-2">
                 <span
                   className={cn(
                     'font-medium -tracking-tighter whitespace-nowrap',
@@ -113,75 +112,58 @@ export default function EditorSidebar({ language }: EditorSidebarProps) {
                 <SidebarMenu className="gap-2.5 px-4 pt-0.5">
                   <SidebarMenuItem
                     key="add-new-snippet"
-                    className="flex justify-center py-1 text-sm"
+                    className={cn(baseMenuItemClasses, 'bg-transparent px-0')}
                   >
                     <TooltipButton
-                      tooltip="Create snippet"
-                      variant={null}
-                      className="w-full rounded"
+                      tooltip="Add a new snippet"
+                      className="text-background min-h-10 w-full rounded"
                       onClick={() => {
                         setIsModalOpen(true)
                       }}
                     >
-                      <Plus
-                        aria-hidden="true"
-                        role="img"
-                        className="h-4 w-4 text-neutral-300 group-hover:text-neutral-100"
-                      />
+                      <Plus aria-hidden="true" role="img" className="h-4 w-4" />
                     </TooltipButton>
                   </SidebarMenuItem>
 
                   {(snippets ?? []).map((snippet) => (
                     <SidebarMenuItem
                       key={snippet.id}
-                      className="flex cursor-pointer justify-between gap-0.5 py-1"
+                      className={cn(
+                        baseMenuItemClasses,
+                        activeSnippetId === snippet.id && activeMenuItemClasses,
+                      )}
+                      onClick={() => {
+                        navigate(`/editor/${snippet.id}/${snippet.slug}`)
+                      }}
                     >
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <button
-                            onClick={() => {
-                              navigate(`/editor/${snippet.id}/${snippet.slug}`)
-                            }}
-                            className={cn(
-                              'flex-1 cursor-pointer justify-start truncate rounded-md px-2 py-1.5 text-left transition-colors',
-                              activeSnippetId === snippet.id
-                                ? 'text-sky-500 hover:text-sky-300'
-                                : hoveredTextStyles,
-                            )}
-                          >
-                            {snippet.name}
-                          </button>
-                        </TooltipTrigger>
-                        <TooltipContent side="right" align="center">
-                          {snippet.name}
-                        </TooltipContent>
-                      </Tooltip>
-
-                      <div className="flex items-center pr-2">
+                      <span className="r flex-1 truncate text-left">
+                        {snippet.name}
+                      </span>
+                      <div>
                         <TooltipButton
                           tooltip="Rename snippet"
-                          variant={null}
+                          variant="ghost"
                           size="icon"
-                          className="min-w-0 rounded-full px-0"
+                          className="rounded-full px-0"
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            alert(`🚧 Rename snippet ${snippet.id}...`)
+                          }}
                         >
-                          <Pencil
-                            aria-hidden="true"
-                            role="img"
-                            className={iconsStyles}
-                          />
+                          <Pencil aria-hidden="true" role="img" />
                         </TooltipButton>
 
                         <TooltipButton
                           tooltip="Delete snippet"
-                          variant={null}
+                          variant="ghost"
                           size="icon"
-                          className="rounded-full px-0"
+                          className="hover:text-error rounded-full px-0"
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            alert(`🚧 Delete snippet ${snippet.id}...`)
+                          }}
                         >
-                          <Trash
-                            aria-hidden="true"
-                            role="img"
-                            className={iconsStyles}
-                          />
+                          <Trash aria-hidden="true" role="img" />
                         </TooltipButton>
                       </div>
                     </SidebarMenuItem>

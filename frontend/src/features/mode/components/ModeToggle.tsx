@@ -1,20 +1,17 @@
-import {
-  DropdownMenuContent,
-  DropdownMenuItem,
-} from '@radix-ui/react-dropdown-menu'
 import { LucideProps, MoonIcon, SunIcon, CogIcon } from 'lucide-react'
 
 import { useMode } from '@/features/mode/hooks'
 import { Mode, MODE_OPTIONS } from '@/features/mode/types'
-
 import { TooltipButton } from '@/shared/components'
 import {
   DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/shared/components/ui/dropdown-menu'
 import { cn } from '@/shared/lib/utils'
 
-const baseIconClasses = 'h-[1.2rem] w-[1.2rem] transition-all'
 const baseItemClasses =
   'hover:bg-accent hover:text-accent-foreground cursor-pointer rounded-md px-2 py-1.5 text-sm tracking-wide outline-none'
 
@@ -53,35 +50,41 @@ export default function ModeToggle() {
   const ToggleIcon = modeIcons[mode]
 
   return (
-    <DropdownMenu modal>
+    <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <TooltipButton
           tooltip={`Change mode (${mode})`}
           variant="outline"
-          size="icon"
-          className="text-red rounded-full"
+          className="rounded-md"
         >
-          <ToggleIcon className={baseIconClasses} />
-          <span className="sr-only">Change mode (current is {mode})</span>
+          <span>{mode.slice(0, 1).toUpperCase() + mode.slice(1)}</span>
+          <ToggleIcon
+            aria-hidden="true"
+            role="img"
+            size={15}
+            className="relative transition-all"
+          />
         </TooltipButton>
       </DropdownMenuTrigger>
 
       <DropdownMenuContent
         align="end"
         sideOffset={6}
-        className="border-input bg-background min-w-[128px] rounded-md border p-1 shadow-xs"
+        className="border-input bg-background min-w-[128px] rounded-md border p-1 text-sm shadow-xs"
       >
-        {MODE_OPTIONS.map((mode, index) => (
-          <DropdownMenuItem
-            key={index}
-            className={baseItemClasses}
-            onClick={() => {
-              changeMode(mode)
-            }}
-          >
-            {mode.charAt(0).toUpperCase() + mode.slice(1)}
-          </DropdownMenuItem>
-        ))}
+        <DropdownMenuGroup>
+          {MODE_OPTIONS.map((mode, index) => (
+            <DropdownMenuItem
+              key={index}
+              className={baseItemClasses}
+              onClick={() => {
+                changeMode(mode)
+              }}
+            >
+              {mode.charAt(0).toUpperCase() + mode.slice(1)}
+            </DropdownMenuItem>
+          ))}
+        </DropdownMenuGroup>
       </DropdownMenuContent>
     </DropdownMenu>
   )

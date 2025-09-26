@@ -39,7 +39,7 @@ export default function EditorLayout({
       <SidebarProvider className="gap-2">
         <EditorSidebar language={state.language} />
 
-        <ResizablePanelGroup direction="horizontal" className="h-full">
+        <ResizablePanelGroup direction="horizontal" className="h-full gap-2">
           <ResizablePanel
             id="editor-panel"
             defaultSize={50}
