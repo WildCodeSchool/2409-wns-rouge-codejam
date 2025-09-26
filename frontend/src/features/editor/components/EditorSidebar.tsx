@@ -21,7 +21,7 @@ import {
   SidebarTrigger,
   useSidebar,
 } from '@/shared/components/ui/sidebar'
-import { Spinner } from '@/shared/components/ui/spinner'
+import { Skeleton } from '@/shared/components/ui/skeleton'
 import {
   Tooltip,
   TooltipContent,
@@ -36,13 +36,14 @@ type EditorSidebarProps = {
 
 export default function EditorSidebar({ language }: EditorSidebarProps) {
   const { open } = useSidebar()
-  const { data: { whoAmI: user } = {}, loading: loadingUser } =
-    useQuery(WHO_AM_I)
+  const { data: { whoAmI: user } = {} } = useQuery(WHO_AM_I)
 
-  const { data: { getAllSnippets: snippets } = {}, loading: loadingSnippets } =
-    useQuery(GET_ALL_SNIPPETS, {
+  const { data: { getAllSnippets: snippets } = {} } = useQuery(
+    GET_ALL_SNIPPETS,
+    {
       skip: !user,
-    })
+    },
+  )
 
   const { snippetId } = useParams<EditorUrlParams>()
   const navigate = useNavigate()
@@ -72,10 +73,6 @@ export default function EditorSidebar({ language }: EditorSidebarProps) {
 
   const hoveredTextStyles = 'text-neutral-300 hover:text-neutral-100'
   const iconsStyles = `cursor-pointer h-4 w-4 ${hoveredTextStyles}`
-
-  if (loadingUser || loadingSnippets) {
-    return <Spinner />
-  }
 
   //  If user is guest
   if (!user?.email) {
@@ -209,5 +206,20 @@ export default function EditorSidebar({ language }: EditorSidebarProps) {
         />
       </Modal>
     </>
+  )
+}
+
+export function EditorSidebarSkeleton() {
+  const { open } = useSidebar()
+  return (
+    <Sidebar
+      collapsible="icon"
+      className={cn(
+        'bg-background ml-2 h-full rounded-none pt-1',
+        open && 'border-0 shadow-[6px_6px_6px_0px_rgba(0,_0,_0,_0.1)]',
+      )}
+    >
+      <Skeleton className="h-full w-full" />
+    </Sidebar>
   )
 }

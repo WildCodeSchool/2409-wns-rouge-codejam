@@ -15,7 +15,7 @@ import {
   ResizablePanelGroup,
 } from '@/shared/components/ui/resizable'
 import { ExecutionStatus } from '@/shared/gql/graphql'
-import EditorSidebar from '../EditorSidebar'
+import EditorSidebar, { EditorSidebarSkeleton } from '../EditorSidebar'
 import { SidebarProvider } from '@/shared/components/ui/sidebar'
 
 type EditorLayoutProps = {
@@ -87,16 +87,21 @@ export default function EditorLayout({
 
 export function EditorPageSkeleton() {
   return (
-    <ResizablePanelGroup direction="horizontal" className="h-full">
-      <ResizablePanel className="grid grid-rows-[auto_1fr] gap-2">
-        <EditorLeftActionsSkeleton />
-        <CodeEditorSkeleton />
-      </ResizablePanel>
-      <ResizableHandle withHandle className="bg-transparent" />
-      <ResizablePanel className="grid grid-rows-[auto_1fr] gap-2">
-        <EditorRightActionsSkeleton />
-        <EditorOutputSkeleton />
-      </ResizablePanel>
-    </ResizablePanelGroup>
+    <div className="flex h-full">
+      <SidebarProvider className="gap-2">
+        <EditorSidebarSkeleton />
+        <ResizablePanelGroup direction="horizontal" className="h-full">
+          <ResizablePanel className="grid grid-rows-[auto_1fr] gap-2">
+            <EditorLeftActionsSkeleton />
+            <CodeEditorSkeleton />
+          </ResizablePanel>
+          <ResizableHandle withHandle className="bg-transparent" />
+          <ResizablePanel className="grid grid-rows-[auto_1fr] gap-2">
+            <EditorRightActionsSkeleton />
+            <EditorOutputSkeleton />
+          </ResizablePanel>
+        </ResizablePanelGroup>
+      </SidebarProvider>
+    </div>
   )
 }

@@ -261,7 +261,12 @@
 /* Use the @layer component directive to add more complicated classes that can still be overriden with utility classes */
 @layer component {
   .shimmer {
-    background: linear-gradient(-45deg, #eee 40%, #fafafa 50%, #eee 60%);
+    background: linear-gradient(
+      -45deg,
+      var(--muted-foreground) 40%,
+      var(--foreground) 50%,
+      var(--muted-foreground) 60%
+    );
     background-size: 300%;
     background-position-x: 100%;
   }

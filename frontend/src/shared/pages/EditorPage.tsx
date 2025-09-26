@@ -1,6 +1,4 @@
-import { useEffect } from 'react'
 import { Navigate, useParams } from 'react-router-dom'
-import { toast } from 'sonner'
 
 import {
   EditorLayout,
@@ -9,7 +7,6 @@ import {
 } from '@/features/editor/components/editor'
 import { useEditorPage } from '@/features/editor/hooks'
 import { EditorUrlParams } from '@/features/editor/types'
-import { toastOptions } from '@/shared/config'
 
 export default function EditorPage() {
   const { snippetId } = useParams<EditorUrlParams>()
@@ -23,12 +20,6 @@ export default function EditorPage() {
     updateOutput,
     updateStatus,
   } = useEditorPage(snippetId)
-
-  useEffect(() => {
-    toast.success('Snippet created successfully', {
-      ...toastOptions.success,
-    })
-  }, [])
 
   if (loading && !snippetId) {
     return <EditorPageSkeleton />
