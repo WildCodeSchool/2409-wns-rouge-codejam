@@ -82,7 +82,7 @@ export default function CreateSnippetModal({
   }
   const handleRenameSnippet = async (values: SnippetRenameType) => {
     try {
-      await renameSnippet({
+      const snippet = await renameSnippet({
         variables: {
           data: {
             name: values.name,
@@ -91,7 +91,11 @@ export default function CreateSnippetModal({
         },
         refetchQueries: [GET_ALL_SNIPPETS],
       })
-
+      if (snippet.data?.updateSnippet) {
+        navigate(
+          `/editor/${snippet.data.updateSnippet.id}/${snippet.data.updateSnippet.slug}`,
+        )
+      }
       toast.success(`Snippet ${values.name} renamed successfully`)
       onClose()
     } catch (err) {
