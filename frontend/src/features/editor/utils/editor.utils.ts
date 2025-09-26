@@ -80,5 +80,5 @@ export function resolveEditorTheme(mode: Mode): MonacoTheme {
  *
  */
 export function resolveOutputBackgroundColor(isDarkMode: boolean): string {
-  return `bg-[${isDarkMode ? '#24292e' : '#FFFFFF'}]`
+  return isDarkMode ? 'bg-[#24292e]' : 'bg-[#FFFFFF]'
 }

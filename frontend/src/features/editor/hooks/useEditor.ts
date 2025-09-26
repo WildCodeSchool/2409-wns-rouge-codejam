@@ -8,7 +8,6 @@ import {
   resolveEditorTheme,
 } from '@/features/editor/utils'
 import { useMode } from '@/features/mode/hooks'
-import { prefersDarkMediaQuery } from '@/features/mode/utils'
 
 export default function useEditor() {
   const editorRef = useRef<MonacoEditorInstance | null>(null)
@@ -28,23 +27,14 @@ export default function useEditor() {
 
   // Update editor theme when mode changes or system preference changes
   useEffect(() => {
-    setEditorTheme(resolveEditorTheme(mode))
-
     if (mode !== 'system') {
+      setEditorTheme(resolveEditorTheme(mode))
       return
     }
-
-    const listener = (e: MediaQueryListEvent) => {
-      setEditorTheme(
-        e.matches ? resolveEditorTheme('dark') : resolveEditorTheme('light'),
-      )
-    }
-    prefersDarkMediaQuery.addEventListener('change', listener)
-
-    return () => {
-      prefersDarkMediaQuery.removeEventListener('change', listener)
-    }
-  }, [mode])
+    setEditorTheme(
+      isDarkMode ? resolveEditorTheme('dark') : resolveEditorTheme('light'),
+    )
+  }, [mode, isDarkMode])
 
   const handleOnEditorMount = useCallback(
     (editor: MonacoEditorInstance, code: string) => {

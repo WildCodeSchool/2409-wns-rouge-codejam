@@ -43,6 +43,9 @@ export default function ModeContextProvider({
   const [mode, setMode] = useState<Mode>(() => {
     return (localStorage.getItem(storageKey) as Mode | null) ?? defaultMode
   })
+  const [isDarkMode, setIsDarkMode] = useState(() => {
+    return mode === 'system' ? prefersDarkMediaQuery.matches : mode === 'dark'
+  })
 
   /*
     Applies the current mode.
@@ -57,6 +60,7 @@ export default function ModeContextProvider({
 
     const listener = () => {
       applyMode('system')
+      setIsDarkMode(prefersDarkMediaQuery.matches)
     }
     prefersDarkMediaQuery.addEventListener('change', listener)
 
@@ -64,11 +68,6 @@ export default function ModeContextProvider({
       prefersDarkMediaQuery.removeEventListener('change', listener)
     }
   }, [mode])
-
-  const isDarkMode = useMemo(
-    () => (mode === 'system' ? prefersDarkMediaQuery.matches : mode === 'dark'),
-    [mode],
-  )
 
   /**
    * Changes the current mode and persists it in localStorage.
@@ -78,6 +77,9 @@ export default function ModeContextProvider({
   const changeMode = useCallback(
     (newMode: Mode) => {
       setMode(newMode)
+      if (newMode !== 'system') {
+        setIsDarkMode(newMode === 'dark')
+      }
       localStorage.setItem(storageKey, newMode)
     },
     [storageKey],

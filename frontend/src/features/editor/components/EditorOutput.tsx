@@ -1,8 +1,5 @@
-import { useEffect, useState } from 'react'
-
 import { resolveOutputBackgroundColor } from '@/features/editor/utils'
 import { useMode } from '@/features/mode/hooks'
-import { prefersDarkMediaQuery } from '@/features/mode/utils'
 import { Skeleton } from '@/shared/components/ui/skeleton'
 import { ExecutionStatus } from '@/shared/gql/graphql'
 import { cn } from '@/shared/lib/utils'
@@ -18,30 +15,10 @@ type EditorOutputProps = {
 }
 
 export default function EditorOutput({ output, status }: EditorOutputProps) {
-  const { mode, isDarkMode } = useMode()
-  const [theme, setTheme] = useState<string | null>(null)
-
-  // Update editor output theme when mode changes or system preference changes
-  useEffect(() => {
-    setTheme(resolveOutputBackgroundColor(isDarkMode))
-
-    if (mode !== 'system') {
-      return
-    }
-
-    const listener = (e: MediaQueryListEvent) => {
-      setTheme(resolveOutputBackgroundColor(e.matches))
-    }
-    prefersDarkMediaQuery.addEventListener('change', listener)
-
-    return () => {
-      prefersDarkMediaQuery.removeEventListener('change', listener)
-    }
-  }, [mode, isDarkMode])
+  const { isDarkMode } = useMode()
 
   const isError = !!status && status === ExecutionStatus.Error
   const isSuccess = !!status && status === ExecutionStatus.Success
-
   const outputValue =
     output || 'Click the "Run code" button to visualize the output here...'
 
@@ -60,7 +37,7 @@ export default function EditorOutput({ output, status }: EditorOutputProps) {
           isError ? 'text-destructive' : 'text-foreground/50',
           output && 'text-foreground',
           isDarkMode ? 'border-transparent' : 'border-input',
-          theme,
+          resolveOutputBackgroundColor(isDarkMode),
         )}
       />
 
