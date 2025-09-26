@@ -5,7 +5,7 @@ import { ExecutionStatus } from '@/shared/gql/graphql'
 import { cn } from '@/shared/lib/utils'
 
 const baseContainerClasses =
-  'relative flex h-full overflow-hidden rounded-md border border-transparent'
+  'mt-4 relative flex h-full overflow-hidden rounded-md border border-transparent'
 const baseOutputClasses = 'font-editor w-full resize-none p-4 text-sm'
 const baseStatusClasses = 'absolute right-2 top-2 rounded-full w-3 h-3'
 

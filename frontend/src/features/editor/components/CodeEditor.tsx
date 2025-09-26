@@ -30,7 +30,7 @@ export default function CodeEditor({
   }
 
   return (
-    <div className="relative">
+    <div className="relative h-full pt-4">
       <MonacoEditor
         defaultLanguage="javascript"
         options={BASE_OPTIONS}

@@ -26,7 +26,7 @@ import { Snippet } from '@/shared/gql/graphql'
 import { cn } from '@/shared/lib/utils'
 
 const baseMenuItemClasses =
-  'border-input bg-snippet-card-background flex min-h-10 cursor-pointer items-center justify-center border pl-4 pr-2 text-sm transition-colors'
+  'border-input bg-snippet-card-background flex min-h-10 cursor-pointer items-center justify-center border pl-4 pr-2 text-sm transition-colors mb-2'
 
 const activeMenuItemClasses =
   'outline-codejam-accent-300 text-codejam-accent outline-2'
@@ -82,7 +82,7 @@ export default function EditorSidebar({ language }: EditorSidebarProps) {
       <Sidebar
         collapsible="icon"
         className={cn(
-          'bg-background ml-2 h-full rounded-none pt-1',
+          'bg-background h-full rounded-none pt-0',
           open &&
             'rounded-md border-0 shadow-[6px_6px_6px_0px_rgba(0,_0,_0,_0.1)]',
         )}
@@ -90,7 +90,7 @@ export default function EditorSidebar({ language }: EditorSidebarProps) {
         <SidebarContent className="bg-background">
           <SidebarGroup className="justify-center px-0">
             <SidebarGroupContent>
-              <SidebarHeader className="flex flex-row items-center pt-0 pr-2 pb-2">
+              <SidebarHeader className="flex flex-row items-center pt-0 pr-2 pb-4">
                 <span
                   className={cn(
                     'font-medium -tracking-tighter whitespace-nowrap',
@@ -108,18 +108,22 @@ export default function EditorSidebar({ language }: EditorSidebarProps) {
               </SidebarHeader>
 
               {open && (
-                <SidebarMenu className="gap-2.5 px-4 pt-0.5">
+                <SidebarMenu className="gap-2.5 pr-4 pl-2">
                   <SidebarMenuItem
                     key="add-new-snippet"
-                    className={cn(baseMenuItemClasses, 'bg-transparent px-0')}
+                    className={cn(
+                      baseMenuItemClasses,
+                      'mb-4 bg-transparent px-0',
+                    )}
                   >
                     <TooltipButton
                       tooltip="Add a new snippet"
-                      className="text-background min-h-10 w-full rounded"
+                      className="text-background min-h-10 w-full gap-1 rounded"
                       onClick={() => {
                         setIsModalOpen(true)
                       }}
                     >
+                      <span>Add</span>
                       <Plus aria-hidden="true" className="h-4 w-4" />
                     </TooltipButton>
                   </SidebarMenuItem>

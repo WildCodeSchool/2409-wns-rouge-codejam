@@ -36,51 +36,53 @@ export default function EditorLayout({
 }: EditorLayoutProps) {
   return (
     <div className="flex h-full">
-      <SidebarProvider className="gap-2">
+      <SidebarProvider className="gap-4">
         <EditorSidebar language={state.language} />
 
-        <ResizablePanelGroup direction="horizontal" className="h-full gap-2">
-          <ResizablePanel
-            id="editor-panel"
-            defaultSize={50}
-            minSize={25}
-            maxSize={75}
-            className="grid grid-rows-[auto_1fr] gap-2 pt-2 pl-2"
-          >
+        <div className="grid h-full flex-1 grid-rows-[auto_1fr]">
+          <div className="flex items-center justify-between px-2 pt-1">
             <EditorLeftActions
               code={state.code}
               language={state.language}
               onChangeLanguage={onChangeLanguage}
             />
-
-            <CodeEditor
-              code={state.code}
-              language={state.language}
-              onChange={onChangeCode}
-            />
-          </ResizablePanel>
-
-          <ResizableHandle withHandle className="bg-transparent" />
-
-          <ResizablePanel
-            id="output-panel"
-            defaultSize={50}
-            minSize={25}
-            maxSize={75}
-            className="grid grid-rows-[auto_1fr] gap-2 pt-2 pr-2"
-          >
             <EditorRightActions
               code={state.code}
               language={state.language}
               onChangeOutput={onChangeOutput}
               onChangeStatus={onChangeStatus}
             />
-            <EditorOutput
-              output={state.output}
-              status={state.executionStatus}
-            />
-          </ResizablePanel>
-        </ResizablePanelGroup>
+          </div>
+
+          <ResizablePanelGroup direction="horizontal" className="h-full gap-2">
+            <ResizablePanel
+              id="editor-panel"
+              defaultSize={50}
+              minSize={25}
+              maxSize={75}
+            >
+              <CodeEditor
+                code={state.code}
+                language={state.language}
+                onChange={onChangeCode}
+              />
+            </ResizablePanel>
+
+            <ResizableHandle withHandle className="bg-transparent" />
+
+            <ResizablePanel
+              id="output-panel"
+              defaultSize={50}
+              minSize={25}
+              maxSize={75}
+            >
+              <EditorOutput
+                output={state.output}
+                status={state.executionStatus}
+              />
+            </ResizablePanel>
+          </ResizablePanelGroup>
+        </div>
       </SidebarProvider>
     </div>
   )
