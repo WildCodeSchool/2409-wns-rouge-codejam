@@ -1,7 +1,6 @@
 import { AuthModal } from '@/features/auth/components'
 import { useActions } from '@/features/auth/hooks'
 import { Button } from '@/shared/components/ui/button'
-import { Skeleton } from '@/shared/components/ui/skeleton'
 
 export default function NavActions() {
   const { modal, closeModal, openSignIn, openSignUp } = useActions()
@@ -33,14 +32,5 @@ export default function NavActions() {
         />
       )}
     </>
-  )
-}
-
-export function NavActionsSkeleton() {
-  return (
-    <div className="flex flex-row items-center gap-4">
-      <Skeleton className="h-9 w-22" />
-      <Skeleton className="h-9 w-22" />
-    </div>
   )
 }

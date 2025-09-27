@@ -1,5 +1,6 @@
 import { ChevronDownIcon, LogOutIcon } from 'lucide-react'
 
+import { useAuth } from '@/features/auth/hooks'
 import { TooltipButton } from '@/shared/components'
 import {
   Avatar,
@@ -16,19 +17,18 @@ import {
   DropdownMenuTrigger,
 } from '@/shared/components/ui/dropdown-menu'
 import { Skeleton } from '@/shared/components/ui/skeleton'
+import { useIsMobile } from '@/shared/hooks/use-mobile'
+import { cn } from '@/shared/lib/utils'
 
-type AccountSettingsProps = {
-  username: string | null | undefined
-  email: string | null | undefined
-  onLogout: () => void
-}
+export default function AccountSettings() {
+  const { user, loading, logout } = useAuth()
+  const isMobile = useIsMobile()
 
-export default function AccountSettings({
-  username,
-  email,
-  onLogout,
-}: AccountSettingsProps) {
-  const displayInitials = username?.slice(0, 2).toUpperCase() ?? 'CJ'
+  const displayInitials = user?.username?.slice(0, 2).toUpperCase() ?? 'CJ'
+
+  if (loading) {
+    return <AccountSettingsSkeleton />
+  }
 
   return (
     <DropdownMenu>
@@ -36,18 +36,27 @@ export default function AccountSettings({
         <TooltipButton
           tooltip="Show your account settings"
           variant="ghost"
-          className="group border-input h-fit min-h-9 w-fit min-w-30 rounded-md border px-2 py-1"
+          className={cn(
+            'group border-input h-fit min-h-9 w-40 rounded-md border py-1',
+            isMobile && 'aspect-square w-fit rounded-full p-0',
+          )}
         >
           <Avatar className="h-6 w-6 rounded-full">
             <AvatarImage src="/assets/images/avatar.jpeg" alt="" />
             <AvatarFallback>{displayInitials}</AvatarFallback>
           </Avatar>
-          <span className="max-w-40 truncate text-right">{username}</span>
-          <ChevronDownIcon
-            aria-hidden="true"
-            size={15}
-            className="transition-transform group-data-[state=open]:rotate-180"
-          />
+          {!isMobile && (
+            <>
+              <span className="max-w-25 flex-1 truncate text-left">
+                {user?.username}
+              </span>
+              <ChevronDownIcon
+                aria-hidden="true"
+                size={15}
+                className="transition-transform group-data-[state=open]:rotate-180"
+              />
+            </>
+          )}
         </TooltipButton>
       </DropdownMenuTrigger>
 
@@ -58,8 +67,8 @@ export default function AccountSettings({
             <AvatarFallback>{displayInitials}</AvatarFallback>
           </Avatar>
           <div className="grid gap-0.5 text-center">
-            <span>{username}</span>
-            <span className="text-foreground/70 text-xs">{email}</span>
+            <span>{user?.username}</span>
+            <span className="text-foreground/70 text-xs">{user?.email}</span>
           </div>
         </DropdownMenuGroup>
 
@@ -70,7 +79,9 @@ export default function AccountSettings({
         <DropdownMenuItem asChild>
           <Button
             variant="ghost"
-            onClick={onLogout}
+            onClick={() => {
+              void logout()
+            }}
             className="w-full cursor-pointer justify-start px-2! py-1.5"
           >
             <LogOutIcon aria-hidden="true" size={15} className="rotate-180" />
@@ -83,9 +94,13 @@ export default function AccountSettings({
 }
 
 export function AccountSettingsSkeleton() {
+  const isMobile = useIsMobile()
+  if (isMobile) {
+    return <Skeleton className="aspect-square w-9 rounded-full" />
+  }
   return (
     <div className="flex items-center gap-2">
-      <Skeleton className="min-h-9 min-w-30 border border-transparent px-2 py-1" />
+      <Skeleton className="min-h-9 w-40 border border-transparent px-2 py-1" />
     </div>
   )
 }

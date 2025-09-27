@@ -10,6 +10,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/shared/components/ui/dropdown-menu'
+import { useIsMobile } from '@/shared/hooks/use-mobile'
 import { cn } from '@/shared/lib/utils'
 
 const baseItemClasses =
@@ -47,6 +48,8 @@ const modeIcons: Record<Mode, React.FC<LucideProps>> = {
 
 export default function ModeToggle() {
   const { mode, changeMode } = useMode()
+  const isMobile = useIsMobile()
+
   const ToggleIcon = modeIcons[mode]
 
   return (
@@ -55,9 +58,14 @@ export default function ModeToggle() {
         <TooltipButton
           tooltip={`Change mode (${mode})`}
           variant="outline"
-          className="rounded-md"
+          className={cn(
+            'rounded-md',
+            isMobile && 'aspect-square rounded-full px-2!',
+          )}
         >
-          <span>{mode.slice(0, 1).toUpperCase() + mode.slice(1)}</span>
+          {!isMobile && (
+            <span>{mode.slice(0, 1).toUpperCase() + mode.slice(1)}</span>
+          )}
           <ToggleIcon
             aria-hidden="true"
             size={15}
