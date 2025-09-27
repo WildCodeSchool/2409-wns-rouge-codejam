@@ -13,7 +13,7 @@ const client = new ApolloClient({
   credentials: 'same-origin',
   defaultOptions: {
     watchQuery: {
-      fetchPolicy: 'cache-and-network',
+      fetchPolicy: 'cache-first',
     },
   },
 })
