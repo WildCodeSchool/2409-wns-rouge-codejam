@@ -50,7 +50,7 @@ export default function EditorSidebar({ language }: EditorSidebarProps) {
     snippetId,
   )
 
-  const [currentName, setCurrentName] = useState<string | undefined>('')
+  const [currentName, setCurrentName] = useState<string>('')
   const [selectedSnippetId, setSelectedSnippetID] = useState<
     string | undefined
   >()

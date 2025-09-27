@@ -17,6 +17,7 @@ import { GET_SNIPPET } from '@/shared/api/getSnippet'
 import { GET_ALL_SNIPPETS } from '@/shared/api/getUserSnippets'
 import { toastOptions } from '@/shared/config'
 import { ExecutionStatus, Language } from '@/shared/gql/graphql'
+import useSnippet from './useSnippet'
 
 const baseUniqueNameConfig: Config = {
   dictionaries: [adjectives, colors, animals],
@@ -30,6 +31,8 @@ export default function useEditorRightActions(
   onChangeStatus: (nextStatus?: ExecutionStatus) => void,
 ) {
   const { snippetId, snippetSlug } = useParams<EditorUrlParams>()
+  const { snippet } = useSnippet(snippetId)
+
   const [showModal, setShowModal] = useState(false)
   const [status, setStatus] = useState<Status>('typing')
   const [execute] = useMutation(EXECUTE)
@@ -65,7 +68,10 @@ export default function useEditorRightActions(
       const { data } = await execute({
         variables: {
           data: {
-            name: snippetSlug ?? uniqueNamesGenerator(baseUniqueNameConfig),
+            name:
+              snippetSlug && snippet
+                ? snippet.name
+                : uniqueNamesGenerator(baseUniqueNameConfig),
             code,
             language: language,
           },

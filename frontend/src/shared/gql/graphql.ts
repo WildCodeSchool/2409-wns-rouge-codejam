@@ -336,6 +336,7 @@ export type GetSnippetQuery = {
   getSnippet?: {
     __typename?: 'Snippet'
     id: string
+    name: string
     code: string
     language: Language
     slug: string
@@ -666,6 +667,7 @@ export const GetSnippetDocument = {
               kind: 'SelectionSet',
               selections: [
                 { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'name' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'code' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'language' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'slug' } },

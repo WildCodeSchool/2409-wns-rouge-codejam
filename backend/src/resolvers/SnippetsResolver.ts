@@ -133,7 +133,7 @@ export class SnippetsResolver {
     const snippet = await Snippet.findOne({
       where: { id, user: { id: context.user.id } },
     })
-    console.log('snippet ', snippet)
+
     if (!snippet) throw new Error('Snippet not found or not owned by user')
     Object.assign(snippet, data)
     return await Snippet.save(snippet)

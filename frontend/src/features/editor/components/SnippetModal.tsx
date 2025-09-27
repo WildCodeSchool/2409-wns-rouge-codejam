@@ -14,28 +14,29 @@ import {
   SnippetRenameType,
 } from '@/features/auth/schemas/formSchema'
 import { toast } from 'sonner'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import {
   CreateSnippetMutation,
   Snippet,
   UpdateSnippetMutation,
 } from '@/shared/gql/graphql'
+import { EditorUrlParams } from '../types'
 
-type CreateSnippetModalProps = {
+type SnippetModalProps = {
   language: Snippet['language']
   isSnippetCreation: boolean
-  currentName: string | undefined
+  currentName: string
   selectedSnippetId: string | undefined
   onClose: () => void
 }
 
-export default function CreateSnippetModal({
+export default function SnippetModal({
   language,
   isSnippetCreation,
   currentName,
   selectedSnippetId,
   onClose,
-}: CreateSnippetModalProps) {
+}: SnippetModalProps) {
   const form = useForm<SnippetCreateType>({
     defaultValues: {
       name: '',
@@ -48,6 +49,7 @@ export default function CreateSnippetModal({
   const isSubmitting = form.formState.isSubmitting
   const isSubmittingError = Object.keys(form.formState.errors)
   const navigate = useNavigate()
+  const { snippetId } = useParams<EditorUrlParams>()
 
   const [createSnippet] = useMutation<CreateSnippetMutation>(CREATE_SNIPPET)
   const [renameSnippet] = useMutation<UpdateSnippetMutation>(UPDATE_SNIPPET)
@@ -91,7 +93,8 @@ export default function CreateSnippetModal({
         },
         refetchQueries: [GET_ALL_SNIPPETS],
       })
-      if (snippet.data?.updateSnippet) {
+
+      if (snippet.data && selectedSnippetId === snippetId) {
         navigate(
           `/editor/${snippet.data.updateSnippet.id}/${snippet.data.updateSnippet.slug}`,
         )
