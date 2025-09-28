@@ -1,5 +1,5 @@
 import { Slot } from '@radix-ui/react-slot'
-import { cva, VariantProps } from 'class-variance-authority'
+import { cva, type VariantProps } from 'class-variance-authority'
 import * as React from 'react'
 
 import { TooltipButton } from '@/shared/components'
@@ -14,6 +14,7 @@ import {
   SheetTitle,
 } from '@/shared/components/ui/sheet'
 import { Skeleton } from '@/shared/components/ui/skeleton'
+
 import {
   Tooltip,
   TooltipContent,
@@ -26,7 +27,7 @@ import { cn } from '@/shared/lib/utils'
 const SIDEBAR_STORAGE_KEY = 'sidebar_is_open'
 const SIDEBAR_WIDTH = '16rem'
 const SIDEBAR_WIDTH_MOBILE = '10rem'
-const SIDEBAR_WIDTH_ICON = '3.25rem'
+const SIDEBAR_WIDTH_ICON = '3rem'
 const SIDEBAR_KEYBOARD_SHORTCUT = 'b'
 
 type SidebarContextProps = {
@@ -72,6 +73,7 @@ function SidebarProvider({
     const stored = localStorage.getItem(SIDEBAR_STORAGE_KEY)
     return (stored !== null ? JSON.parse(stored) : defaultOpen) as boolean
   })
+
   const open = openProp ?? _open
   const setOpen = React.useCallback(
     (value: boolean | ((value: boolean) => boolean)) => {
@@ -81,6 +83,7 @@ function SidebarProvider({
       } else {
         _setOpen(openState)
       }
+
       // Update localStorage to keep the sidebar state.
       localStorage.setItem(SIDEBAR_STORAGE_KEY, JSON.stringify(openState))
     },
@@ -144,7 +147,7 @@ function SidebarProvider({
             } as React.CSSProperties
           }
           className={cn(
-            'group/sidebar-wrapper has-data-[variant=inset]:bg-sidebar flex w-full',
+            'group/sidebar-wrapper has-data-[variant=inset]:bg-sidebar flex h-full w-full',
             className,
           )}
           {...props}
@@ -264,15 +267,15 @@ function SidebarTrigger({
   children,
   ...props
 }: React.ComponentProps<typeof Button>) {
-  const { open, toggleSidebar } = useSidebar()
+  const { toggleSidebar, open } = useSidebar()
 
   return (
     <TooltipButton
-      tooltip={`${open ? 'Hide' : 'Show'} sidebar (⌘${SIDEBAR_KEYBOARD_SHORTCUT.toUpperCase()})`}
       data-sidebar="trigger"
       data-slot="sidebar-trigger"
       variant="ghost"
       size="icon"
+      tooltip={`${open ? 'Hide' : 'Show'} sidebar (⌘${SIDEBAR_KEYBOARD_SHORTCUT.toUpperCase()})`}
       className={cn('size-7', className)}
       onClick={(event) => {
         onClick?.(event)
@@ -368,10 +371,7 @@ function SidebarSeparator({
     <Separator
       data-slot="sidebar-separator"
       data-sidebar="separator"
-      className={cn(
-        'bg-sidebar-border mx-2 w-auto',
-        typeof className === 'string' ? className : undefined,
-      )}
+      className={cn('bg-sidebar-border mx-2 w-auto', className)}
       {...props}
     />
   )
@@ -627,7 +627,7 @@ function SidebarMenuSkeleton({
 }) {
   // Random width between 50 to 90%.
   const width = React.useMemo(() => {
-    return String(Math.floor(Math.random() * 40) + 50) + '%'
+    return `${(Math.floor(Math.random() * 40) + 50).toString()}%`
   }, [])
 
   return (

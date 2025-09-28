@@ -6,6 +6,7 @@ import { MonacoEditorInstance } from '@/features/editor/types'
 
 import { Skeleton } from '@/shared/components/ui/skeleton'
 import { Language } from '@/shared/gql/graphql'
+import { useIsMobile } from '@/shared/hooks/use-mobile'
 import { cn } from '@/shared/lib/utils'
 
 const baseEditorClasses =
@@ -24,13 +25,14 @@ export default function CodeEditor({
 }: CodeEditorProps) {
   const { editorTheme, handleOnEditorMount, isDarkMode, loadingThemes } =
     useEditor()
+  const isMobile = useIsMobile()
 
   if (loadingThemes || !editorTheme) {
     return <EditorLoadingSkeleton />
   }
 
   return (
-    <div className="relative h-full pt-4">
+    <div className={cn('relative h-full', isMobile ? 'pt-2' : 'pt-4')}>
       <MonacoEditor
         defaultLanguage="javascript"
         options={BASE_OPTIONS}
@@ -53,5 +55,9 @@ function EditorLoadingSkeleton() {
 }
 
 export function CodeEditorSkeleton() {
-  return <Skeleton className="h-full" />
+  return (
+    <div className="relative h-full overflow-hidden rounded-md pt-4">
+      <Skeleton className={cn(baseEditorClasses)} />
+    </div>
+  )
 }

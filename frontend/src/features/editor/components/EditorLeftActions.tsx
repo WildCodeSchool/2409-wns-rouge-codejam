@@ -6,6 +6,8 @@ import { TooltipButton } from '@/shared/components'
 import { Skeleton } from '@/shared/components/ui/skeleton'
 import { Spinner } from '@/shared/components/ui/spinner'
 import { Language } from '@/shared/gql/graphql'
+import { useIsMobile } from '@/shared/hooks/use-mobile'
+import { cn } from '@/shared/lib/utils'
 
 type EditorLeftActionProps = {
   code: string
@@ -19,6 +21,7 @@ export default function EditorLeftActions({
   onChangeLanguage,
 }: EditorLeftActionProps) {
   const { saveSnippet, status } = useEditorLeftActions(code, language)
+  const isMobile = useIsMobile()
 
   return (
     <div className="flex justify-start gap-4">
@@ -30,9 +33,12 @@ export default function EditorLeftActions({
         aria-disabled={!code}
         disabled={!code}
         onClick={saveSnippet}
-        className="min-w-24"
+        className={cn(
+          'min-w-24',
+          isMobile && 'aspect-square min-w-[unset] rounded-full px-2!',
+        )}
       >
-        <span>Save</span>
+        {!isMobile && <span>Save</span>}
         {status === 'saving' ? (
           <Spinner show size="small" />
         ) : (
@@ -44,10 +50,12 @@ export default function EditorLeftActions({
 }
 
 export function EditorLeftActionsSkeleton() {
+  const isMobile = useIsMobile()
+
   return (
     <div className="flex justify-start gap-4">
       <Skeleton className="h-9 w-40" />
-      <Skeleton className="h-9 w-24" />
+      <Skeleton className={cn('h-9', isMobile ? 'w-9 rounded-full' : 'w-24')} />
     </div>
   )
 }

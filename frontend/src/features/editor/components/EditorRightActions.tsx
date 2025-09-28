@@ -6,6 +6,8 @@ import { Modal, TooltipButton } from '@/shared/components'
 import { Skeleton } from '@/shared/components/ui/skeleton'
 import { Spinner } from '@/shared/components/ui/spinner'
 import { ExecutionStatus, Language } from '@/shared/gql/graphql'
+import { useIsMobile } from '@/shared/hooks/use-mobile'
+import { cn } from '@/shared/lib/utils'
 
 type EditorRightActionProps = {
   code: string
@@ -28,6 +30,7 @@ export default function EditorRightActions({
     closeModal,
     snippetId,
   } = useEditorRightActions(code, language, onChangeOutput, onChangeStatus)
+  const isMobile = useIsMobile()
 
   const isExecuting = status === 'executing'
   const disabled = !code || isExecuting || status === 'disabled'
@@ -39,9 +42,12 @@ export default function EditorRightActions({
         aria-disabled={disabled}
         disabled={disabled}
         onClick={executeSnippet}
-        className="min-w-24"
+        className={cn(
+          'min-w-24',
+          isMobile && 'aspect-square min-w-[unset] rounded-full px-2!',
+        )}
       >
-        <span>Run</span>
+        {!isMobile && <span>Run</span>}
         {isExecuting ? (
           <Spinner show size="small" />
         ) : (
@@ -55,9 +61,12 @@ export default function EditorRightActions({
         aria-disabled={!code}
         disabled={!code || !snippetId}
         onClick={debouncedShareUrl}
-        className="min-w-24"
+        className={cn(
+          'min-w-24',
+          isMobile && 'aspect-square min-w-[unset] rounded-full px-2!',
+        )}
       >
-        <span>Share</span>
+        {!isMobile && <span>Share</span>}
         <Share2Icon aria-hidden="true" size={15} />
       </TooltipButton>
 
@@ -75,10 +84,12 @@ export default function EditorRightActions({
 }
 
 export function EditorRightActionsSkeleton() {
+  const isMobile = useIsMobile()
+
   return (
-    <div className="ml-auto flex justify-end gap-4">
-      <Skeleton className="h-9 w-24" />
-      <Skeleton className="h-9 w-24" />
+    <div className="flex justify-end gap-4">
+      <Skeleton className={cn('h-9', isMobile ? 'w-9 rounded-full' : 'w-24')} />
+      <Skeleton className={cn('h-9', isMobile ? 'w-9 rounded-full' : 'w-24')} />
     </div>
   )
 }

@@ -33,7 +33,7 @@ export default function LanguageSelect({
       <Select value={language} onValueChange={onChange}>
         <SelectTrigger
           aria-label="Select a language"
-          className="min-w-40 cursor-pointer"
+          className="w-40 cursor-pointer"
         >
           <SelectValue placeholder="Select a language" />
         </SelectTrigger>
@@ -47,7 +47,7 @@ export default function LanguageSelect({
                 aria-label={language.label}
               >
                 <div className="flex cursor-pointer items-center gap-4">
-                  <span>{language.label}</span>
+                  <span className="w-20 truncate">{language.label}</span>
                   <img
                     src={language.icon}
                     alt=""

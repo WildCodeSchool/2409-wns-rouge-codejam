@@ -8,7 +8,6 @@ import {
   EditorRightActions,
   EditorRightActionsSkeleton,
   EditorSidebar,
-  EditorSidebarSkeleton,
 } from '@/features/editor/components'
 import { EditorState } from '@/features/editor/reducers'
 import {
@@ -16,8 +15,10 @@ import {
   ResizablePanel,
   ResizablePanelGroup,
 } from '@/shared/components/ui/resizable'
-import { ExecutionStatus } from '@/shared/gql/graphql'
 import { SidebarProvider } from '@/shared/components/ui/sidebar'
+import { ExecutionStatus } from '@/shared/gql/graphql'
+import { useIsMobile } from '@/shared/hooks/use-mobile'
+import { cn } from '@/shared/lib/utils'
 
 type EditorLayoutProps = {
   state: EditorState
@@ -34,13 +35,20 @@ export default function EditorLayout({
   onChangeOutput,
   onChangeStatus,
 }: EditorLayoutProps) {
+  const isMobile = useIsMobile()
+
   return (
     <div className="flex h-full">
       <SidebarProvider className="gap-4">
-        <EditorSidebar language={state.language} />
+        {!isMobile && <EditorSidebar language={state.language} />}
 
         <div className="grid h-full flex-1 grid-rows-[auto_1fr]">
-          <div className="flex items-center justify-between px-2 pt-1">
+          <div
+            className={cn(
+              'flex items-center justify-between',
+              isMobile ? 'px-2' : 'pt-1 pr-2',
+            )}
+          >
             <EditorLeftActions
               code={state.code}
               language={state.language}
@@ -54,7 +62,10 @@ export default function EditorLayout({
             />
           </div>
 
-          <ResizablePanelGroup direction="horizontal" className="h-full gap-2">
+          <ResizablePanelGroup
+            direction={isMobile ? 'vertical' : 'horizontal'}
+            className={cn('h-full', isMobile ? 'px-2 pb-2' : 'gap-2 pr-2')}
+          >
             <ResizablePanel
               id="editor-panel"
               defaultSize={50}
@@ -75,10 +86,15 @@ export default function EditorLayout({
               defaultSize={50}
               minSize={25}
               maxSize={75}
+              className="overflow-hidden rounded-md"
             >
               <EditorOutput
                 output={state.output}
                 status={state.executionStatus}
+                className={cn(
+                  'relative flex h-full overflow-hidden rounded-md border border-transparent',
+                  !isMobile && 'mt-4',
+                )}
               />
             </ResizablePanel>
           </ResizablePanelGroup>
@@ -89,18 +105,40 @@ export default function EditorLayout({
 }
 
 export function EditorPageSkeleton() {
+  const isMobile = useIsMobile()
+
   return (
     <div className="flex h-full">
-      <SidebarProvider className="gap-2">
-        <EditorSidebarSkeleton />
-        <ResizablePanelGroup direction="horizontal" className="h-full">
-          <ResizablePanel className="grid grid-rows-[auto_1fr] gap-2">
+      <SidebarProvider className="flex-col gap-0">
+        <div className="grid h-full flex-1 grid-rows-[auto_1fr]">
+          <div className="flex items-center justify-between px-2 pt-1">
             <EditorLeftActionsSkeleton />
+            <EditorRightActionsSkeleton />
+          </div>
+        </div>
+
+        <ResizablePanelGroup
+          direction={isMobile ? 'vertical' : 'horizontal'}
+          className={cn('h-full', !isMobile && 'gap-2')}
+        >
+          <ResizablePanel
+            id="editor-panel"
+            defaultSize={50}
+            minSize={25}
+            maxSize={75}
+          >
             <CodeEditorSkeleton />
           </ResizablePanel>
+
           <ResizableHandle withHandle className="bg-transparent" />
-          <ResizablePanel className="grid grid-rows-[auto_1fr] gap-2">
-            <EditorRightActionsSkeleton />
+
+          <ResizablePanel
+            id="output-panel"
+            defaultSize={50}
+            minSize={25}
+            maxSize={75}
+            className="overflow-hidden rounded-md"
+          >
             <EditorOutputSkeleton />
           </ResizablePanel>
         </ResizablePanelGroup>

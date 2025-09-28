@@ -25,11 +25,13 @@ import { Skeleton } from '@/shared/components/ui/skeleton'
 import { Snippet } from '@/shared/gql/graphql'
 import { cn } from '@/shared/lib/utils'
 
+const activeMenuItemClasses =
+  'outline-codejam-accent-300 text-codejam-accent outline-2'
+
 const baseMenuItemClasses =
   'border-input bg-snippet-card-background flex min-h-10 cursor-pointer items-center justify-center border pl-4 pr-2 text-sm transition-colors mb-2'
 
-const activeMenuItemClasses =
-  'outline-codejam-accent-300 text-codejam-accent outline-2'
+const collapsedMenuItemClasses = 'w-0 overflow-hidden border-0 p-0 outline-0'
 
 type EditorSidebarProps = {
   language: Snippet['language']
@@ -87,10 +89,19 @@ export default function EditorSidebar({ language }: EditorSidebarProps) {
             'rounded-md border-0 shadow-[6px_6px_6px_0px_rgba(0,_0,_0,_0.1)]',
         )}
       >
-        <SidebarContent className="bg-background">
+        <SidebarContent className="bg-background overflow-hidden">
           <SidebarGroup className="justify-center px-0">
             <SidebarGroupContent>
               <SidebarHeader className="flex flex-row items-center pt-0 pr-2 pb-4">
+                <SidebarTrigger
+                  size="icon"
+                  className="relative -left-1 mx-2 size-9 rounded-full"
+                >
+                  <PanelRightCloseIcon
+                    aria-hidden="true"
+                    className={cn('transition-all', open && 'rotate-180')}
+                  />
+                </SidebarTrigger>
                 <span
                   className={cn(
                     'font-medium -tracking-tighter whitespace-nowrap',
@@ -99,80 +110,74 @@ export default function EditorSidebar({ language }: EditorSidebarProps) {
                 >
                   My Snippets
                 </span>
-                <SidebarTrigger size="icon" className="size-9 rounded-full">
-                  <PanelRightCloseIcon
-                    aria-hidden="true"
-                    className={cn('transition-all', open && 'rotate-180')}
-                  />
-                </SidebarTrigger>
               </SidebarHeader>
 
-              {open && (
-                <SidebarMenu className="gap-2.5 pr-4 pl-2">
+              <SidebarMenu className="gap-2.5 pr-4 pl-2">
+                <SidebarMenuItem
+                  key="add-new-snippet"
+                  className={cn(
+                    baseMenuItemClasses,
+                    !open && collapsedMenuItemClasses,
+                    'mb-4 bg-transparent px-0',
+                  )}
+                >
+                  <TooltipButton
+                    tooltip="Add a new snippet"
+                    className="text-background min-h-10 w-full gap-1 rounded"
+                    onClick={() => {
+                      setIsModalOpen(true)
+                    }}
+                  >
+                    <span>Add</span>
+                    <Plus aria-hidden="true" className="h-4 w-4" />
+                  </TooltipButton>
+                </SidebarMenuItem>
+
+                {(snippets ?? []).map((snippet) => (
                   <SidebarMenuItem
-                    key="add-new-snippet"
+                    key={snippet.id}
                     className={cn(
                       baseMenuItemClasses,
-                      'mb-4 bg-transparent px-0',
+                      activeSnippetId === snippet.id && activeMenuItemClasses,
+                      !open && collapsedMenuItemClasses,
                     )}
+                    onClick={() => {
+                      navigate(`/editor/${snippet.id}/${snippet.slug}`)
+                    }}
                   >
-                    <TooltipButton
-                      tooltip="Add a new snippet"
-                      className="text-background min-h-10 w-full gap-1 rounded"
-                      onClick={() => {
-                        setIsModalOpen(true)
-                      }}
-                    >
-                      <span>Add</span>
-                      <Plus aria-hidden="true" className="h-4 w-4" />
-                    </TooltipButton>
+                    <span className="flex-1 truncate text-left text-nowrap">
+                      {snippet.name}
+                    </span>
+                    <div className="flex">
+                      <TooltipButton
+                        tooltip="Rename snippet"
+                        variant="ghost"
+                        size="icon"
+                        className="rounded-full px-0"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          alert(`🚧 Rename snippet ${snippet.id}...`)
+                        }}
+                      >
+                        <Pencil aria-hidden="true" />
+                      </TooltipButton>
+
+                      <TooltipButton
+                        tooltip="Delete snippet"
+                        variant="ghost"
+                        size="icon"
+                        className="hover:text-error rounded-full px-0"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          alert(`🚧 Delete snippet ${snippet.id}...`)
+                        }}
+                      >
+                        <Trash aria-hidden="true" />
+                      </TooltipButton>
+                    </div>
                   </SidebarMenuItem>
-
-                  {(snippets ?? []).map((snippet) => (
-                    <SidebarMenuItem
-                      key={snippet.id}
-                      className={cn(
-                        baseMenuItemClasses,
-                        activeSnippetId === snippet.id && activeMenuItemClasses,
-                      )}
-                      onClick={() => {
-                        navigate(`/editor/${snippet.id}/${snippet.slug}`)
-                      }}
-                    >
-                      <span className="r flex-1 truncate text-left">
-                        {snippet.name}
-                      </span>
-                      <div>
-                        <TooltipButton
-                          tooltip="Rename snippet"
-                          variant="ghost"
-                          size="icon"
-                          className="rounded-full px-0"
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            alert(`🚧 Rename snippet ${snippet.id}...`)
-                          }}
-                        >
-                          <Pencil aria-hidden="true" />
-                        </TooltipButton>
-
-                        <TooltipButton
-                          tooltip="Delete snippet"
-                          variant="ghost"
-                          size="icon"
-                          className="hover:text-error rounded-full px-0"
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            alert(`🚧 Delete snippet ${snippet.id}...`)
-                          }}
-                        >
-                          <Trash aria-hidden="true" />
-                        </TooltipButton>
-                      </div>
-                    </SidebarMenuItem>
-                  ))}
-                </SidebarMenu>
-              )}
+                ))}
+              </SidebarMenu>
             </SidebarGroupContent>
           </SidebarGroup>
         </SidebarContent>
