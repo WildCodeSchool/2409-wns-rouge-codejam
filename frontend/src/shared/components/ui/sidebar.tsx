@@ -26,7 +26,7 @@ import { cn } from '@/shared/lib/utils'
 
 const SIDEBAR_STORAGE_KEY = 'sidebar_is_open'
 const SIDEBAR_WIDTH = '16rem'
-const SIDEBAR_WIDTH_MOBILE = '10rem'
+const SIDEBAR_WIDTH_MOBILE = '14rem'
 const SIDEBAR_WIDTH_ICON = '3rem'
 const SIDEBAR_KEYBOARD_SHORTCUT = 'b'
 
@@ -267,7 +267,10 @@ function SidebarTrigger({
   children,
   ...props
 }: React.ComponentProps<typeof Button>) {
-  const { toggleSidebar, open } = useSidebar()
+  const isMobile = useIsMobile()
+  const { toggleSidebar, open, openMobile } = useSidebar()
+
+  const isSidebarOpen = (open && !isMobile) || (isMobile && openMobile)
 
   return (
     <TooltipButton
@@ -275,8 +278,12 @@ function SidebarTrigger({
       data-slot="sidebar-trigger"
       variant="ghost"
       size="icon"
-      tooltip={`${open ? 'Hide' : 'Show'} sidebar (⌘${SIDEBAR_KEYBOARD_SHORTCUT.toUpperCase()})`}
-      className={cn('size-7', className)}
+      tooltip={`${isSidebarOpen ? 'Close' : 'Open'} sidebar (⌘${SIDEBAR_KEYBOARD_SHORTCUT.toUpperCase()})`}
+      className={cn(
+        'size-7 transition-all',
+        className,
+        isSidebarOpen && 'rotate-180',
+      )}
       onClick={(event) => {
         onClick?.(event)
         toggleSidebar()

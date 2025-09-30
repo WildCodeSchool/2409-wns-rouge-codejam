@@ -10,10 +10,6 @@ export {
   default as EditorRightActions,
   EditorRightActionsSkeleton,
 } from './EditorRightActions'
-export {
-  default as EditorSidebar,
-  EditorSidebarSkeleton,
-} from './EditorSidebar'
 export { default as ErrorState } from './ErrorState'
 export { default as LanguageSelect } from './LanguageSelect'
 export { default as Subscribe } from './Subscribe'

@@ -56,8 +56,8 @@ export default function EditorOutput({
 }
 
 export function EditorOutputSkeleton() {
-  const { isDarkMode } = useMode()
   const isMobile = useIsMobile()
+  const { isDarkMode } = useMode()
 
   return (
     <div

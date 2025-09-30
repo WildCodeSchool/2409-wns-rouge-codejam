@@ -7,9 +7,10 @@ import {
   EditorOutputSkeleton,
   EditorRightActions,
   EditorRightActionsSkeleton,
-  EditorSidebar,
 } from '@/features/editor/components'
 import { EditorState } from '@/features/editor/reducers'
+import { EditorSidebar } from '@/features/sidebar/components'
+
 import {
   ResizableHandle,
   ResizablePanel,
@@ -38,68 +39,66 @@ export default function EditorLayout({
   const isMobile = useIsMobile()
 
   return (
-    <div className="flex h-full">
-      <SidebarProvider className="gap-4">
-        {!isMobile && <EditorSidebar language={state.language} />}
+    <div className="flex h-full gap-4">
+      <EditorSidebar language={state.language} />
 
-        <div className="grid h-full flex-1 grid-rows-[auto_1fr]">
-          <div
-            className={cn(
-              'flex items-center justify-between',
-              isMobile ? 'px-2' : 'pt-1 pr-2',
-            )}
-          >
-            <EditorLeftActions
-              code={state.code}
-              language={state.language}
-              onChangeLanguage={onChangeLanguage}
-            />
-            <EditorRightActions
-              code={state.code}
-              language={state.language}
-              onChangeOutput={onChangeOutput}
-              onChangeStatus={onChangeStatus}
-            />
-          </div>
-
-          <ResizablePanelGroup
-            direction={isMobile ? 'vertical' : 'horizontal'}
-            className={cn('h-full', isMobile ? 'px-2 pb-2' : 'gap-2 pr-2')}
-          >
-            <ResizablePanel
-              id="editor-panel"
-              defaultSize={50}
-              minSize={25}
-              maxSize={75}
-            >
-              <CodeEditor
-                code={state.code}
-                language={state.language}
-                onChange={onChangeCode}
-              />
-            </ResizablePanel>
-
-            <ResizableHandle withHandle className="bg-transparent" />
-
-            <ResizablePanel
-              id="output-panel"
-              defaultSize={50}
-              minSize={25}
-              maxSize={75}
-              className="overflow-hidden rounded-md"
-            >
-              <EditorOutput
-                output={state.output}
-                status={state.executionStatus}
-                className={cn(
-                  'relative flex h-full overflow-hidden rounded-md border border-transparent',
-                  !isMobile && 'mt-4',
-                )}
-              />
-            </ResizablePanel>
-          </ResizablePanelGroup>
+      <div className="grid h-full flex-1 grid-rows-[auto_1fr]">
+        <div
+          className={cn(
+            'flex items-center justify-between',
+            isMobile ? 'px-2' : 'pt-1 pr-2',
+          )}
+        >
+          <EditorLeftActions
+            code={state.code}
+            language={state.language}
+            onChangeLanguage={onChangeLanguage}
+          />
+          <EditorRightActions
+            code={state.code}
+            language={state.language}
+            onChangeOutput={onChangeOutput}
+            onChangeStatus={onChangeStatus}
+          />
         </div>
-      </SidebarProvider>
+
+        <ResizablePanelGroup
+          direction={isMobile ? 'vertical' : 'horizontal'}
+          className={cn('h-full', isMobile ? 'px-2 pb-2' : 'gap-2 pr-2')}
+        >
+          <ResizablePanel
+            id="editor-panel"
+            defaultSize={50}
+            minSize={25}
+            maxSize={75}
+          >
+            <CodeEditor
+              code={state.code}
+              language={state.language}
+              onChange={onChangeCode}
+            />
+          </ResizablePanel>
+
+          <ResizableHandle withHandle className="bg-transparent" />
+
+          <ResizablePanel
+            id="output-panel"
+            defaultSize={50}
+            minSize={25}
+            maxSize={75}
+            className="overflow-hidden rounded-md"
+          >
+            <EditorOutput
+              output={state.output}
+              status={state.executionStatus}
+              className={cn(
+                'relative flex h-full overflow-hidden rounded-md border border-transparent',
+                !isMobile && 'mt-4',
+              )}
+            />
+          </ResizablePanel>
+        </ResizablePanelGroup>
+      </div>
     </div>
   )
 }

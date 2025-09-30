@@ -1,10 +1,11 @@
 import { useQuery } from '@apollo/client'
-import { PanelRightCloseIcon, Pencil, Plus, Trash } from 'lucide-react'
+import { Pencil, Plus, Trash } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 
 import CreateSnippetModal from '@/features/editor/components/CreateSnippetModal'
 import { EditorUrlParams } from '@/features/editor/types'
+import SidebarToggleButton from '@/features/sidebar/components/SidebarToggleButton'
 
 import { GET_ALL_SNIPPETS } from '@/shared/api/getUserSnippets'
 import { WHO_AM_I } from '@/shared/api/whoAmI'
@@ -18,11 +19,11 @@ import {
   SidebarHeader,
   SidebarMenu,
   SidebarMenuItem,
-  SidebarTrigger,
   useSidebar,
 } from '@/shared/components/ui/sidebar'
 import { Skeleton } from '@/shared/components/ui/skeleton'
 import { Snippet } from '@/shared/gql/graphql'
+import { useIsMobile } from '@/shared/hooks/use-mobile'
 import { cn } from '@/shared/lib/utils'
 
 const activeMenuItemClasses =
@@ -31,29 +32,29 @@ const activeMenuItemClasses =
 const baseMenuItemClasses =
   'border-input bg-snippet-card-background flex min-h-10 cursor-pointer items-center justify-center border pl-4 pr-2 text-sm transition-colors mb-2'
 
-const collapsedMenuItemClasses = 'w-0 overflow-hidden border-0 p-0 outline-0'
+const collapsedMenuItemClasses =
+  'w-0 overflow-hidden border-0 p-0 outline-0 collapse'
 
 type EditorSidebarProps = {
   language: Snippet['language']
 }
 
 export default function EditorSidebar({ language }: EditorSidebarProps) {
-  const { open } = useSidebar()
-  const { data: { whoAmI: user } = {} } = useQuery(WHO_AM_I)
-
-  const { data: { getAllSnippets: snippets } = {} } = useQuery(
-    GET_ALL_SNIPPETS,
-    {
-      skip: !user,
-    },
-  )
-
   const { snippetId } = useParams<EditorUrlParams>()
   const navigate = useNavigate()
   const [activeSnippetId, setActiveSnippetId] = useState<string | undefined>(
     snippetId,
   )
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const isMobile = useIsMobile()
+  const { open, openMobile, setOpenMobile } = useSidebar()
+  const { data: { whoAmI: user } = {} } = useQuery(WHO_AM_I)
+  const { data: { getAllSnippets: snippets } = {} } = useQuery(
+    GET_ALL_SNIPPETS,
+    {
+      skip: !user,
+    },
+  )
 
   useEffect(() => {
     let nextActiveSnippetId: string | undefined
@@ -74,6 +75,8 @@ export default function EditorSidebar({ language }: EditorSidebarProps) {
     setActiveSnippetId(nextActiveSnippetId)
   }, [snippetId, snippets, navigate])
 
+  const isSidebarOpen = open || openMobile
+
   //  If user is guest
   if (!user?.email) {
     return null
@@ -85,23 +88,15 @@ export default function EditorSidebar({ language }: EditorSidebarProps) {
         collapsible="icon"
         className={cn(
           'bg-background h-full rounded-none pt-0',
-          open &&
+          isSidebarOpen &&
             'rounded-md border-0 shadow-[6px_6px_6px_0px_rgba(0,_0,_0,_0.1)]',
         )}
       >
         <SidebarContent className="bg-background overflow-hidden">
           <SidebarGroup className="justify-center px-0">
             <SidebarGroupContent>
-              <SidebarHeader className="flex flex-row items-center pt-0 pr-2 pb-4">
-                <SidebarTrigger
-                  size="icon"
-                  className="relative -left-1 mx-2 size-9 rounded-full"
-                >
-                  <PanelRightCloseIcon
-                    aria-hidden="true"
-                    className={cn('transition-all', open && 'rotate-180')}
-                  />
-                </SidebarTrigger>
+              <SidebarHeader className="flex flex-row items-center gap-0 pt-0 pr-2 pb-4">
+                <SidebarToggleButton />
                 <span
                   className={cn(
                     'font-medium -tracking-tighter whitespace-nowrap',
@@ -117,7 +112,7 @@ export default function EditorSidebar({ language }: EditorSidebarProps) {
                   key="add-new-snippet"
                   className={cn(
                     baseMenuItemClasses,
-                    !open && collapsedMenuItemClasses,
+                    !isMobile && !open && collapsedMenuItemClasses,
                     'mb-4 bg-transparent px-0',
                   )}
                 >
@@ -139,9 +134,12 @@ export default function EditorSidebar({ language }: EditorSidebarProps) {
                     className={cn(
                       baseMenuItemClasses,
                       activeSnippetId === snippet.id && activeMenuItemClasses,
-                      !open && collapsedMenuItemClasses,
+                      !isMobile && !open && collapsedMenuItemClasses,
                     )}
                     onClick={() => {
+                      if (isMobile && openMobile) {
+                        setOpenMobile(false)
+                      }
                       navigate(`/editor/${snippet.id}/${snippet.slug}`)
                     }}
                   >
@@ -166,7 +164,7 @@ export default function EditorSidebar({ language }: EditorSidebarProps) {
                         tooltip="Delete snippet"
                         variant="ghost"
                         size="icon"
-                        className="hover:text-error rounded-full px-0"
+                        className="hover:text-error focus-visible:text-error rounded-full px-0"
                         onClick={(e) => {
                           e.stopPropagation()
                           alert(`🚧 Delete snippet ${snippet.id}...`)
@@ -200,13 +198,16 @@ export default function EditorSidebar({ language }: EditorSidebarProps) {
 }
 
 export function EditorSidebarSkeleton() {
-  const { open } = useSidebar()
+  const { open, openMobile } = useSidebar()
+
+  const isSidebarOpen = open || openMobile
+
   return (
     <Sidebar
       collapsible="icon"
       className={cn(
         'bg-background ml-2 h-full rounded-none pt-1',
-        open && 'border-0 shadow-[6px_6px_6px_0px_rgba(0,_0,_0,_0.1)]',
+        isSidebarOpen && 'border-0 shadow-[6px_6px_6px_0px_rgba(0,_0,_0,_0.1)]',
       )}
     >
       <Skeleton className="h-full w-full" />

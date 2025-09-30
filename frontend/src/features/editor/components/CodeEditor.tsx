@@ -3,6 +3,7 @@ import MonacoEditor from '@monaco-editor/react'
 import { BASE_OPTIONS } from '@/features/editor/config'
 import { useEditor } from '@/features/editor/hooks'
 import { MonacoEditorInstance } from '@/features/editor/types'
+import { resolveOutputBackgroundColor } from '@/features/editor/utils'
 
 import { Skeleton } from '@/shared/components/ui/skeleton'
 import { Language } from '@/shared/gql/graphql'
@@ -23,9 +24,9 @@ export default function CodeEditor({
   language,
   onChange,
 }: CodeEditorProps) {
+  const isMobile = useIsMobile()
   const { editorTheme, handleOnEditorMount, isDarkMode, loadingThemes } =
     useEditor()
-  const isMobile = useIsMobile()
 
   if (loadingThemes || !editorTheme) {
     return <EditorLoadingSkeleton />
@@ -51,7 +52,25 @@ export default function CodeEditor({
 }
 
 function EditorLoadingSkeleton() {
-  return <div className="bg-background h-full w-full rounded-md" />
+  const isMobile = useIsMobile()
+  const { isDarkMode } = useEditor()
+
+  return (
+    <div
+      className={cn(
+        'h-full w-full overflow-hidden rounded-md',
+        isMobile ? 'pt-2' : 'pt-4',
+      )}
+    >
+      <div
+        className={cn(
+          'h-full w-full rounded-md border border-transparent',
+          resolveOutputBackgroundColor(isDarkMode),
+          !isDarkMode && 'border-input',
+        )}
+      />
+    </div>
+  )
 }
 
 export function CodeEditorSkeleton() {
