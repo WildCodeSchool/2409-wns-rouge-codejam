@@ -19,6 +19,7 @@ const baseMotionProps: MotionProps = {
 type ModalProps = React.PropsWithChildren & {
   title?: string
   titleKey?: AuthModal // 👈 key for animation (e.g. "signIn" | "signUp")
+  className?: string
   open: boolean
   onOpenChange?: (nextOpen: boolean) => void
 }
@@ -29,10 +30,11 @@ export default function Modal({
   open,
   onOpenChange,
   children,
+  className,
 }: ModalProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
+      <DialogContent className={className}>
         <DialogHeader className="overflow-hidden">
           <AnimatePresence mode="wait" initial={false}>
             <motion.div
@@ -44,7 +46,7 @@ export default function Modal({
               </DialogTitle>
             </motion.div>
           </AnimatePresence>
-          <DialogDescription></DialogDescription>
+          <DialogDescription />
         </DialogHeader>
         {children}
       </DialogContent>

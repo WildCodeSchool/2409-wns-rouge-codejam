@@ -95,8 +95,8 @@ export default function SignInForm({
         )}
       </form>
 
-      <div className="text-muted-foreground mt-4 mb-2 flex items-center justify-center gap-2 text-sm">
-        New user?
+      <div className="text-muted-foreground mt-4 mb-2 flex flex-wrap items-center justify-center gap-2 text-sm">
+        <span>New user?</span>
         <Button
           variant="link"
           size="sm"

@@ -141,8 +141,8 @@ export default function SignUpForm({
         </Button>
       </form>
 
-      <div className="text-muted-foreground mt-4 mb-2 flex items-center justify-center gap-2 text-sm">
-        Already have an account?
+      <div className="text-muted-foreground mt-4 mb-2 flex flex-wrap items-center justify-center gap-2 text-sm">
+        <span>Already have an account?</span>
         <Button
           variant="link"
           size="sm"
