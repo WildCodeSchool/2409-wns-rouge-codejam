@@ -1,5 +1,6 @@
 import { useMutation } from '@apollo/client'
-import { useState } from 'react'
+import { debounce } from 'lodash'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { toast } from 'sonner'
 import {
@@ -11,10 +12,13 @@ import {
 } from 'unique-names-generator'
 
 import { EditorStatus, EditorUrlParams } from '@/features/editor/types'
+
 import { GET_ALL_SNIPPETS } from '@/shared/api/getUserSnippets'
 import { SAVE_SNIPPET } from '@/shared/api/saveSnippet'
 import { toastOptions } from '@/shared/config'
 import { Language } from '@/shared/gql/graphql'
+
+const SAVE_SNIPPET_SHORTCUT = 's'
 
 const baseUniqueNameConfig: Config = {
   dictionaries: [adjectives, colors, animals],
@@ -27,7 +31,7 @@ export default function useEditorLeftActions(code: string, language: Language) {
   const [saveSnippetMutation] = useMutation(SAVE_SNIPPET)
   const navigate = useNavigate()
 
-  async function saveSnippet() {
+  const saveSnippet = useCallback(async () => {
     try {
       setStatus('saving')
 
@@ -63,7 +67,35 @@ export default function useEditorLeftActions(code: string, language: Language) {
     } finally {
       setStatus('typing')
     }
-  }
+  }, [code, language, navigate, saveSnippetMutation, snippetId, snippetSlug])
 
-  return { saveSnippet, status }
+  const debouncedSaveSnippet = useMemo(
+    () =>
+      debounce(saveSnippet, 1000, {
+        leading: true,
+        trailing: false,
+      }),
+    [saveSnippet],
+  )
+
+  // Adds a keyboard shortcut to save the snippet.
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (
+        event.key === SAVE_SNIPPET_SHORTCUT &&
+        (event.metaKey || event.ctrlKey) &&
+        event.shiftKey
+      ) {
+        event.preventDefault()
+        void debouncedSaveSnippet()
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [debouncedSaveSnippet])
+
+  return { debouncedSaveSnippet, SAVE_SNIPPET_SHORTCUT, status }
 }

@@ -20,26 +20,29 @@ export default function EditorLeftActions({
   language,
   onChangeLanguage,
 }: EditorLeftActionProps) {
-  const { saveSnippet, status } = useEditorLeftActions(code, language)
   const isMobile = useIsMobile()
+  const { debouncedSaveSnippet, SAVE_SNIPPET_SHORTCUT, status } =
+    useEditorLeftActions(code, language)
+
+  const isSaving = status === 'saving'
 
   return (
     <div className="flex justify-start gap-4">
       <LanguageSelect language={language} onChange={onChangeLanguage} />
 
       <TooltipButton
-        tooltip="Save current snippet"
+        tooltip={`Save current snippet (⌘⇧${SAVE_SNIPPET_SHORTCUT.toUpperCase()})`}
         variant="outline"
         aria-disabled={!code}
-        disabled={!code}
-        onClick={saveSnippet}
+        disabled={!code || isSaving}
+        onClick={debouncedSaveSnippet}
         className={cn(
           'min-w-24',
           isMobile && 'aspect-square min-w-[unset] rounded-full px-2!',
         )}
       >
         {!isMobile && <span>Save</span>}
-        {status === 'saving' ? (
+        {isSaving ? (
           <Spinner show size="small" />
         ) : (
           <Save aria-hidden="true" size={15} />

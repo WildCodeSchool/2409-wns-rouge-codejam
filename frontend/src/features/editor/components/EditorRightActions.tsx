@@ -22,15 +22,17 @@ export default function EditorRightActions({
   onChangeOutput,
   onChangeStatus,
 }: EditorRightActionProps) {
+  const isMobile = useIsMobile()
   const {
-    executeSnippet,
+    debouncedRunSnippet,
     debouncedShareUrl,
+    RUN_SNIPPET_SHORTCUT,
+    SHARE_SNIPPET_SHORTCUT,
     status,
     showModal,
     closeModal,
     snippetId,
   } = useEditorRightActions(code, language, onChangeOutput, onChangeStatus)
-  const isMobile = useIsMobile()
 
   const isExecuting = status === 'executing'
   const disabled = !code || isExecuting || status === 'disabled'
@@ -38,10 +40,10 @@ export default function EditorRightActions({
   return (
     <div className="flex justify-end gap-4">
       <TooltipButton
-        tooltip="Execute current snippet"
+        tooltip={`Execute current snippet (⌘⇧${RUN_SNIPPET_SHORTCUT.toUpperCase()})`}
         aria-disabled={disabled}
         disabled={disabled}
-        onClick={executeSnippet}
+        onClick={debouncedRunSnippet}
         className={cn(
           'min-w-24',
           isMobile && 'aspect-square min-w-[unset] rounded-full px-2!',
@@ -56,7 +58,7 @@ export default function EditorRightActions({
       </TooltipButton>
 
       <TooltipButton
-        tooltip="Copy url to clipboard"
+        tooltip={`Copy url to clipboard (⌘⇧${SHARE_SNIPPET_SHORTCUT.toUpperCase()})`}
         variant="outline"
         aria-disabled={!code}
         disabled={!code || !snippetId}
