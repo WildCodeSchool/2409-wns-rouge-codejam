@@ -1,81 +1,40 @@
-import { useQuery } from '@apollo/client'
-import { Pencil, Plus, Trash } from 'lucide-react'
-import { useEffect, useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { CreateSnippetModal } from '@/features/editor/components'
+import {
+  AddSnippet,
+  SidebarHeader,
+  Snippet,
+} from '@/features/sidebar/components'
+import { useEditorSidebar } from '@/features/sidebar/hooks'
 
-import CreateSnippetModal from '@/features/editor/components/CreateSnippetModal'
-import { EditorUrlParams } from '@/features/editor/types'
-import SidebarToggleButton from '@/features/sidebar/components/SidebarToggleButton'
-
-import { GET_ALL_SNIPPETS } from '@/shared/api/getUserSnippets'
-import { WHO_AM_I } from '@/shared/api/whoAmI'
-import { TooltipButton } from '@/shared/components'
 import Modal from '@/shared/components/Modal'
 import {
   Sidebar,
   SidebarContent,
   SidebarGroup,
   SidebarGroupContent,
-  SidebarHeader,
   SidebarMenu,
-  SidebarMenuItem,
   useSidebar,
 } from '@/shared/components/ui/sidebar'
 import { Skeleton } from '@/shared/components/ui/skeleton'
-import { Snippet } from '@/shared/gql/graphql'
-import { useIsMobile } from '@/shared/hooks/use-mobile'
+import { Snippet as TSnippet } from '@/shared/gql/graphql'
 import { cn } from '@/shared/lib/utils'
 
-const activeMenuItemClasses =
-  'outline-codejam-accent-300 text-codejam-accent outline-2'
-
-const baseMenuItemClasses =
-  'border-input bg-snippet-card-background flex min-h-10 cursor-pointer items-center justify-center border pl-4 pr-2 text-sm transition-colors mb-2'
-
-const collapsedMenuItemClasses =
-  'w-0 overflow-hidden border-0 p-0 outline-0 collapse'
-
 type EditorSidebarProps = {
-  language: Snippet['language']
+  language: TSnippet['language']
 }
 
 export default function EditorSidebar({ language }: EditorSidebarProps) {
-  const { snippetId } = useParams<EditorUrlParams>()
-  const navigate = useNavigate()
-  const [activeSnippetId, setActiveSnippetId] = useState<string | undefined>(
-    snippetId,
-  )
-  const [isModalOpen, setIsModalOpen] = useState(false)
-  const isMobile = useIsMobile()
-  const { open, openMobile, setOpenMobile } = useSidebar()
-  const { data: { whoAmI: user } = {} } = useQuery(WHO_AM_I)
-  const { data: { getAllSnippets: snippets } = {} } = useQuery(
-    GET_ALL_SNIPPETS,
-    {
-      skip: !user,
-    },
-  )
-
-  useEffect(() => {
-    let nextActiveSnippetId: string | undefined
-
-    if (snippetId) {
-      const matchSnippet = snippets?.find((s) => s.id === snippetId)
-      nextActiveSnippetId =
-        matchSnippet !== undefined ? matchSnippet.id : undefined
-    } else {
-      nextActiveSnippetId = snippets?.[0]?.id
-      // Load first snippet (if any) when user signned in and there is no snippet in the url
-      if (snippets && snippets.length > 0) {
-        navigate(`/editor/${snippets[0].id}/${snippets[0]?.slug}`, {
-          replace: true,
-        })
-      }
-    }
-    setActiveSnippetId(nextActiveSnippetId)
-  }, [snippetId, snippets, navigate])
-
-  const isSidebarOpen = open || openMobile
+  const {
+    activeSnippetId,
+    closeModal,
+    isModalOpen,
+    isSidebarOpen,
+    openModal,
+    selectSnippet,
+    snippets,
+    toggleModal,
+    user,
+  } = useEditorSidebar()
 
   //  If user is guest
   if (!user?.email) {
@@ -95,85 +54,27 @@ export default function EditorSidebar({ language }: EditorSidebarProps) {
         <SidebarContent className="bg-background overflow-hidden">
           <SidebarGroup className="justify-center px-0">
             <SidebarGroupContent>
-              <SidebarHeader className="flex flex-row items-center gap-0 pt-0 pr-2 pb-4">
-                <SidebarToggleButton />
-                <span
-                  className={cn(
-                    'font-medium -tracking-tighter whitespace-nowrap',
-                    open ? 'w-full pl-2' : 'w-0 overflow-hidden',
-                  )}
-                >
-                  My Snippets
-                </span>
-              </SidebarHeader>
+              <SidebarHeader>My Snippets</SidebarHeader>
 
               <SidebarMenu className="gap-2.5 pr-4 pl-2">
-                <SidebarMenuItem
-                  key="add-new-snippet"
-                  className={cn(
-                    baseMenuItemClasses,
-                    !isMobile && !open && collapsedMenuItemClasses,
-                    'mb-4 bg-transparent px-0',
-                  )}
-                >
-                  <TooltipButton
-                    tooltip="Add a new snippet"
-                    className="text-background min-h-10 w-full gap-1 rounded"
-                    onClick={() => {
-                      setIsModalOpen(true)
-                    }}
-                  >
-                    <span>Add</span>
-                    <Plus aria-hidden="true" className="h-4 w-4" />
-                  </TooltipButton>
-                </SidebarMenuItem>
+                <AddSnippet onAddClick={openModal} />
 
                 {(snippets ?? []).map((snippet) => (
-                  <SidebarMenuItem
+                  <Snippet
                     key={snippet.id}
-                    className={cn(
-                      baseMenuItemClasses,
-                      activeSnippetId === snippet.id && activeMenuItemClasses,
-                      !isMobile && !open && collapsedMenuItemClasses,
-                    )}
-                    onClick={() => {
-                      if (isMobile && openMobile) {
-                        setOpenMobile(false)
-                      }
-                      navigate(`/editor/${snippet.id}/${snippet.slug}`)
+                    isActive={activeSnippetId === snippet.id}
+                    onSnippetClick={() => {
+                      selectSnippet(snippet.id, snippet.slug)
+                    }}
+                    onSnippetDelete={() => {
+                      alert(`🚧 Delete snippet ${snippet.id}...`)
+                    }}
+                    onSnippetEdit={() => {
+                      alert(`🚧 Rename snippet ${snippet.id}...`)
                     }}
                   >
-                    <span className="flex-1 truncate text-left text-nowrap">
-                      {snippet.name}
-                    </span>
-                    <div className="flex">
-                      <TooltipButton
-                        tooltip="Rename snippet"
-                        variant="ghost"
-                        size="icon"
-                        className="rounded-full px-0"
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          alert(`🚧 Rename snippet ${snippet.id}...`)
-                        }}
-                      >
-                        <Pencil aria-hidden="true" />
-                      </TooltipButton>
-
-                      <TooltipButton
-                        tooltip="Delete snippet"
-                        variant="ghost"
-                        size="icon"
-                        className="hover:text-error focus-visible:text-error rounded-full px-0"
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          alert(`🚧 Delete snippet ${snippet.id}...`)
-                        }}
-                      >
-                        <Trash aria-hidden="true" />
-                      </TooltipButton>
-                    </div>
-                  </SidebarMenuItem>
+                    {snippet.name}
+                  </Snippet>
                 ))}
               </SidebarMenu>
             </SidebarGroupContent>
@@ -184,14 +85,9 @@ export default function EditorSidebar({ language }: EditorSidebarProps) {
       <Modal
         title="Create Snippet"
         open={isModalOpen}
-        onOpenChange={setIsModalOpen}
+        onOpenChange={toggleModal}
       >
-        <CreateSnippetModal
-          language={language}
-          onClose={() => {
-            setIsModalOpen(false)
-          }}
-        />
+        <CreateSnippetModal language={language} onClose={closeModal} />
       </Modal>
     </>
   )

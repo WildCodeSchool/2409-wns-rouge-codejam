@@ -4,8 +4,9 @@ import {
   NavActions,
 } from '@/features/auth/components'
 import { useAuth } from '@/features/auth/hooks'
-import { SidebarToggleButton } from '@/features/sidebar/components'
 import { ModeToggle } from '@/features/mode/components'
+import { SidebarTrigger } from '@/features/sidebar/components'
+
 import { Separator } from '@/shared/components/ui/separator'
 import { useSidebar } from '@/shared/components/ui/sidebar'
 
@@ -37,7 +38,7 @@ export default function NavBar() {
           {showSidebar && (
             <div className="flex h-full items-center">
               <Separator orientation="vertical" className="h-3/4!" />
-              <SidebarToggleButton />
+              <SidebarTrigger />
             </div>
           )}
         </div>

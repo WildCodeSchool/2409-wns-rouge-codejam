@@ -1,14 +1,14 @@
 import { PanelRightCloseIcon } from 'lucide-react'
 
-import { SidebarTrigger } from '@/shared/components/ui/sidebar'
+import { SidebarTrigger as UISidebarTrigger } from '@/shared/components/ui/sidebar'
 
-export default function SidebarToggleButton() {
+export default function SidebarTrigger() {
   return (
-    <SidebarTrigger
+    <UISidebarTrigger
       size="icon"
       className="relative -left-1 mx-2 size-9 rounded-full"
     >
       <PanelRightCloseIcon aria-hidden="true" />
-    </SidebarTrigger>
+    </UISidebarTrigger>
   )
 }
