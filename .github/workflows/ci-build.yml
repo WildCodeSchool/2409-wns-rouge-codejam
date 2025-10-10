@@ -1,9 +1,10 @@
 name: ci-build
 
+# Run build and publish job only if the commit is tagged like vX.Y.Z
 on:
   push:
     tags:
-      - v*
+      - "v*.*.*"
 
 jobs:
   test-frontend:
@@ -38,11 +39,9 @@ jobs:
       - name: Run tests
         run: cd $directory && pnpm run test:db
 
-  build-frontend:
+  build-and-publish-frontend:
     # Ensure frontend tests pass before building and pushing the Docker image
     needs: test-frontend
-    # Run job only if:
-    # - the commit is tagged starting with v
     runs-on: ubuntu-latest
     steps:
       # Retrieve code from the repository (mandatory prior to using the custom local action)
@@ -56,11 +55,9 @@ jobs:
           docker-token: ${{ secrets.DOCKERHUB_TOKEN }}
           docker-repository: ${{ vars.DOCKERHUB_REPO_FRONTEND }}
 
-  build-backend:
+  build-and-publish-backend:
     # Ensure backend tests pass before building and pushing the Docker image
     needs: test-backend
-    # Run job only if:
-    # - the commit is tagged starting with v
     runs-on: ubuntu-latest
     steps:
       # Retrieve code from the repository (mandatory prior to using the custom local action)
@@ -74,9 +71,7 @@ jobs:
           docker-token: ${{ secrets.DOCKERHUB_TOKEN }}
           docker-repository: ${{ vars.DOCKERHUB_REPO_BACKEND }}
 
-  build-code-execution:
-    # Run job only if:
-    # - the commit is tagged starting with v
+  build-and-publish-code-execution:
     runs-on: ubuntu-latest
     steps:
       # Retrieve code from the repository (mandatory prior to using the custom local action)

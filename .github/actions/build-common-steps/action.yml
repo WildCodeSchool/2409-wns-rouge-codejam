@@ -34,4 +34,4 @@ runs:
       with:
         push: true
         context: "{{defaultContext}}:${{ inputs.directory }}"
-        tags: ${{ inputs.docker-repository }}:${{ github.ref_name }}, ${{ inputs.docker-repository }}:latest
+        tags: ${{ inputs.docker-repository }}:${{ github.ref_name }}, ${{ inputs.docker-repository }}:latest # 👈 ${{ github.ref_name }} allows to retrieve the tag version and use it as Docker tag
