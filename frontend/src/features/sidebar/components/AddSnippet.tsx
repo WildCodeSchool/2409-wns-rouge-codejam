@@ -29,7 +29,7 @@ export default function AddSnippet({ onAddClick }: AddSnippetProps) {
     >
       <TooltipButton
         tooltip="Add a new snippet"
-        className="text-background min-h-10 w-full gap-1 rounded"
+        className="text-background min-h-10 w-full gap-1 rounded-md"
         onClick={() => {
           onAddClick()
         }}

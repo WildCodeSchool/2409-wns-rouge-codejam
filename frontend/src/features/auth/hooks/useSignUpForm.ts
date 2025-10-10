@@ -81,7 +81,7 @@ export default function useSignInForm(cbFn?: () => void) {
           }
         } else {
           console.error(err)
-          toast.error('Oops! We couldn’t create your account...', {
+          toast.error("Oops! We couldn't create your account...", {
             ...toastOptions.error,
           })
         }

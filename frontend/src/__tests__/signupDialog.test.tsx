@@ -10,6 +10,7 @@ import { useState } from 'react'
 import { describe, expect, it, vi } from 'vitest'
 
 import SignUpForm from '@/features/auth/components/SignUpForm'
+
 import { CREATE_USER } from '@/shared/api/createUser'
 import { CreateUserMutation, UserCreateInput } from '@/shared/gql/graphql'
 import { Modal } from '@/shared/components'
@@ -108,7 +109,9 @@ describe('SignUp dialog', () => {
     await userEvent.keyboard('{Tab}')
 
     // Error should be visible
-    const error = screen.getByText(/Must be an email/)
+    const error = screen.getByText(
+      /Please provide a valid email address \(example: name@example\.com\)/,
+    )
     expect(error).toBeVisible()
 
     const submitButton = screen.getByTestId('submit-signup')
@@ -148,7 +151,7 @@ describe('SignUp dialog', () => {
 
     // Error should be visible
     const error = screen.getByText(
-      /String must contain at least 2 character\(s\)/,
+      /Username must contain at least 2 characters/,
     )
     expect(error).toBeVisible()
 

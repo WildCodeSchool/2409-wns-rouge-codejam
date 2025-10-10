@@ -79,9 +79,8 @@ export default function useSignInForm(cbFn?: () => void) {
           form.reset()
           cbFn()
         }
-      } catch (err: unknown) {
-        console.error(err)
-        toast.error('Oops! We couldn’t log you in...', {
+      } catch (_err: unknown) {
+        toast.error("Oops! We couldn't log you in...", {
           ...toastOptions.error,
         })
       }

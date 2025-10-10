@@ -25,7 +25,7 @@ const PasswordVisibiltyInput = ({
     <div className="relative">
       <FormControl onChange={onChange}>
         <Input
-          className="w-full"
+          className="w-full pr-10"
           type={isVisible ? 'text' : 'password'}
           {...field}
           {...restProps}

@@ -40,22 +40,25 @@ export default function SignUpForm({
           render={({ field }) => {
             return (
               <FormItem>
-                <FormLabel>Email</FormLabel>
+                <FormLabel>
+                  Email<span className="text-destructive-foreground">*</span>
+                </FormLabel>
                 <FormControl
                   onChange={(e) => {
                     handleChange(e, field.onChange)
                   }}
                 >
                   <Input
+                    required
                     data-testid="email-input"
                     type="email"
-                    placeholder="Enter your email"
                     autoComplete="email"
+                    placeholder="Enter your email"
                     disabled={isSubmitting}
                     {...field}
                   />
                 </FormControl>
-                <FormMessage />
+                <FormMessage role="alert" />
               </FormItem>
             )
           }}
@@ -66,21 +69,24 @@ export default function SignUpForm({
           render={({ field }) => {
             return (
               <FormItem>
-                <FormLabel>Username</FormLabel>
+                <FormLabel>
+                  Username<span className="text-destructive-foreground">*</span>
+                </FormLabel>
                 <FormControl
                   onChange={(e) => {
                     handleChange(e, field.onChange)
                   }}
                 >
                   <Input
+                    required
                     data-testid="username-input"
-                    placeholder="Enter your username"
                     autoComplete="username"
+                    placeholder="Enter your username"
                     disabled={isSubmitting}
                     {...field}
                   />
                 </FormControl>
-                <FormMessage />
+                <FormMessage role="alert" />
               </FormItem>
             )
           }}
@@ -92,19 +98,21 @@ export default function SignUpForm({
             return (
               <FormItem>
                 <FormLabel>
-                  Password
+                  Password<span className="text-destructive-foreground">*</span>
                   <PasswordTooltip />
                 </FormLabel>
                 <PasswordVisibiltyInput
+                  required
+                  data-testid="password-input"
+                  autoComplete="new-password"
+                  placeholder="Enter your password"
+                  disabled={isSubmitting}
+                  field={restField}
                   onChange={(e) => {
                     handleChange(e, onChange)
                   }}
-                  autoComplete="new-password"
-                  disabled={isSubmitting}
-                  field={restField}
-                  data-testid="password-input"
                 />
-                <FormMessage />
+                <FormMessage role="alert" />
               </FormItem>
             )
           }}
@@ -115,17 +123,21 @@ export default function SignUpForm({
           render={({ field: { onChange, ...restField } }) => {
             return (
               <FormItem>
-                <FormLabel>Confirm password</FormLabel>
+                <FormLabel>
+                  Confirm password
+                  <span className="text-destructive-foreground">*</span>
+                </FormLabel>
                 <PasswordVisibiltyInput
+                  required
+                  data-testid="confirm-password-input"
+                  autoComplete="new-password"
+                  disabled={isSubmitting}
+                  field={restField}
                   onChange={(e) => {
                     handleChange(e, onChange)
                   }}
-                  autoComplete="new-password"
-                  disabled={isSubmitting}
-                  data-testid="confirm-password-input"
-                  field={restField}
                 />
-                <FormMessage />
+                <FormMessage role="alert" />
               </FormItem>
             )
           }}
