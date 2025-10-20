@@ -62,7 +62,9 @@ export class Snippet extends BaseEntity {
   @Field(() => GraphQLDateTime)
   updatedAt!: Date
 
-  @ManyToOne(() => User, (user) => user.snippets)
+  @ManyToOne(() => User, (user) => user.snippets, {
+    onDelete: 'CASCADE',
+  })
   @Field(() => User)
   user!: User
 

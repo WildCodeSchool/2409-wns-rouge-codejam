@@ -1,7 +1,7 @@
 import { z } from 'zod'
 
 export const PASSWORD_REQUIREMENT = {
-  minLength: 'Must contain at least 16 character(s)',
+  minLength: 'Must contain at least 12 characters',
   uppercase: 'Must contain at least an uppercase letter',
   lowercase: 'Must contain at least a lowercase letter',
   number: 'Must contain at least a number',
@@ -47,7 +47,7 @@ export const signUpFormSchema = signInFormSchema
     password: z
       .string()
       .min(1, 'This field is required')
-      .min(16, PASSWORD_REQUIREMENT.minLength)
+      .min(12, PASSWORD_REQUIREMENT.minLength)
       .regex(/[A-Z]/, PASSWORD_REQUIREMENT.uppercase)
       .regex(/[a-z]/, PASSWORD_REQUIREMENT.lowercase)
       .regex(/[0-9]/, PASSWORD_REQUIREMENT.number)
