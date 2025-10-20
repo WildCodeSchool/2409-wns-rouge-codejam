@@ -110,6 +110,8 @@
 
 /* Use the @custom-variant directive to add a custom variant to the project */
 @custom-variant dark (&:is(.dark *));
+@custom-variant dark-only (&:is(.dark:not(.system) *));
+@custom-variant system (&:is(.system *));
 
 :root {
   --background: oklch(1 0 0);
@@ -146,14 +148,22 @@
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
   --link: oklch(54.6% 0.245 262.881);
+  --success: oklch(0.7263 0.21 148.03);
+  --error: oklch(0.6378 0.2373 25.44);
+  --warning: oklch(0.7712 0.1721 65.68);
+
+  --codejam-accent: oklch(0.5 0.1193 242.75);
+  --codejam-accent-300: oklch(0.5934 0.1041 236.47);
+  --snippet-card-background: oklch(1 0 0);
+  --snippet-card-foreground: var(--codejam-accent);
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
+  --background: oklch(0.2103 0.0059 285.89);
   --foreground: oklch(0.985 0 0);
   --card: oklch(0.145 0 0);
   --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.145 0 0);
+  --popover: var(--background);
   --popover-foreground: oklch(0.985 0 0);
   --primary: oklch(0.985 0 0);
   --primary-foreground: oklch(0.205 0 0);
@@ -163,8 +173,8 @@
   --muted-foreground: oklch(0.708 0 0);
   --accent: oklch(0.269 0 0);
   --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(44.4% 0.177 26.899);
-  --destructive-foreground: oklch(44.4% 0.177 26.899);
+  --destructive: oklch(63.7% 0.237 25.331);
+  --destructive-foreground: oklch(63.7% 0.237 25.331);
   --border: oklch(0.269 0 0);
   --input: oklch(0.269 0 0);
   --ring: oklch(0.439 0 0);
@@ -181,7 +191,14 @@
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(0.269 0 0);
   --sidebar-ring: oklch(0.439 0 0);
-  --link: oklch(54.6% 0.245 262.881);
+  --link: oklch(62.3% 0.214 259.815);
+  --success: oklch(0.7915 0.2089 151.62);
+  --error: oklch(0.7007 0.1882 22.19);
+  --warning: oklch(0.8309 0.171389 81.5486);
+
+  --codejam-accent: oklch(0.7587 0.1193 242.75);
+  --snippet-card-background: oklch(0.3143 0.0053 286.09);
+  --snippet-card-foreground: var(--codejam-accent);
 }
 
 @theme inline {
@@ -222,6 +239,14 @@
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-link: var(--link);
+  --color-success: var(--success);
+  --color-error: var(--error);
+  --color-warning: var(--warning);
+
+  --color-codejam-accent: var(--codejam-accent);
+  --color-codejam-accent-300: var(--codejam-accent-300);
+  --color-snippet-card-background: var(--snippet-card-background);
+  --color-snippet-card-foreground: var(--snippet-card-foreground);
 
   --font-main: 'Inter VF', 'Inter', sans-serif;
   --font-editor: 'Fira Code VF', 'Fira Code', monospace;
@@ -250,7 +275,12 @@
 /* Use the @layer component directive to add more complicated classes that can still be overriden with utility classes */
 @layer component {
   .shimmer {
-    background: linear-gradient(-45deg, #eee 40%, #fafafa 50%, #eee 60%);
+    background: linear-gradient(
+      -45deg,
+      var(--muted-foreground) 40%,
+      var(--foreground) 50%,
+      var(--muted-foreground) 60%
+    );
     background-size: 300%;
     background-position-x: 100%;
   }

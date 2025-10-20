@@ -4,7 +4,7 @@ import {
   EditorLayout,
   EditorPageSkeleton,
   ErrorState,
-} from '@/features/editor/components/editor'
+} from '@/features/editor/components'
 import { useEditorPage } from '@/features/editor/hooks'
 import { EditorUrlParams } from '@/features/editor/types'
 
