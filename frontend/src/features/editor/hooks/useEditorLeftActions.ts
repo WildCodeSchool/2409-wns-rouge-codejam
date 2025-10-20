@@ -1,8 +1,8 @@
-import { useState } from 'react'
-import { EditorUrlParams, Status } from '../types'
-import { toast } from 'sonner'
-import { Language } from '@/shared/gql/graphql'
 import { useMutation } from '@apollo/client'
+import { debounce } from 'lodash'
+import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useNavigate, useParams } from 'react-router-dom'
+import { toast } from 'sonner'
 import {
   adjectives,
   animals,
@@ -10,9 +10,15 @@ import {
   Config,
   uniqueNamesGenerator,
 } from 'unique-names-generator'
-import { useNavigate, useParams } from 'react-router-dom'
-import { SAVE_SNIPPET } from '@/shared/api/saveSnippet'
+
+import { EditorStatus, EditorUrlParams } from '@/features/editor/types'
+
 import { GET_ALL_SNIPPETS } from '@/shared/api/getUserSnippets'
+import { SAVE_SNIPPET } from '@/shared/api/saveSnippet'
+import { toastOptions } from '@/shared/config'
+import { Language } from '@/shared/gql/graphql'
+
+const SAVE_SNIPPET_SHORTCUT = 'KeyS'
 
 const baseUniqueNameConfig: Config = {
   dictionaries: [adjectives, colors, animals],
@@ -21,11 +27,11 @@ const baseUniqueNameConfig: Config = {
 
 export default function useEditorLeftActions(code: string, language: Language) {
   const { snippetId, snippetSlug } = useParams<EditorUrlParams>()
-  const [status, setStatus] = useState<Status>('typing')
+  const [status, setStatus] = useState<EditorStatus>('typing')
   const [saveSnippetMutation] = useMutation(SAVE_SNIPPET)
   const navigate = useNavigate()
 
-  async function saveSnippet() {
+  const saveSnippet = useCallback(async () => {
     try {
       setStatus('saving')
 
@@ -50,15 +56,46 @@ export default function useEditorLeftActions(code: string, language: Language) {
         setStatus('typing')
       }
 
-      toast.success('Successfully saved')
-    } catch (err) {
-      toast.error('Failed to save', {
-        description: err instanceof Error ? err.message : JSON.stringify(err),
+      toast.success('Snippet saved successfully', {
+        ...toastOptions.success,
+      })
+    } catch (err: unknown) {
+      console.error(err)
+      toast.error("Oops! We couldn't save your snippet...", {
+        ...toastOptions.error,
       })
     } finally {
       setStatus('typing')
     }
-  }
+  }, [code, language, navigate, saveSnippetMutation, snippetId, snippetSlug])
 
-  return { saveSnippet, status }
+  const debouncedSaveSnippet = useMemo(
+    () =>
+      debounce(saveSnippet, 1000, {
+        leading: true,
+        trailing: false,
+      }),
+    [saveSnippet],
+  )
+
+  // Adds a keyboard shortcut to save the snippet.
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (
+        event.code === SAVE_SNIPPET_SHORTCUT &&
+        (event.metaKey || event.ctrlKey) &&
+        event.shiftKey
+      ) {
+        event.preventDefault()
+        void debouncedSaveSnippet()
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [debouncedSaveSnippet])
+
+  return { debouncedSaveSnippet, SAVE_SNIPPET_SHORTCUT, status }
 }

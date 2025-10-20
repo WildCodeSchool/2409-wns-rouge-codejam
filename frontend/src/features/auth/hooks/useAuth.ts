@@ -6,6 +6,7 @@ import { toast } from 'sonner'
 import { LOGOUT } from '@/shared/api/logout'
 import { WHO_AM_I } from '@/shared/api/whoAmI'
 import { DELETE_USER } from '@/shared/api/deleteUser'
+import { toastOptions } from '@/shared/config'
 
 export default function useAuth() {
   const navigate = useNavigate()
@@ -19,16 +20,19 @@ export default function useAuth() {
         refetchQueries: [{ query: WHO_AM_I }],
         awaitRefetchQueries: true,
       })
+
       toast.success('Successful logout', {
-        description: '👋 Hope to see you soon!',
+        ...toastOptions.success,
+        description: 'Hope to see you soon 👋',
       })
+
       navigate('/editor', {
         replace: true,
       })
     } catch (error: unknown) {
       console.error(error)
-      toast.error('Failed to logout', {
-        description: 'Oops! Something went wrong.',
+      toast.error('Oops! We couldn’t log you out...', {
+        ...toastOptions.error,
       })
     }
   }, [logoutMutation, navigate])

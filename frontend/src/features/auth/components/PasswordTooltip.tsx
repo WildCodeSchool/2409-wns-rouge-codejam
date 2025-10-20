@@ -1,4 +1,5 @@
-import { Info } from 'lucide-react'
+import { CircleHelpIcon } from 'lucide-react'
+
 import { PASSWORD_REQUIREMENT } from '@/features/auth/schemas/formSchema'
 import {
   Tooltip,
@@ -15,13 +16,15 @@ const PasswordTooltip = () => {
           aria-label="Show password requirements"
           className="h-fit w-fit cursor-pointer"
         >
-          <Info aria-hidden="true" role="img" size={15} />
+          <CircleHelpIcon aria-hidden="true" size={15} className="text-link" />
         </TooltipTrigger>
         <TooltipContent align="start">
           <ul className="list-inside list-disc">
             Password requirements:
             {Object.values(PASSWORD_REQUIREMENT).map((requirement, index) => (
-              <li key={index}>{requirement}</li>
+              <li key={index} className="first:mt-2">
+                {requirement}
+              </li>
             ))}
           </ul>
         </TooltipContent>

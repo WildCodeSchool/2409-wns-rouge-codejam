@@ -39,21 +39,24 @@ export default function SignInForm({
           render={({ field }) => {
             return (
               <FormItem>
-                <FormLabel>Email</FormLabel>
+                <FormLabel>
+                  Email<span className="text-destructive-foreground">*</span>
+                </FormLabel>
                 <FormControl
                   onChange={(e) => {
                     handleChange(e, field.onChange)
                   }}
                 >
                   <Input
+                    required
                     type="email"
-                    placeholder="Enter your email"
                     autoComplete="email"
+                    placeholder="Enter your email"
                     disabled={isSubmitting}
                     {...field}
                   />
                 </FormControl>
-                <FormMessage />
+                <FormMessage role="alert" />
               </FormItem>
             )
           }}
@@ -64,26 +67,30 @@ export default function SignInForm({
           render={({ field: { onChange, ...restField } }) => {
             return (
               <FormItem>
-                <FormLabel>Password</FormLabel>
+                <FormLabel>
+                  Password<span className="text-destructive-foreground">*</span>
+                </FormLabel>
                 <PasswordVisibiltyInput
+                  required
+                  autoComplete="current-password"
+                  placeholder="Enter your password"
+                  disabled={isSubmitting}
+                  field={restField}
                   onChange={(e) => {
                     handleChange(e, onChange)
                   }}
-                  autoComplete="current-password"
-                  disabled={isSubmitting}
-                  field={restField}
                 />
-                <FormMessage />
+                <FormMessage role="alert" />
               </FormItem>
             )
           }}
         />
         <Button
+          type="submit"
           data-testid="submit-signin"
           id="signin-submit"
-          className="mb-0 w-full"
-          type="submit"
           disabled={isSubmitting}
+          className="mb-0 w-full"
         >
           {isSubmitting ? <Spinner show size="small" /> : 'Sign In'}
         </Button>
@@ -95,8 +102,8 @@ export default function SignInForm({
         )}
       </form>
 
-      <div className="text-muted-foreground mt-4 mb-2 flex items-center justify-center gap-2 text-sm">
-        New user?
+      <div className="text-muted-foreground mt-4 mb-2 flex flex-wrap items-center justify-center gap-2 text-sm">
+        <span>New user?</span>
         <Button
           variant="link"
           size="sm"
