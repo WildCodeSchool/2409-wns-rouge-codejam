@@ -164,7 +164,7 @@ describe('SignUp dialog', () => {
     })
   })
 
-  it('should not submit the values after a click on the submit button when password value is incorrect (less than 16 characters)', async () => {
+  it('should not submit the values after a click on the submit button when password value is incorrect (less than 12 characters)', async () => {
     render(<MockedSignupDialog />)
     const button = screen.getByRole('button', { name: 'Sign Up' })
     fireEvent.click(button)
@@ -193,7 +193,7 @@ describe('SignUp dialog', () => {
     await userEvent.keyboard('{Tab}')
 
     // Error should be visible
-    const error = screen.getByText(/Must contain at least 16 character\(s\)/)
+    const error = screen.getByText(/Must contain at least 12 characters/)
     expect(error).toBeVisible()
 
     // Form modal should be already visible after clicking on submit button

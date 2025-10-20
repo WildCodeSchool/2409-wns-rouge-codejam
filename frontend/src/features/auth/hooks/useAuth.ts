@@ -40,12 +40,13 @@ export default function useAuth() {
   const deleteAccount = useCallback(async () => {
     try {
       await deleteUser({
-        refetchQueries: [{ query: WHO_AM_I }],
+        refetchQueries: [WHO_AM_I],
         awaitRefetchQueries: true,
       })
       toast.success('Account successfully deleted', {
         description: '👋 Hope to see you soon!',
       })
+
       navigate('/editor', {
         replace: true,
       })
