@@ -18,7 +18,7 @@ import { SAVE_SNIPPET } from '@/shared/api/saveSnippet'
 import { toastOptions } from '@/shared/config'
 import { Language } from '@/shared/gql/graphql'
 
-const SAVE_SNIPPET_SHORTCUT = 's'
+const SAVE_SNIPPET_SHORTCUT = 'KeyS'
 
 const baseUniqueNameConfig: Config = {
   dictionaries: [adjectives, colors, animals],
@@ -82,7 +82,7 @@ export default function useEditorLeftActions(code: string, language: Language) {
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (
-        event.key === SAVE_SNIPPET_SHORTCUT &&
+        event.code === SAVE_SNIPPET_SHORTCUT &&
         (event.metaKey || event.ctrlKey) &&
         event.shiftKey
       ) {

@@ -19,8 +19,8 @@ import { GET_ALL_SNIPPETS } from '@/shared/api/getUserSnippets'
 import { toastOptions } from '@/shared/config'
 import { ExecutionStatus, Language } from '@/shared/gql/graphql'
 
-const SHARE_SNIPPET_SHORTCUT = 'c'
-const RUN_SNIPPET_SHORTCUT = 'e'
+const SHARE_SNIPPET_SHORTCUT = 'KeyC'
+const RUN_SNIPPET_SHORTCUT = 'KeyE'
 
 const baseUniqueNameConfig: Config = {
   dictionaries: [adjectives, colors, animals],
@@ -149,7 +149,7 @@ export default function useEditorRightActions(
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (
-        event.key === RUN_SNIPPET_SHORTCUT &&
+        event.code === RUN_SNIPPET_SHORTCUT &&
         (event.metaKey || event.ctrlKey) &&
         event.shiftKey
       ) {
@@ -168,7 +168,7 @@ export default function useEditorRightActions(
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (
-        event.key === SHARE_SNIPPET_SHORTCUT &&
+        event.code === SHARE_SNIPPET_SHORTCUT &&
         (event.metaKey || event.ctrlKey) &&
         event.shiftKey
       ) {

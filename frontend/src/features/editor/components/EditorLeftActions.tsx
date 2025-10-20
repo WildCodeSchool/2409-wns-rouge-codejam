@@ -31,7 +31,7 @@ export default function EditorLeftActions({
       <LanguageSelect language={language} onChange={onChangeLanguage} />
 
       <TooltipButton
-        tooltip={`Save current snippet (⌘⇧${SAVE_SNIPPET_SHORTCUT.toUpperCase()})`}
+        tooltip={`Save current snippet (⌘⇧${SAVE_SNIPPET_SHORTCUT.toLowerCase().replace(/Key/i, '').toUpperCase()})`}
         variant="outline"
         aria-disabled={!code}
         disabled={!code || isSaving}

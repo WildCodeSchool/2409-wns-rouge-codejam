@@ -40,7 +40,7 @@ export default function EditorRightActions({
   return (
     <div className="flex justify-end gap-4">
       <TooltipButton
-        tooltip={`Execute current snippet (⌘⇧${RUN_SNIPPET_SHORTCUT.toUpperCase()})`}
+        tooltip={`Execute current snippet (⌘⇧${RUN_SNIPPET_SHORTCUT.toLowerCase().replace(/Key/i, '').toUpperCase()})`}
         aria-disabled={disabled}
         disabled={disabled}
         onClick={debouncedRunSnippet}
@@ -58,7 +58,7 @@ export default function EditorRightActions({
       </TooltipButton>
 
       <TooltipButton
-        tooltip={`Copy url to clipboard (⌘⇧${SHARE_SNIPPET_SHORTCUT.toUpperCase()})`}
+        tooltip={`Copy url to clipboard (⌘⇧${SHARE_SNIPPET_SHORTCUT.toLowerCase().replace(/Key/i, '').toUpperCase()})`}
         variant="outline"
         aria-disabled={!code}
         disabled={!code || !snippetId}

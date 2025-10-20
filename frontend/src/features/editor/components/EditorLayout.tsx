@@ -18,6 +18,7 @@ import {
 } from '@/shared/components/ui/resizable'
 import { SidebarProvider } from '@/shared/components/ui/sidebar'
 import { ExecutionStatus } from '@/shared/gql/graphql'
+import { useIsDesktop } from '@/shared/hooks/use-desktop'
 import { useIsMobile } from '@/shared/hooks/use-mobile'
 import { cn } from '@/shared/lib/utils'
 
@@ -37,6 +38,7 @@ export default function EditorLayout({
   onChangeStatus,
 }: EditorLayoutProps) {
   const isMobile = useIsMobile()
+  const isDesktop = useIsDesktop()
 
   return (
     <div className="flex h-full gap-4">
@@ -63,8 +65,8 @@ export default function EditorLayout({
         </div>
 
         <ResizablePanelGroup
-          direction={isMobile ? 'vertical' : 'horizontal'}
-          className={cn('h-full', isMobile ? 'px-2 pb-2' : 'gap-2 pr-2')}
+          direction={!isDesktop ? 'vertical' : 'horizontal'}
+          className={cn('h-full', !isDesktop ? 'px-2 pb-2' : 'gap-2 pr-2')}
         >
           <ResizablePanel
             id="editor-panel"
@@ -93,7 +95,7 @@ export default function EditorLayout({
               status={state.executionStatus}
               className={cn(
                 'relative flex h-full overflow-hidden rounded-md border border-transparent',
-                !isMobile && 'mt-4',
+                isDesktop && 'mt-4',
               )}
             />
           </ResizablePanel>
