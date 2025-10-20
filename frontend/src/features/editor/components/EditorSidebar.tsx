@@ -36,6 +36,7 @@ import {
   type DeleteSnippetMutationVariables,
 } from '@/shared/gql/graphql'
 import { cn } from '@/shared/lib/utils'
+import { pickNeighborById } from '@/features/editor/utils'
 
 type EditorSidebarProps = {
   language: Snippet['language']
@@ -59,7 +60,7 @@ export default function EditorSidebar({ language }: EditorSidebarProps) {
   const [isModalOpen, setIsModalOpen] = useState(false)
 
   // Controlled modal: delete — stores the target snippet
-  const [deleteTargetId, setDeleteTarget] = useState<string | null>(null)
+  const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null)
 
   useEffect(() => {
     let nextActiveSnippetId: string | undefined
@@ -68,6 +69,16 @@ export default function EditorSidebar({ language }: EditorSidebarProps) {
       const matchSnippet = snippets?.find((s) => s.id === snippetId)
       nextActiveSnippetId =
         matchSnippet !== undefined ? matchSnippet.id : undefined
+
+      if (!matchSnippet) {
+        if (snippets && snippets.length > 0) {
+          navigate(`/editor/${snippets[0].id}/${snippets[0].slug}`, {
+            replace: true,
+          })
+        } else {
+          navigate('/editor', { replace: true })
+        }
+      }
     } else {
       nextActiveSnippetId = snippets?.[0]?.id
       // Load first snippet (if any) when user signned in and there is no snippet in the url
@@ -75,6 +86,8 @@ export default function EditorSidebar({ language }: EditorSidebarProps) {
         navigate(`/editor/${snippets[0].id}/${snippets[0]?.slug}`, {
           replace: true,
         })
+      } else {
+        navigate('/editor', { replace: true })
       }
     }
     setActiveSnippetId(nextActiveSnippetId)
@@ -83,74 +96,33 @@ export default function EditorSidebar({ language }: EditorSidebarProps) {
   const hoveredTextStyles = 'text-neutral-300 hover:text-neutral-100'
   const iconsStyles = `cursor-pointer h-4 w-4 ${hoveredTextStyles}`
 
-  // Helper: open the delete modal with a sanitized UI shape
-  const openDelete = (id: string) => {
-    setDeleteTarget(id)
-  }
-
-  // Helper: close the delete modal
-  const handleCancelDelete = () => {
-    setDeleteTarget(null)
-  }
-
-  // Closes the delete modal when Dialog reports a close (click outside / Esc)
-  const handleDeleteOpenChange = (isOpen: boolean) => {
-    if (!isOpen) {
-      setDeleteTarget(null)
-    }
-  }
-
   // Derive the label from the current list + selected id
   const deleteTargetName = useMemo(
     () => snippets?.find((s) => s.id === deleteTargetId)?.name ?? '',
     [snippets, deleteTargetId],
   )
 
-  type NavTarget = { id: string; slug: string }
-
-  // Helper: choose neighbor (prefer previous, otherwise next) from the current list
-  const pickNeighborBeforeDelete = (toDeleteId: string): NavTarget | null => {
-    // Normalize list to avoid repeating null checks
-    const list = snippets ?? []
-    if (list.length === 0) return null
-
-    const idx = list.findIndex((s) => s.id === toDeleteId)
-    if (idx === -1) return null
-
-    // `.at()` returns `T | undefined`, which plays nicely with the linter
-    const prev = list.at(idx - 1)
-    const next = list.at(idx + 1)
-    const chosen = prev ?? next
-
-    // Return only what's needed for navigation
-    return chosen ? { id: chosen.id, slug: chosen.slug } : null
-  }
-
   // Delete mutation — refetch list
   const [deleteSnippet] = useMutation<
     DeleteSnippetMutation,
-    DeleteSnippetMutationVariables // if missing after rebase, replace with { id: string }
+    DeleteSnippetMutationVariables
   >(DELETE_SNIPPET, {
     refetchQueries: [{ query: GET_ALL_SNIPPETS }],
     awaitRefetchQueries: true,
   })
 
-  // Execute deletion then navigate if necessary; close modal and notify.
-  // Returns true on success, false otherwise.
   const confirmDelete = async (): Promise<boolean> => {
     if (!deleteTargetId) return false
 
-    // Compute neighbor BEFORE Apollo refetch changes the list
-    const neighbor = pickNeighborBeforeDelete(deleteTargetId)
+    // Compute neighbor BEFORE Apollo refetch changes the list (using the util)
+    const neighbor = pickNeighborById(snippets ?? [], deleteTargetId)
 
-    // Optional: nice label for the toast, derived from current list
     const targetName =
       snippets?.find((s) => s.id === deleteTargetId)?.name ?? 'Snippet'
 
     try {
       await deleteSnippet({ variables: { id: deleteTargetId } })
 
-      // If the deleted item was the active one -> activate neighbor if any, else go to /editor
       if (activeSnippetId === deleteTargetId) {
         if (neighbor) {
           navigate(`/editor/${neighbor.id}/${neighbor.slug}`, { replace: true })
@@ -160,7 +132,7 @@ export default function EditorSidebar({ language }: EditorSidebarProps) {
       }
 
       toast.success(`“${targetName}” was deleted.`)
-      setDeleteTarget(null) // close modal
+      setDeleteTargetId(null)
       return true
     } catch {
       toast.error('An error occurred while deleting the snippet.')
@@ -269,8 +241,10 @@ export default function EditorSidebar({ language }: EditorSidebarProps) {
                           variant={null}
                           size="icon"
                           className="rounded-full px-0"
-                          onClick={() => {
-                            openDelete(snippet.id)
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            e.preventDefault()
+                            setDeleteTargetId(snippet.id)
                           }}
                         >
                           <Trash aria-hidden="true" className={iconsStyles} />
@@ -301,12 +275,19 @@ export default function EditorSidebar({ language }: EditorSidebarProps) {
       <Modal
         title={deleteTargetId ? `Delete snippet “${deleteTargetName}”?` : ''}
         open={!!deleteTargetId}
-        onOpenChange={handleDeleteOpenChange}
+        onOpenChange={(isOpen) => {
+          if (!isOpen) setDeleteTargetId(null)
+        }}
       >
         <div className="space-y-4">
           <p>This action is irreversible.</p>
           <div className="flex justify-end gap-2">
-            <Button variant="outline" onClick={handleCancelDelete}>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setDeleteTargetId(null)
+              }}
+            >
               Cancel
             </Button>
             <Button variant="destructive" onClick={confirmDelete}>
