@@ -79,6 +79,8 @@ export default function ModeContextProvider({
       setMode(newMode)
       if (newMode !== 'system') {
         setIsDarkMode(newMode === 'dark')
+      } else {
+        setIsDarkMode(prefersDarkMediaQuery.matches)
       }
       localStorage.setItem(storageKey, newMode)
     },
