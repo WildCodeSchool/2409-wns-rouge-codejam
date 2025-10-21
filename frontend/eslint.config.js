@@ -33,6 +33,7 @@ export default tseslint.config(
       ...reactHooks.configs.recommended.rules,
       ...react.configs.recommended.rules,
       ...react.configs['jsx-runtime'].rules,
+      ...jsxA11y.configs.recommended.rules, // 👈 enable a11y rules
       'react-refresh/only-export-components': [
         'warn',
         { allowConstantExport: true },

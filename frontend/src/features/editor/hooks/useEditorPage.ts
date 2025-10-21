@@ -1,19 +1,19 @@
 import { useCallback, useEffect, useReducer } from 'react'
 import { toast } from 'sonner'
 
-import { STARTER_SNIPPET } from '@/features/editor/components/editor'
+import { STARTER_SNIPPETS } from '@/features/editor/config'
 import { useSnippet } from '@/features/editor/hooks'
 import {
   editorReducer,
   EditorState,
   initialEditorState,
 } from '@/features/editor/reducers'
-
 import {
   ExecutionStatus,
   GetSnippetQuery,
   Language,
 } from '@/shared/gql/graphql'
+import { toastOptions } from '@/shared/config'
 
 const initializeEditorState = (
   snippet: GetSnippetQuery['getSnippet'] | null | undefined,
@@ -73,12 +73,12 @@ export default function useEditorPage(snippetId?: string) {
   const updateLanguage = useCallback(
     (nextLanguage: string) => {
       const keepCode =
-        snippetId ?? state.code !== STARTER_SNIPPET[state.language]
+        snippetId ?? state.code !== STARTER_SNIPPETS[state.language]
 
       // If current code is starter code, switch to next language starter code
       const nextCode = keepCode
         ? state.code
-        : STARTER_SNIPPET[nextLanguage.toUpperCase() as Language]
+        : STARTER_SNIPPETS[nextLanguage.toUpperCase() as Language]
 
       dispatch({
         type: 'SET_LANGUAGE',
@@ -97,6 +97,13 @@ export default function useEditorPage(snippetId?: string) {
       executionStatus: nextStatus,
     })
   }, [])
+
+  if (error) {
+    toast.error('Error getting snippet', {
+      ...toastOptions.error,
+      description: error.message,
+    })
+  }
 
   return {
     snippet,

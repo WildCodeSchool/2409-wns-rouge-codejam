@@ -1,7 +1,6 @@
 import { AuthModal } from '@/features/auth/components'
 import { useActions } from '@/features/auth/hooks'
 import { Button } from '@/shared/components/ui/button'
-import { Skeleton } from '@/shared/components/ui/skeleton'
 
 export default function NavActions() {
   const { modal, closeModal, openSignIn, openSignUp } = useActions()
@@ -12,14 +11,14 @@ export default function NavActions() {
         variant="outline"
         data-testid="navbar-signin"
         onClick={openSignIn}
-        className="min-w-20"
+        className="min-w-22"
       >
         Sign In
       </Button>
       <Button
         data-testid="navbar-signup"
         onClick={openSignUp}
-        className="min-w-20"
+        className="min-w-22"
       >
         Sign Up
       </Button>
@@ -33,14 +32,5 @@ export default function NavActions() {
         />
       )}
     </>
-  )
-}
-
-export function NavActionsSkeleton() {
-  return (
-    <div className="flex flex-row items-center gap-4">
-      <Skeleton className="h-8 w-20" />
-      <Skeleton className="h-8 w-20" />
-    </div>
   )
 }

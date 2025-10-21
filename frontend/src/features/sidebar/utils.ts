@@ -17,5 +17,5 @@ export function pickNeighborById<T extends WithId>(
   // `.at()` handles negative/overflow indices and returns T | undefined
   const prev = list.at(idx - 1)
   const next = list.at(idx + 1)
-  return prev ?? next ?? null
+  return next ?? prev ?? null
 }

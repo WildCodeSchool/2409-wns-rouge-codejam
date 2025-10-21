@@ -19,6 +19,7 @@ import {
   createGuestUser,
   createSnippet,
   getUserFromContext,
+  subscribeGuest,
   updateSnippet,
 } from './utils'
 import { FindOptionsWhere } from 'typeorm'
@@ -87,7 +88,9 @@ export class SnippetsResolver {
     // If user does not exist, create a new guest user
     if (!currentUser) {
       const newGuestUser = await createGuestUser()
-      createCookieWithJwt(newGuestUser.id, context)
+      // Subscribe user with role guest to the guest free plan
+      await subscribeGuest(newGuestUser.id)
+      createCookieWithJwt(newGuestUser.id, context, null)
       currentUser = newGuestUser
     }
     context.user = currentUser

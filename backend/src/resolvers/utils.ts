@@ -16,28 +16,15 @@ import {
   SnippetCreateInput,
   SnippetUpdateInput,
 } from '../entities/Snippet'
+import { GraphQLError } from 'graphql'
 import { UserSubscription } from '../entities/UserSubscription'
 import { Plan } from '../entities/Plan'
 
 /**
- * Extracts the user ID from a JWT token.
- * @param token - The JWT token from which to extract the user ID.
- * @throws Will throw an error if the token is invalid or expired.
- * @returns The user ID extracted from the token.
- */
-export function getUserIdFromToken(token: string): string {
-  const payload = jwt.verify(
-    token,
-    process.env.JWT_SECRET || '',
-  ) as UserIDJwtPayload
-  return payload.userId
-}
-
-/**
  * Retrieve current user from context (if authenticated).
  * @param context - The context object that contains the request and response objects.
- * @returns The user object if found (authenticated user), otherwise null.
- *
+ * @returns The user object if found (authenticated user), otherwise null
+ * @throws An error if the jwt is invalid
  */
 export async function getUserFromContext(
   context: ContextType,
@@ -45,13 +32,25 @@ export async function getUserFromContext(
   if (context.user) return context.user
 
   const cookies = new Cookies(context.req, context.res)
-  const token = cookies.get('access_token')
-  if (!token) return null
+  const cookieValue = cookies.get('access_token')
+  if (!cookieValue) return null
 
-  const userId = getUserIdFromToken(token)
-  const user = await User.findOne({ where: { id: userId } })
-  if (!user) return null
-  return user
+  try {
+    const jwtToken = jwt.verify(
+      cookieValue,
+      process.env.JWT_SECRET || '',
+    ) as UserIDJwtPayload
+
+    const user = await User.findOne({ where: { id: jwtToken.userId } })
+    return user
+  } catch (e: unknown) {
+    // Delete the cookie
+    cookies.set('access_token', '', { maxAge: 0 })
+
+    throw new GraphQLError('Session expired. Please log in again.', {
+      extensions: { code: 'INVALID_JWT' },
+    })
+  }
 }
 
 /**
@@ -202,15 +201,27 @@ export async function getUserSnippetCount(userId: string): Promise<number> {
 export function createCookieWithJwt(
   userId: string,
   context: ContextType,
-  expiresIn: number = 24 * 60 * 60,
+  expiresIn: number | null = 24 * 60 * 60,
 ) {
   const token = jwt.sign({ userId }, process.env.JWT_SECRET || '', {
-    expiresIn: expiresIn,
+    // If expiresIn is explicitly set to null, we omit the parameter. This makes the JWT imperishable.
+    ...(expiresIn !== null && { expiresIn }),
   })
+
   new Cookies(context.req, context.res).set('access_token', token, {
     httpOnly: true,
     secure: false,
   })
+}
+
+/**
+ * Function to delete a cookie.
+ * @param userId - The user id
+ * @param context - The context of the request
+ */
+export function deleteCookie(context: ContextType) {
+  const cookies = new Cookies(context.req, context.res)
+  cookies.set('access_token', '', { maxAge: 0 })
 }
 
 /**

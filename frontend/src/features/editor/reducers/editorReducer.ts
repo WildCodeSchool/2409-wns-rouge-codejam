@@ -1,4 +1,4 @@
-import { STARTER_SNIPPET } from '@/features/editor/components/editor'
+import { STARTER_SNIPPETS } from '@/features/editor/config'
 import { ExecutionStatus, Language } from '@/shared/gql/graphql'
 
 type EditorAction =
@@ -20,7 +20,7 @@ export type EditorState = {
 }
 
 export const initialEditorState: EditorState = {
-  code: STARTER_SNIPPET.JAVASCRIPT,
+  code: STARTER_SNIPPETS.JAVASCRIPT,
   language: Language.Javascript,
   output: '',
   executionStatus: undefined,
