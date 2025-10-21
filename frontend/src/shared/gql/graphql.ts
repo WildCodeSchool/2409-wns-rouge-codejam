@@ -31,6 +31,15 @@ export type Scalars = {
   DateTime: { input: any; output: any }
 }
 
+/** Cancelation possible reason */
+export enum CancelationReadon {
+  Canceledadmin = 'CANCELEDADMIN',
+  Cancelled = 'CANCELLED',
+  Expired = 'EXPIRED',
+  Subscribed = 'SUBSCRIBED',
+  Unpaid = 'UNPAID',
+}
+
 export type Execution = {
   __typename?: 'Execution'
   executedAt: Scalars['DateTime']['output']
@@ -54,6 +63,7 @@ export enum Language {
 
 export type Mutation = {
   __typename?: 'Mutation'
+  createPlan: Plan
   createSnippet: Snippet
   createUser: User
   deleteSnippet: Scalars['Boolean']['output']
@@ -62,8 +72,16 @@ export type Mutation = {
   login?: Maybe<User>
   logout: Scalars['Boolean']['output']
   saveSnippet?: Maybe<Snippet>
+  subscribe: UserSubscription
+  unsubscribe: Scalars['Boolean']['output']
+  updatePlan: Plan
   updateSnippet: Snippet
   updateUser?: Maybe<User>
+  updateUserSubscription?: Maybe<UserSubscription>
+}
+
+export type MutationCreatePlanArgs = {
+  data: PlanCreateInput
 }
 
 export type MutationCreateSnippetArgs = {
@@ -96,6 +114,19 @@ export type MutationSaveSnippetArgs = {
   id?: InputMaybe<Scalars['ID']['input']>
 }
 
+export type MutationSubscribeArgs = {
+  data: UserSubscriptionCreateInput
+}
+
+export type MutationUnsubscribeArgs = {
+  userId: Scalars['ID']['input']
+}
+
+export type MutationUpdatePlanArgs = {
+  data: PlanUpdateInput
+  id: Scalars['ID']['input']
+}
+
 export type MutationUpdateSnippetArgs = {
   data: SnippetUpdateInput
   id: Scalars['ID']['input']
@@ -106,13 +137,48 @@ export type MutationUpdateUserArgs = {
   id?: InputMaybe<Scalars['ID']['input']>
 }
 
+export type MutationUpdateUserSubscriptionArgs = {
+  data: UserSubscriptionUpdateInput
+  email: Scalars['String']['input']
+}
+
+export type Plan = {
+  __typename?: 'Plan'
+  createdAt: Scalars['DateTime']['output']
+  executionLimit?: Maybe<Scalars['Int']['output']>
+  id: Scalars['ID']['output']
+  name: Scalars['String']['output']
+  price: Scalars['Int']['output']
+  subscriptions: Array<UserSubscription>
+  updatedAt: Scalars['DateTime']['output']
+}
+
+export type PlanCreateInput = {
+  executionLimit?: InputMaybe<Scalars['Int']['input']>
+  name: Scalars['String']['input']
+  price: Scalars['Int']['input']
+}
+
+export type PlanUpdateInput = {
+  executionLimit: Scalars['Int']['input']
+  name: Scalars['String']['input']
+  price: Scalars['Int']['input']
+}
+
 export type Query = {
   __typename?: 'Query'
+  getActiveSubscription?: Maybe<UserSubscription>
   getAllSnippets: Array<Snippet>
+  getAllUsersSubscriptions: Array<User>
   getSnippet?: Maybe<Snippet>
+  plans: Array<Plan>
   user?: Maybe<User>
   users: Array<User>
   whoAmI?: Maybe<User>
+}
+
+export type QueryGetActiveSubscriptionArgs = {
+  userId?: InputMaybe<Scalars['String']['input']>
 }
 
 export type QueryGetSnippetArgs = {
@@ -157,6 +223,7 @@ export type User = {
   id: Scalars['ID']['output']
   role: UserRole
   snippets: Array<Snippet>
+  subscriptions: Array<UserSubscription>
   updatedAt: Scalars['DateTime']['output']
   username?: Maybe<Scalars['String']['output']>
 }
@@ -235,17 +302,13 @@ export type CreateUserMutation = {
   }
 }
 
-<<<<<<< HEAD
-export type ExecuteMutationVariables = Exact<{
-=======
 export type DeletUserMutationVariables = Exact<{
   deleteUserId?: InputMaybe<Scalars['ID']['input']>
 }>
 
 export type DeletUserMutation = { __typename?: 'Mutation'; deleteUser: boolean }
 
-export type MutationMutationVariables = Exact<{
->>>>>>> main
+export type ExecuteMutationVariables = Exact<{
   data: SnippetCreateInput
   snippetId?: InputMaybe<Scalars['ID']['input']>
 }>
@@ -454,9 +517,6 @@ export const CreateUserDocument = {
     },
   ],
 } as unknown as DocumentNode<CreateUserMutation, CreateUserMutationVariables>
-<<<<<<< HEAD
-export const ExecuteDocument = {
-=======
 export const DeletUserDocument = {
   kind: 'Document',
   definitions: [
@@ -496,8 +556,7 @@ export const DeletUserDocument = {
     },
   ],
 } as unknown as DocumentNode<DeletUserMutation, DeletUserMutationVariables>
-export const MutationDocument = {
->>>>>>> main
+export const ExecuteDocument = {
   kind: 'Document',
   definitions: [
     {
