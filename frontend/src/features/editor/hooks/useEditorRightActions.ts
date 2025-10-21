@@ -1,6 +1,6 @@
 import { useMutation } from '@apollo/client'
 import { debounce } from 'lodash'
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import {
   adjectives,
@@ -11,13 +11,17 @@ import {
 } from 'unique-names-generator'
 import { toast } from 'sonner'
 
-import { EditorUrlParams, Status } from '@/features/editor/types'
+import { EditorUrlParams, EditorStatus } from '@/features/editor/types'
+
 import { EXECUTE } from '@/shared/api/execute'
 import { GET_SNIPPET } from '@/shared/api/getSnippet'
 import { GET_ALL_SNIPPETS } from '@/shared/api/getUserSnippets'
 import { toastOptions } from '@/shared/config'
 import { ExecutionStatus, Language } from '@/shared/gql/graphql'
 import useSnippet from './useSnippet'
+
+const SHARE_SNIPPET_SHORTCUT = 'KeyC'
+const RUN_SNIPPET_SHORTCUT = 'KeyE'
 
 const baseUniqueNameConfig: Config = {
   dictionaries: [adjectives, colors, animals],
@@ -34,35 +38,11 @@ export default function useEditorRightActions(
   const { snippet } = useSnippet(snippetId)
 
   const [showModal, setShowModal] = useState(false)
-  const [status, setStatus] = useState<Status>('typing')
+  const [status, setStatus] = useState<EditorStatus>('typing')
   const [execute] = useMutation(EXECUTE)
   const navigate = useNavigate()
 
-  const closeModal = useCallback(() => {
-    setShowModal(false)
-  }, [])
-
-  const shareUrl = useCallback(
-    async (_e: React.MouseEvent<HTMLButtonElement>) => {
-      const url = window.location.href
-      await navigator.clipboard.writeText(url)
-      toast.success('URL copied to clipboard', {
-        ...toastOptions.base,
-        icon: toastOptions.success.Icon,
-      })
-    },
-    [],
-  )
-  const debouncedShareUrl = useMemo(
-    () =>
-      debounce(shareUrl, 1000, {
-        leading: true,
-        trailing: false,
-      }),
-    [shareUrl],
-  )
-
-  async function executeSnippet() {
+  const runSnippet = useCallback(async () => {
     try {
       setStatus('executing')
       const { data } = await execute({
@@ -73,16 +53,14 @@ export default function useEditorRightActions(
                 ? snippet.name
                 : uniqueNamesGenerator(baseUniqueNameConfig),
             code,
-            language: language,
+            language,
           },
-          snippetId: snippetId,
+          snippetId,
         },
         refetchQueries: [
           { query: GET_SNIPPET, variables: { id: snippetId } },
           // !TODO: refetch only when user is logged in and run code without any existing snippet...
-          {
-            query: GET_ALL_SNIPPETS,
-          },
+          GET_ALL_SNIPPETS,
         ],
       })
       if (data) {
@@ -114,27 +92,110 @@ export default function useEditorRightActions(
           setStatus('disabled')
         } else {
           console.error('Error executing code:', error.message)
-          toast.error(`Error executing code: ${error.message}`, {
-            description: 'Please try again later.',
+          toast.error("Oops! We couldn't run your code...", {
+            ...toastOptions.error,
+            description: error.message,
           })
         }
       } else {
         console.error('Unexpected error:', error)
-        toast.error('Execution service temporarily unavailable', {
-          description: 'Please try again later.',
+        toast.error('Oops! Our service is temporarily unavailable...', {
+          ...toastOptions.error,
         })
       }
     } finally {
       setStatus('typing')
     }
-  }
+  }, [
+    snippetSlug,
+    code,
+    language,
+    snippetId,
+    navigate,
+    execute,
+    onChangeOutput,
+    onChangeStatus,
+  ])
+
+  const debouncedRunSnippet = useMemo(
+    () =>
+      debounce(runSnippet, 1000, {
+        leading: true,
+        trailing: false,
+      }),
+    [runSnippet],
+  )
+
+  const closeModal = useCallback(() => {
+    setShowModal(false)
+  }, [])
+
+  const shareUrl = useCallback(
+    async (_e?: React.MouseEvent<HTMLButtonElement>) => {
+      const url = window.location.href
+      await navigator.clipboard.writeText(url)
+      toast.success('URL copied to clipboard', {
+        ...toastOptions.base,
+        icon: toastOptions.success.Icon,
+      })
+    },
+    [],
+  )
+  const debouncedShareUrl = useMemo(
+    () =>
+      debounce(shareUrl, 1000, {
+        leading: true,
+        trailing: false,
+      }),
+    [shareUrl],
+  )
+
+  // Adds a keyboard shortcut to run the snippet.
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (
+        event.code === RUN_SNIPPET_SHORTCUT &&
+        (event.metaKey || event.ctrlKey) &&
+        event.shiftKey
+      ) {
+        event.preventDefault()
+        void debouncedRunSnippet()
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [debouncedRunSnippet])
+
+  // Adds a keyboard shortcut to share the snippet.
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (
+        event.code === SHARE_SNIPPET_SHORTCUT &&
+        (event.metaKey || event.ctrlKey) &&
+        event.shiftKey
+      ) {
+        event.preventDefault()
+        void debouncedShareUrl()
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [debouncedShareUrl])
 
   return {
-    executeSnippet,
-    debouncedShareUrl,
-    status,
-    showModal,
     closeModal,
+    debouncedRunSnippet,
+    debouncedShareUrl,
+    RUN_SNIPPET_SHORTCUT,
+    SHARE_SNIPPET_SHORTCUT,
+    showModal,
     snippetId,
+    status,
   }
 }

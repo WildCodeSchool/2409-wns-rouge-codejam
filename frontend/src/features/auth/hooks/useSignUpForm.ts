@@ -10,6 +10,7 @@ import {
 } from '@/features/auth/schemas/formSchema'
 import { CREATE_USER } from '@/shared/api/createUser'
 import { WHO_AM_I } from '@/shared/api/whoAmI'
+import { toastOptions } from '@/shared/config'
 
 export default function useSignInForm(cbFn?: () => void) {
   const [createUserMutation] = useMutation(CREATE_USER)
@@ -59,13 +60,14 @@ export default function useSignInForm(cbFn?: () => void) {
         })
 
         if (data?.createUser) {
-          toast.success(`Welcome ${data.createUser.username ?? 'Codejamer'}`, {
-            description: 'Successful registration',
+          toast.success('Successful registration', {
+            ...toastOptions.success,
+            description: `Welcome ${data.createUser.username ?? 'Codejamer'} 🎉 `,
           })
 
           cbFn?.()
         }
-      } catch (err) {
+      } catch (err: unknown) {
         if (err instanceof Error) {
           if (err.message.includes('email')) {
             form.setError('email', {
@@ -78,9 +80,9 @@ export default function useSignInForm(cbFn?: () => void) {
             })
           }
         } else {
-          toast.error(`Error while creating your account`, {
-            description:
-              err instanceof Error ? err.message : JSON.stringify(err),
+          console.error(err)
+          toast.error("Oops! We couldn't create your account...", {
+            ...toastOptions.error,
           })
         }
       }

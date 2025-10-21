@@ -1,5 +1,4 @@
 import argon2 from 'argon2'
-import Cookies from 'cookies'
 import {
   Arg,
   Authorized,
@@ -20,6 +19,7 @@ import { AuthContextType, ContextType, UserRole } from '../types'
 import {
   createCookieWithJwt,
   createDefaultSubscription,
+  deleteCookie,
   findActiveSubscription,
   getUserFromContext,
 } from './utils'
@@ -146,8 +146,7 @@ export class UsersResolver {
 
   @Mutation(() => Boolean)
   async logout(@Ctx() context: AuthContextType): Promise<boolean> {
-    const cookies = new Cookies(context.req, context.res)
-    cookies.set('access_token', '', { maxAge: 0 })
+    deleteCookie(context)
     return true
   }
 
@@ -190,6 +189,7 @@ export class UsersResolver {
     if (!user) return false
 
     const deletedUser = await user.remove()
+    deleteCookie(context)
     return !!deletedUser
   }
 }

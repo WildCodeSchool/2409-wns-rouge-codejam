@@ -120,6 +120,7 @@ export default function SnippetModal({
           className="text-foreground bg-input mb-2 w-full rounded border p-2"
           {...form.register('name')}
           placeholder={isSnippetCreation ? 'Snippet name' : currentName}
+          // eslint-disable-next-line jsx-a11y/no-autofocus
           autoFocus
           disabled={isSubmitting}
         />

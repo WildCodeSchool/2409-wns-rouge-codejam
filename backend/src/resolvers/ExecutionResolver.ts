@@ -15,6 +15,7 @@ import {
 } from './utils'
 import { ContextType, UserRole } from '../types'
 import { SnippetCreateInput } from '../entities/Snippet'
+import { GraphQLError } from 'graphql'
 
 @Resolver()
 export class ExecutionResolver {
@@ -32,7 +33,9 @@ export class ExecutionResolver {
         const newGuestUser = await createGuestUser()
         // Subscribe user with role guest to the guest free plan
         await subscribeGuest(newGuestUser.id)
-        createCookieWithJwt(newGuestUser.id, context)
+
+        // Create a cookie with a jwt that does not expire (Prevent a guest account from getting an "INVALID_JWT" error)
+        createCookieWithJwt(newGuestUser.id, context, null)
 
         currentUser = newGuestUser
       }
@@ -94,7 +97,11 @@ export class ExecutionResolver {
       const savedExecution = await Execution.save(execution)
       return savedExecution
     } catch (err) {
-      throw new Error(err instanceof Error ? err.message : JSON.stringify(err))
+      if (err instanceof GraphQLError || err instanceof Error) {
+        throw err
+      } else {
+        throw new Error(JSON.stringify(err))
+      }
     }
   }
 }

@@ -29,10 +29,11 @@ export default function AuthModal({
       title={modal === 'signIn' ? 'Sign In' : 'Sign Up'}
       titleKey={modal} // 👈 important for animation
       onOpenChange={closeModal}
+      className="overflow-hidden"
     >
       <motion.div
         layout
-        className="relative mx-auto w-[400px]"
+        className="relative mx-auto w-full"
         transition={{ duration: 0.35, ease: 'easeInOut' }}
       >
         <AnimatePresence mode="wait" initial={false}>
