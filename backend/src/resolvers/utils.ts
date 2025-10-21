@@ -215,6 +215,16 @@ export function createCookieWithJwt(
 }
 
 /**
+ * Function to delete a cookie.
+ * @param userId - The user id
+ * @param context - The context of the request
+ */
+export function deleteCookie(context: ContextType) {
+  const cookies = new Cookies(context.req, context.res)
+  cookies.set('access_token', '', { maxAge: 0 })
+}
+
+/**
  * Function to send a code to be executed by code-execution service.
  * @param req - An object with the code and a language
  * @returns The execution response as an object with the status and the result

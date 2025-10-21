@@ -6,6 +6,8 @@ import {
   HttpLink,
 } from '@apollo/client'
 
+import { ModeContextProvider } from '@/features/mode/providers'
+
 import { MainLayout } from '@/shared/components/layouts'
 import { Toaster } from '@/shared/components/ui/sonner'
 import { EditorPage } from '@/shared/pages'
@@ -38,7 +40,7 @@ const client = new ApolloClient({
   credentials: 'same-origin',
   defaultOptions: {
     watchQuery: {
-      fetchPolicy: 'cache-and-network',
+      fetchPolicy: 'cache-first',
     },
   },
   link: logoutLink.concat(httpLink),
@@ -47,20 +49,22 @@ const client = new ApolloClient({
 export default function App() {
   return (
     <ApolloProvider client={client}>
-      <Toaster richColors />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" Component={MainLayout}>
-            <Route index element={<Navigate to="/editor" />} />
-            <Route path="/editor" Component={EditorPage} />
-            <Route
-              path="/editor/:snippetId/:snippetSlug"
-              Component={EditorPage}
-            />
-          </Route>
-          <Route path="*" element={<Navigate to="/editor" replace />} />
-        </Routes>
-      </BrowserRouter>
+      <ModeContextProvider defaultMode="system" storageKey="app_mode">
+        <Toaster richColors />
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" Component={MainLayout}>
+              <Route index element={<Navigate to="/editor" />} />
+              <Route path="/editor" Component={EditorPage} />
+              <Route
+                path="/editor/:snippetId/:snippetSlug"
+                Component={EditorPage}
+              />
+            </Route>
+            <Route path="*" element={<Navigate to="/editor" replace />} />
+          </Routes>
+        </BrowserRouter>
+      </ModeContextProvider>
     </ApolloProvider>
   )
 }

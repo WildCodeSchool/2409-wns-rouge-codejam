@@ -1,3 +1,4 @@
+import { AlertCircleIcon } from 'lucide-react'
 import * as React from 'react'
 import * as LabelPrimitive from '@radix-ui/react-label'
 import { Slot } from '@radix-ui/react-slot'
@@ -141,14 +142,17 @@ function FormMessage({ className, ...props }: React.ComponentProps<'p'>) {
   }
 
   return (
-    <p
-      data-slot="form-message"
-      id={formMessageId}
-      className={cn('text-destructive-foreground text-xs', className)}
-      {...props}
+    <div
+      className={cn(
+        'text-destructive-foreground flex items-center gap-1 text-xs',
+        className,
+      )}
     >
-      {body}
-    </p>
+      <AlertCircleIcon size={16} />
+      <p data-slot="form-message" id={formMessageId} {...props}>
+        {body}
+      </p>
+    </div>
   )
 }
 

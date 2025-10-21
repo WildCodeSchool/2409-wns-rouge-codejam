@@ -49,7 +49,9 @@ export class UserSubscription extends BaseEntity {
   @Field(() => CancellationReason)
   cancellationReason!: CancellationReason
 
-  @ManyToOne(() => User, (user) => user.subscriptions)
+  @ManyToOne(() => User, (user) => user.subscriptions, {
+    onDelete: 'CASCADE',
+  })
   @Field(() => User)
   user!: User
 
