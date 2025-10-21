@@ -61,13 +61,7 @@ export const signUpFormSchema = signInFormSchema
 
 // Zod schema for snippet creation
 export const snippetCreateSchema = z.object({
-  name: z
-    .string()
-    .min(1, 'This field is required')
-    .regex(
-      /^[A-Za-z0-9_\- ]+$/,
-      'Only letters, numbers, underscores, spaces, and dashes are allowed',
-    ),
+  name: z.string().min(1, 'This field is required'),
   code: z.string().optional(),
   language: z.string().default('typescript'),
 })
