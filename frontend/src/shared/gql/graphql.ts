@@ -351,6 +351,7 @@ export type GetSnippetQuery = {
   getSnippet?: {
     __typename?: 'Snippet'
     id: string
+    name: string
     code: string
     language: Language
     slug: string
@@ -408,7 +409,7 @@ export type UpdateSnippetMutationVariables = Exact<{
 
 export type UpdateSnippetMutation = {
   __typename?: 'Mutation'
-  updateSnippet: { __typename?: 'Snippet'; id: string }
+  updateSnippet: { __typename?: 'Snippet'; id: string; slug: string }
 }
 
 export type WhoAmIQueryVariables = Exact<{ [key: string]: never }>
@@ -762,6 +763,7 @@ export const GetSnippetDocument = {
               kind: 'SelectionSet',
               selections: [
                 { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'name' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'code' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'language' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'slug' } },
@@ -1013,6 +1015,7 @@ export const UpdateSnippetDocument = {
               kind: 'SelectionSet',
               selections: [
                 { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'slug' } },
               ],
             },
           },

@@ -61,7 +61,7 @@ export class SnippetsResolver {
     return Snippet.find({
       where,
       relations,
-      order: { updatedAt: 'DESC' },
+      order: { createdAt: 'DESC' },
     })
   }
 
@@ -135,8 +135,9 @@ export class SnippetsResolver {
     @Arg('data', () => SnippetUpdateInput) data: SnippetUpdateInput,
   ): Promise<Snippet> {
     const snippet = await Snippet.findOne({
-      where: { id, user: context.user },
+      where: { id, user: { id: context.user.id } },
     })
+
     if (!snippet) throw new Error('Snippet not found or not owned by user')
     Object.assign(snippet, data)
     return await Snippet.save(snippet)

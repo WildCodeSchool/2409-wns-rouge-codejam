@@ -24,7 +24,14 @@ export default function useEditorSidebar() {
   const [activeSnippetId, setActiveSnippetId] = useState<string | undefined>(
     snippetId,
   )
-  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [_isModalOpen, setIsModalOpen] = useState(false)
+  const [currentName, setCurrentName] = useState<string>('')
+  const [selectedSnippetId, setSelectedSnippetID] = useState<
+    string | undefined
+  >()
+
+  const [isModalCreate, setIsModalCreate] = useState(false)
+  const [isModalRename, setIsModalRename] = useState(false)
   const isMobile = useIsMobile()
   const { open, openMobile, setOpenMobile } = useSidebar()
   const { data: { whoAmI: user } = {} } = useQuery(WHO_AM_I)
@@ -90,14 +97,6 @@ export default function useEditorSidebar() {
     setIsModalOpen(true)
   }, [])
 
-  const closeModal = useCallback(() => {
-    setIsModalOpen(false)
-  }, [])
-
-  const toggleModal = useCallback((nextOpen: boolean) => {
-    setIsModalOpen(nextOpen)
-  }, [])
-
   const confirmDelete = useCallback(async (): Promise<boolean> => {
     if (!targetIdToDelete) return false
 
@@ -144,35 +143,41 @@ export default function useEditorSidebar() {
   return useMemo(
     () => ({
       activeSnippetId,
-      closeModal,
       confirmDelete,
+      currentName,
       targetIdToDelete,
       targetNameToDelete,
-      isModalOpen,
       isSidebarOpen,
+      isModalCreate,
+      isModalRename,
       navigate,
       openModal,
+      setCurrentName,
       selectSnippet,
+      selectedSnippetId,
+      setIsModalCreate,
+      setIsModalRename,
+      setSelectedSnippetID,
       setTargetIdToDelete,
       snippetId,
       snippets,
-      toggleModal,
       user,
     }),
     [
       activeSnippetId,
-      closeModal,
       confirmDelete,
+      currentName,
       targetIdToDelete,
       targetNameToDelete,
-      isModalOpen,
       isSidebarOpen,
+      isModalCreate,
+      isModalRename,
       navigate,
       openModal,
       selectSnippet,
+      selectedSnippetId,
       snippetId,
       snippets,
-      toggleModal,
       user,
     ],
   )

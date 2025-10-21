@@ -1,4 +1,4 @@
-import { CreateSnippetModal } from '@/features/editor/components'
+import SnippetModal from '@/features/editor/components/SnippetModal'
 import {
   AddSnippet,
   SidebarHeader,
@@ -27,17 +27,23 @@ type EditorSidebarProps = {
 export default function EditorSidebar({ language }: EditorSidebarProps) {
   const {
     activeSnippetId,
-    closeModal,
+
     confirmDelete,
     targetIdToDelete,
     targetNameToDelete,
-    isModalOpen,
+    currentName,
+    selectedSnippetId,
+    isModalCreate,
+    isModalRename,
     isSidebarOpen,
     openModal,
     selectSnippet,
     setTargetIdToDelete,
+    setIsModalCreate,
     snippets,
-    toggleModal,
+    setSelectedSnippetID,
+    setCurrentName,
+    setIsModalRename,
     user,
   } = useEditorSidebar()
 
@@ -62,7 +68,12 @@ export default function EditorSidebar({ language }: EditorSidebarProps) {
               <SidebarHeader>My Snippets</SidebarHeader>
 
               <SidebarMenu className="gap-2.5 pr-4 pl-2">
-                <AddSnippet onAddClick={openModal} />
+                <AddSnippet
+                  onAddClick={() => {
+                    setIsModalCreate(true)
+                    openModal()
+                  }}
+                />
 
                 {(snippets ?? []).map((snippet) => (
                   <Snippet
@@ -75,7 +86,9 @@ export default function EditorSidebar({ language }: EditorSidebarProps) {
                       setTargetIdToDelete(snippet.id)
                     }}
                     onSnippetEdit={() => {
-                      alert(`🚧 Rename snippet ${snippet.id}...`)
+                      setIsModalRename(true)
+                      setCurrentName(snippet.name)
+                      setSelectedSnippetID(snippet.id)
                     }}
                   >
                     {snippet.name}
@@ -89,10 +102,33 @@ export default function EditorSidebar({ language }: EditorSidebarProps) {
 
       <Modal
         title="Create Snippet"
-        open={isModalOpen}
-        onOpenChange={toggleModal}
+        open={isModalCreate}
+        onOpenChange={setIsModalCreate}
       >
-        <CreateSnippetModal language={language} onClose={closeModal} />
+        <SnippetModal
+          language={language}
+          isSnippetCreation={true}
+          currentName=""
+          selectedSnippetId=""
+          onClose={() => {
+            setIsModalCreate(false)
+          }}
+        />
+      </Modal>
+      <Modal
+        title="Rename Snippet"
+        open={isModalRename}
+        onOpenChange={setIsModalRename}
+      >
+        <SnippetModal
+          language={language}
+          isSnippetCreation={false}
+          currentName={currentName}
+          selectedSnippetId={selectedSnippetId}
+          onClose={() => {
+            setIsModalRename(false)
+          }}
+        />
       </Modal>
       <Modal
         title={
