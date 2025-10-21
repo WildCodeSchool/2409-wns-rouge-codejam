@@ -7,6 +7,7 @@ import {
 import { useEditorSidebar } from '@/features/sidebar/hooks'
 
 import Modal from '@/shared/components/Modal'
+import { Button } from '@/shared/components/ui/button'
 import {
   Sidebar,
   SidebarContent,
@@ -27,10 +28,14 @@ export default function EditorSidebar({ language }: EditorSidebarProps) {
   const {
     activeSnippetId,
     closeModal,
+    confirmDelete,
+    targetIdToDelete,
+    targetNameToDelete,
     isModalOpen,
     isSidebarOpen,
     openModal,
     selectSnippet,
+    setTargetIdToDelete,
     snippets,
     toggleModal,
     user,
@@ -67,7 +72,7 @@ export default function EditorSidebar({ language }: EditorSidebarProps) {
                       selectSnippet(snippet.id, snippet.slug)
                     }}
                     onSnippetDelete={() => {
-                      alert(`🚧 Delete snippet ${snippet.id}...`)
+                      setTargetIdToDelete(snippet.id)
                     }}
                     onSnippetEdit={() => {
                       alert(`🚧 Rename snippet ${snippet.id}...`)
@@ -88,6 +93,32 @@ export default function EditorSidebar({ language }: EditorSidebarProps) {
         onOpenChange={toggleModal}
       >
         <CreateSnippetModal language={language} onClose={closeModal} />
+      </Modal>
+      <Modal
+        title={
+          targetIdToDelete ? `Delete snippet “${targetNameToDelete}”?` : ''
+        }
+        open={!!targetIdToDelete}
+        onOpenChange={(isOpen) => {
+          if (!isOpen) setTargetIdToDelete(null)
+        }}
+      >
+        <div className="space-y-4">
+          <p>This action is irreversible.</p>
+          <div className="flex justify-end gap-2">
+            <Button
+              variant="outline"
+              onClick={() => {
+                setTargetIdToDelete(null)
+              }}
+            >
+              Cancel
+            </Button>
+            <Button variant="destructive" onClick={confirmDelete}>
+              Delete
+            </Button>
+          </div>
+        </div>
       </Modal>
     </>
   )

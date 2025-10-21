@@ -16,6 +16,7 @@ import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/
 type Documents = {
   '\n  mutation CreateSnippet($data: SnippetCreateInput!) {\n    createSnippet(data: $data) {\n      id\n      name\n      slug\n    }\n  }\n': typeof types.CreateSnippetDocument
   '\n  mutation createUser($data: UserCreateInput!) {\n    createUser(data: $data) {\n      email\n      username\n      id\n    }\n  }\n': typeof types.CreateUserDocument
+  '\n  mutation deleteSnippet($id: ID!) {\n    deleteSnippet(id: $id)\n  }\n': typeof types.DeleteSnippetDocument
   '\n  mutation deletUser($deleteUserId: ID) {\n    deleteUser(id: $deleteUserId)\n  }\n': typeof types.DeletUserDocument
   '\n  mutation execute($data: SnippetCreateInput!, $snippetId: ID) {\n    execute(data: $data, snippetId: $snippetId) {\n      id\n      result\n      status\n      snippet {\n        id\n        name\n        slug\n        language\n        updatedAt\n      }\n    }\n  }\n': typeof types.ExecuteDocument
   '\n  query getSnippet($id: ID!, $limit: Int, $offset: Int) {\n    getSnippet(id: $id, limit: $limit, offset: $offset) {\n      id\n      code\n      language\n      slug\n      executions {\n        id\n        status\n        result\n        executedAt\n      }\n    }\n  }\n': typeof types.GetSnippetDocument
@@ -31,6 +32,8 @@ const documents: Documents = {
     types.CreateSnippetDocument,
   '\n  mutation createUser($data: UserCreateInput!) {\n    createUser(data: $data) {\n      email\n      username\n      id\n    }\n  }\n':
     types.CreateUserDocument,
+  '\n  mutation deleteSnippet($id: ID!) {\n    deleteSnippet(id: $id)\n  }\n':
+    types.DeleteSnippetDocument,
   '\n  mutation deletUser($deleteUserId: ID) {\n    deleteUser(id: $deleteUserId)\n  }\n':
     types.DeletUserDocument,
   '\n  mutation execute($data: SnippetCreateInput!, $snippetId: ID) {\n    execute(data: $data, snippetId: $snippetId) {\n      id\n      result\n      status\n      snippet {\n        id\n        name\n        slug\n        language\n        updatedAt\n      }\n    }\n  }\n':
@@ -76,6 +79,12 @@ export function gql(
 export function gql(
   source: '\n  mutation createUser($data: UserCreateInput!) {\n    createUser(data: $data) {\n      email\n      username\n      id\n    }\n  }\n',
 ): (typeof documents)['\n  mutation createUser($data: UserCreateInput!) {\n    createUser(data: $data) {\n      email\n      username\n      id\n    }\n  }\n']
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(
+  source: '\n  mutation deleteSnippet($id: ID!) {\n    deleteSnippet(id: $id)\n  }\n',
+): (typeof documents)['\n  mutation deleteSnippet($id: ID!) {\n    deleteSnippet(id: $id)\n  }\n']
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

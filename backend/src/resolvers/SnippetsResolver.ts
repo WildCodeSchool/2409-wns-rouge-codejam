@@ -22,6 +22,7 @@ import {
   subscribeGuest,
   updateSnippet,
 } from './utils'
+import { FindOptionsWhere } from 'typeorm'
 
 @Resolver()
 export class SnippetsResolver {
@@ -148,14 +149,16 @@ export class SnippetsResolver {
     @Ctx() context: AuthContextType,
     @Arg('id', () => ID) id: string,
   ): Promise<boolean> {
-    const isAdmin = context.user.role === UserRole.ADMIN
-    const where = isAdmin ? {} : { id, user: context.user }
+    const where: FindOptionsWhere<Snippet> =
+      context.user.role === UserRole.ADMIN
+        ? { id }
+        : { id, user: { id: context.user.id } }
     const snippet = await Snippet.findOne({
       where,
     })
     if (!snippet) throw new Error('Snippet not found or not owned by user')
 
     await Snippet.remove(snippet)
-    return !!snippet
+    return true
   }
 }
