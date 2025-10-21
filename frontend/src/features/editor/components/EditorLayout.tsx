@@ -8,8 +8,7 @@ import {
   EditorRightActions,
   EditorRightActionsSkeleton,
 } from '@/features/editor/components'
-import { EditorState } from '@/features/editor/reducers'
-import { EditorSidebar } from '@/features/sidebar/components'
+import { SidebarLayout } from '@/features/sidebar/components'
 
 import {
   ResizableHandle,
@@ -17,32 +16,16 @@ import {
   ResizablePanelGroup,
 } from '@/shared/components/ui/resizable'
 import { SidebarProvider } from '@/shared/components/ui/sidebar'
-import { ExecutionStatus } from '@/shared/gql/graphql'
-import { useIsDesktop } from '@/shared/hooks/use-desktop'
-import { useIsMobile } from '@/shared/hooks/use-mobile'
+import { useIsDesktop, useIsMobile } from '@/shared/hooks'
 import { cn } from '@/shared/lib/utils'
 
-type EditorLayoutProps = {
-  state: EditorState
-  onChangeCode: (nextCode?: string) => void
-  onChangeLanguage: (nextLanguage: string) => void
-  onChangeOutput: (nextOutput?: string) => void
-  onChangeStatus: (nextStatus?: ExecutionStatus) => void
-}
-
-export default function EditorLayout({
-  state,
-  onChangeCode,
-  onChangeLanguage,
-  onChangeOutput,
-  onChangeStatus,
-}: EditorLayoutProps) {
+export default function EditorLayout() {
   const isMobile = useIsMobile()
   const isDesktop = useIsDesktop()
 
   return (
     <div className="flex h-full gap-4">
-      <EditorSidebar language={state.language} />
+      <SidebarLayout />
 
       <div className="grid h-full flex-1 grid-rows-[auto_1fr]">
         <div
@@ -51,17 +34,8 @@ export default function EditorLayout({
             isMobile ? 'px-2' : 'pt-1 pr-2',
           )}
         >
-          <EditorLeftActions
-            code={state.code}
-            language={state.language}
-            onChangeLanguage={onChangeLanguage}
-          />
-          <EditorRightActions
-            code={state.code}
-            language={state.language}
-            onChangeOutput={onChangeOutput}
-            onChangeStatus={onChangeStatus}
-          />
+          <EditorLeftActions />
+          <EditorRightActions />
         </div>
 
         <ResizablePanelGroup
@@ -74,11 +48,7 @@ export default function EditorLayout({
             minSize={25}
             maxSize={75}
           >
-            <CodeEditor
-              code={state.code}
-              language={state.language}
-              onChange={onChangeCode}
-            />
+            <CodeEditor />
           </ResizablePanel>
 
           <ResizableHandle withHandle className="bg-transparent" />
@@ -91,8 +61,6 @@ export default function EditorLayout({
             className="overflow-hidden rounded-md"
           >
             <EditorOutput
-              output={state.output}
-              status={state.executionStatus}
               className={cn(
                 'relative flex h-full overflow-hidden rounded-md border border-transparent',
                 isDesktop && 'mt-4',

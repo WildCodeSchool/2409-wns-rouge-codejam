@@ -1,7 +1,8 @@
 import { LucideProps, MoonIcon, SunIcon, CogIcon } from 'lucide-react'
 
-import { useMode } from '@/features/mode/hooks'
+import { useModeContext } from '@/features/mode/hooks'
 import { Mode, MODE_OPTIONS } from '@/features/mode/types'
+
 import { TooltipButton } from '@/shared/components'
 import {
   DropdownMenu,
@@ -10,13 +11,13 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/shared/components/ui/dropdown-menu'
-import { useIsMobile } from '@/shared/hooks/use-mobile'
+import { useIsMobile } from '@/shared/hooks'
 import { cn } from '@/shared/lib/utils'
 
-const baseItemClasses =
+const BASE_ITEM_CLASSES =
   'hover:bg-accent hover:text-accent-foreground cursor-pointer rounded-md px-2 py-1.5 text-sm tracking-wide outline-none'
 
-const modeIcons: Record<Mode, React.FC<LucideProps>> = {
+const MODE_ICONS: Record<Mode, React.FC<LucideProps>> = {
   light: ({ className, ...restProps }) => (
     <SunIcon
       {...restProps}
@@ -47,10 +48,10 @@ const modeIcons: Record<Mode, React.FC<LucideProps>> = {
 }
 
 export default function ModeToggle() {
-  const { mode, changeMode } = useMode()
+  const { mode, changeMode } = useModeContext()
   const isMobile = useIsMobile()
 
-  const ToggleIcon = modeIcons[mode]
+  const ToggleIcon = MODE_ICONS[mode]
 
   return (
     <DropdownMenu>
@@ -80,10 +81,10 @@ export default function ModeToggle() {
         className="border-input bg-background min-w-[128px] rounded-md border p-1 text-sm shadow-xs"
       >
         <DropdownMenuGroup>
-          {MODE_OPTIONS.map((mode, index) => (
+          {Object.values(MODE_OPTIONS).map((mode) => (
             <DropdownMenuItem
-              key={index}
-              className={baseItemClasses}
+              key={mode}
+              className={BASE_ITEM_CLASSES}
               onClick={() => {
                 changeMode(mode)
               }}

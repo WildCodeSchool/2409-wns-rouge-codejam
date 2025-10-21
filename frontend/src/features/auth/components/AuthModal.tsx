@@ -4,7 +4,7 @@ import { SignInForm, SignUpForm } from '@/features/auth/components'
 import { type AuthModal as TAuthModal } from '@/features/auth/hooks'
 import { Modal } from '@/shared/components'
 
-const baseMotionProps: MotionProps = {
+const BASE_MOTION_CONFIG: MotionProps = {
   layout: true,
   animate: { x: 0, opacity: 1 },
   transition: { duration: 0.3, ease: 'easeInOut' },
@@ -40,7 +40,7 @@ export default function AuthModal({
           {modal === 'signIn' ? (
             <motion.div
               key="signin"
-              {...baseMotionProps}
+              {...BASE_MOTION_CONFIG}
               initial={{ x: -50, opacity: 0 }}
               exit={{ x: 50, opacity: 0 }}
             >
@@ -53,7 +53,7 @@ export default function AuthModal({
           ) : (
             <motion.div
               key="signup"
-              {...baseMotionProps}
+              {...BASE_MOTION_CONFIG}
               initial={{ x: 50, opacity: 0 }}
               exit={{ x: -50, opacity: 0 }}
             >

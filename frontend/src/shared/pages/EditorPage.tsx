@@ -5,27 +5,20 @@ import {
   EditorPageSkeleton,
   ErrorState,
 } from '@/features/editor/components'
-import { useEditorPage } from '@/features/editor/hooks'
+import { EditorContextProvider } from '@/features/editor/providers'
 import { EditorUrlParams } from '@/features/editor/types'
+
+import { useAppContext } from '@/shared/hooks'
 
 export default function EditorPage() {
   const { snippetId } = useParams<EditorUrlParams>()
-  const {
-    loading,
-    error,
-    snippet,
-    state,
-    updateCode,
-    updateLanguage,
-    updateOutput,
-    updateStatus,
-  } = useEditorPage(snippetId)
+  const { snippet, loadingSnippet, errorSnippet } = useAppContext()
 
-  if (loading && !snippetId) {
+  if (loadingSnippet && !snippetId) {
     return <EditorPageSkeleton />
   }
 
-  if (error) {
+  if (errorSnippet) {
     return (
       <ErrorState message=" Oops the editor is momentarily unavailable... Please try again later." />
     )
@@ -38,13 +31,9 @@ export default function EditorPage() {
 
   return (
     <div className="h-full">
-      <EditorLayout
-        state={state}
-        onChangeCode={updateCode}
-        onChangeLanguage={updateLanguage}
-        onChangeOutput={updateOutput}
-        onChangeStatus={updateStatus}
-      />
+      <EditorContextProvider>
+        <EditorLayout />
+      </EditorContextProvider>
     </div>
   )
 }

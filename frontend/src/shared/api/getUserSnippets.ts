@@ -5,8 +5,6 @@ export const GET_ALL_SNIPPETS = gql(/* GraphQL */ `
     getAllSnippets {
       id
       name
-      language
-      code
       slug
     }
   }

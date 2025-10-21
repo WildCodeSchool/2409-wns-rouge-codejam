@@ -1,19 +1,22 @@
 import { useCallback, useEffect, useReducer } from 'react'
+import { useParams } from 'react-router-dom'
 import { toast } from 'sonner'
 
 import { STARTER_SNIPPETS } from '@/features/editor/config'
-import { useSnippet } from '@/features/editor/hooks'
+import { EditorContext } from '@/features/editor/contexts'
 import {
   editorReducer,
   EditorState,
   initialEditorState,
 } from '@/features/editor/reducers'
+import { EditorUrlParams } from '@/features/editor/types'
+
 import {
   ExecutionStatus,
   GetSnippetQuery,
   Language,
 } from '@/shared/gql/graphql'
-import { toastOptions } from '@/shared/config'
+import { useAppContext } from '@/shared/hooks'
 
 const initializeEditorState = (
   snippet: GetSnippetQuery['getSnippet'] | null | undefined,
@@ -29,10 +32,16 @@ const initializeEditorState = (
   }
 }
 
-export default function useEditorPage(snippetId?: string) {
-  const { snippet, loading, error } = useSnippet(snippetId)
-  const [state, dispatch] = useReducer(editorReducer, initialEditorState, () =>
-    initializeEditorState(snippet),
+export default function EditorContextProvider({
+  children,
+}: React.PropsWithChildren) {
+  const { snippetId } = useParams<EditorUrlParams>()
+  const { snippet } = useAppContext()
+
+  const [editorState, dispatch] = useReducer(
+    editorReducer,
+    initialEditorState,
+    () => initializeEditorState(snippet),
   )
 
   // Initialize from snippet or starter code
@@ -61,7 +70,7 @@ export default function useEditorPage(snippetId?: string) {
    */
   useEffect(() => {
     if (snippet === null) {
-      toast.error('Snippet not found', {
+      toast.error("Oops! We couldn't find your snippet...", {
         description: 'Redirecting to home...',
       })
     }
@@ -70,14 +79,15 @@ export default function useEditorPage(snippetId?: string) {
   const updateCode = useCallback((nextCode?: string) => {
     dispatch({ type: 'SET_CODE', code: nextCode ?? '' })
   }, [])
+
   const updateLanguage = useCallback(
     (nextLanguage: string) => {
       const keepCode =
-        snippetId ?? state.code !== STARTER_SNIPPETS[state.language]
+        snippetId ?? editorState.code !== STARTER_SNIPPETS[editorState.language]
 
       // If current code is starter code, switch to next language starter code
       const nextCode = keepCode
-        ? state.code
+        ? editorState.code
         : STARTER_SNIPPETS[nextLanguage.toUpperCase() as Language]
 
       dispatch({
@@ -86,11 +96,13 @@ export default function useEditorPage(snippetId?: string) {
         code: nextCode,
       })
     },
-    [snippetId, state.code, state.language],
+    [snippetId, editorState.code, editorState.language],
   )
+
   const updateOutput = useCallback((nextOutput?: string) => {
     dispatch({ type: 'SET_OUTPUT', output: nextOutput ?? '' })
   }, [])
+
   const updateStatus = useCallback((nextStatus?: ExecutionStatus) => {
     dispatch({
       type: 'SET_EXECUTION_STATUS',
@@ -98,21 +110,14 @@ export default function useEditorPage(snippetId?: string) {
     })
   }, [])
 
-  if (error) {
-    toast.error('Error getting snippet', {
-      ...toastOptions.error,
-      description: error.message,
-    })
-  }
-
-  return {
+  const ctx = {
     snippet,
-    loading,
-    error,
-    state,
+    editorState,
     updateCode,
     updateLanguage,
     updateOutput,
     updateStatus,
   }
+
+  return <EditorContext.Provider value={ctx}>{children}</EditorContext.Provider>
 }

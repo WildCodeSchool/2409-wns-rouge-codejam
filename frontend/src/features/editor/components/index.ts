@@ -1,5 +1,4 @@
 export { default as CodeEditor, CodeEditorSkeleton } from './CodeEditor'
-export { default as SnippetModal } from './SnippetModal'
 export { default as EditorLayout, EditorPageSkeleton } from './EditorLayout'
 export {
   default as EditorLeftActions,

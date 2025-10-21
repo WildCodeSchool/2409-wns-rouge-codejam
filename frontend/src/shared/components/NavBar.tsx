@@ -3,21 +3,21 @@ import {
   AccountSettingsSkeleton,
   NavActions,
 } from '@/features/auth/components'
-import { useAuth } from '@/features/auth/hooks'
 import { ModeToggle } from '@/features/mode/components'
 import { SidebarTrigger } from '@/features/sidebar/components'
 
 import { Separator } from '@/shared/components/ui/separator'
 import { useSidebar } from '@/shared/components/ui/sidebar'
+import { useAppContext } from '@/shared/hooks'
 
 export default function NavBar() {
-  const { user, loading } = useAuth()
+  const { user, isGuest, loadingUser } = useAppContext()
   const { isMobile } = useSidebar()
 
-  const showSidebar = isMobile && user?.email
+  const showSidebar = isMobile && user && !isGuest
 
   const navContent = (() => {
-    if (loading) {
+    if (loadingUser) {
       return <AccountSettingsSkeleton />
     }
 

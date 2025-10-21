@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 
 import { CUSTOM_THEMES } from '@/features/editor/config'
 import { MonacoEditorInstance, MonacoTheme } from '@/features/editor/types'
@@ -7,13 +7,13 @@ import {
   initializeCursorPosition,
   resolveEditorTheme,
 } from '@/features/editor/utils'
-import { useMode } from '@/features/mode/hooks'
+import { useModeContext } from '@/features/mode/hooks'
 
 export default function useEditor() {
+  const { mode, isDarkMode } = useModeContext()
   const editorRef = useRef<MonacoEditorInstance | null>(null)
   const [editorTheme, setEditorTheme] = useState<MonacoTheme | null>(null)
   const [loadingThemes, setLoadingThemes] = useState(true)
-  const { mode, isDarkMode } = useMode()
 
   // Initialize custom themes once and in parallel
   useEffect(() => {
@@ -48,14 +48,11 @@ export default function useEditor() {
     [loadingThemes, mode],
   )
 
-  return useMemo(
-    () => ({
-      editorRef,
-      editorTheme,
-      loadingThemes,
-      isDarkMode,
-      handleOnEditorMount,
-    }),
-    [editorTheme, loadingThemes, isDarkMode, handleOnEditorMount],
-  )
+  return {
+    editorRef,
+    editorTheme,
+    loadingThemes,
+    isDarkMode,
+    handleOnEditorMount,
+  }
 }

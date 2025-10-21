@@ -1,1 +1,1 @@
-export { default as useMode } from './useMode'
+export { default as useModeContext } from './useModeContext'

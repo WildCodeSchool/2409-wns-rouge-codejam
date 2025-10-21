@@ -1,12 +1,13 @@
 import type { editor } from 'monaco-editor'
 
 import { CUSTOM_THEMES, DEFAULT_THEMES } from '@/features/editor/config'
+import { Snippet } from '@/shared/gql/graphql'
 
 export type EditorStatus = 'typing' | 'executing' | 'disabled' | 'saving'
 
 export type EditorUrlParams = {
-  snippetId: string
-  snippetSlug: string
+  snippetId: Snippet['id']
+  snippetSlug: Snippet['slug']
 }
 
 export type MonacoCustomTheme = (typeof CUSTOM_THEMES)[number]

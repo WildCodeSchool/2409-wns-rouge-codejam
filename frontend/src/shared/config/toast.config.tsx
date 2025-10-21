@@ -1,7 +1,7 @@
 import { CircleAlertIcon, CircleCheckIcon } from 'lucide-react'
 import { ToasterProps } from 'sonner'
 
-export const toasterOptions: ToasterProps['toastOptions'] = {
+export const TOASTER_OPTIONS: ToasterProps['toastOptions'] = {
   duration: 3000,
   classNames: {
     toast:
@@ -14,10 +14,10 @@ export const toasterOptions: ToasterProps['toastOptions'] = {
   },
 }
 
-export const toastOptions = {
+export const TOAST_OPTIONS = {
   base: {
     dismissible: true,
-    duration: toasterOptions.duration,
+    duration: TOASTER_OPTIONS.duration,
   },
   success: {
     description: '',
