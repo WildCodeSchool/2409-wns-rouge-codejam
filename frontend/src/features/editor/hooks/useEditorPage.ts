@@ -13,6 +13,7 @@ import {
   GetSnippetQuery,
   Language,
 } from '@/shared/gql/graphql'
+import { toastOptions } from '@/shared/config'
 
 const initializeEditorState = (
   snippet: GetSnippetQuery['getSnippet'] | null | undefined,
@@ -96,6 +97,13 @@ export default function useEditorPage(snippetId?: string) {
       executionStatus: nextStatus,
     })
   }, [])
+
+  if (error) {
+    toast.error('Error getting snippet', {
+      ...toastOptions.error,
+      description: error.message,
+    })
+  }
 
   return {
     snippet,

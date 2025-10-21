@@ -308,12 +308,12 @@ export type DeletUserMutationVariables = Exact<{
 
 export type DeletUserMutation = { __typename?: 'Mutation'; deleteUser: boolean }
 
-export type MutationMutationVariables = Exact<{
+export type ExecuteMutationVariables = Exact<{
   data: SnippetCreateInput
   snippetId?: InputMaybe<Scalars['ID']['input']>
 }>
 
-export type MutationMutation = {
+export type ExecuteMutation = {
   __typename?: 'Mutation'
   execute: {
     __typename?: 'Execution'
@@ -556,13 +556,13 @@ export const DeletUserDocument = {
     },
   ],
 } as unknown as DocumentNode<DeletUserMutation, DeletUserMutationVariables>
-export const MutationDocument = {
+export const ExecuteDocument = {
   kind: 'Document',
   definitions: [
     {
       kind: 'OperationDefinition',
       operation: 'mutation',
-      name: { kind: 'Name', value: 'Mutation' },
+      name: { kind: 'Name', value: 'execute' },
       variableDefinitions: [
         {
           kind: 'VariableDefinition',
@@ -641,7 +641,7 @@ export const MutationDocument = {
       },
     },
   ],
-} as unknown as DocumentNode<MutationMutation, MutationMutationVariables>
+} as unknown as DocumentNode<ExecuteMutation, ExecuteMutationVariables>
 export const GetSnippetDocument = {
   kind: 'Document',
   definitions: [

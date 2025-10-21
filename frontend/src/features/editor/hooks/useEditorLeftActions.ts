@@ -44,7 +44,7 @@ export default function useEditorLeftActions(code: string, language: Language) {
           },
           id: snippetId ?? '',
         },
-        refetchQueries: [{ query: GET_ALL_SNIPPETS }],
+        refetchQueries: [GET_ALL_SNIPPETS],
       })
       if (data?.saveSnippet) {
         const { id, slug } = data.saveSnippet

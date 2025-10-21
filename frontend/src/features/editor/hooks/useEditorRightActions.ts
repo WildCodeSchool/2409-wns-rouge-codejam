@@ -54,9 +54,7 @@ export default function useEditorRightActions(
         refetchQueries: [
           { query: GET_SNIPPET, variables: { id: snippetId } },
           // !TODO: refetch only when user is logged in and run code without any existing snippet...
-          {
-            query: GET_ALL_SNIPPETS,
-          },
+          GET_ALL_SNIPPETS,
         ],
       })
       if (data) {
@@ -90,6 +88,7 @@ export default function useEditorRightActions(
           console.error('Error executing code:', error.message)
           toast.error("Oops! We couldn't run your code...", {
             ...toastOptions.error,
+            description: error.message,
           })
         }
       } else {

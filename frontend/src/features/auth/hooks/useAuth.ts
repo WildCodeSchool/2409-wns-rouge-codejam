@@ -58,5 +58,11 @@ export default function useAuth() {
     }
   }, [deleteUser, navigate])
 
-  return { user: data?.whoAmI, loading, logout, deleteAccount }
+  return {
+    user: data?.whoAmI,
+    isGuest: !data?.whoAmI?.email,
+    loading,
+    logout,
+    deleteAccount,
+  }
 }

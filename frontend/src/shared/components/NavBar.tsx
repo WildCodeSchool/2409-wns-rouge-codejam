@@ -21,7 +21,7 @@ export default function NavBar() {
       return <AccountSettingsSkeleton />
     }
 
-    if (!user) {
+    if (!user?.email) {
       return <NavActions />
     }
 
