@@ -1,7 +1,7 @@
 services:
   db:
     container_name: codejam-db
-    image: postgres
+    image: postgres:17
     ports:
       - 5432:5432
     volumes:
@@ -31,7 +31,7 @@ services:
 
   frontend:
     image: codejam2025proton/frontend:latest
-    command: sh -c "pnpm run dev"
+    command: sh -c "npx serve -s dist -l 5173"
     environment:
       - GRAPHQL_SCHEMA_URL=http://backend:3000
       - NODE_ENV=production
