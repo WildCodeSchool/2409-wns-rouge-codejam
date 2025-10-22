@@ -1,6 +1,7 @@
 import { CircleHelpIcon } from 'lucide-react'
 
-import { PASSWORD_REQUIREMENT } from '@/features/auth/schemas/formSchema'
+import { PASSWORD_REQUIREMENT } from '@/features/auth/schemas'
+
 import {
   Tooltip,
   TooltipContent,

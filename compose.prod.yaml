@@ -2,8 +2,9 @@ services:
   db:
     container_name: codejam-db
     image: postgres:17
-    ports:
-      - 5432:5432
+    # ⚠️ Use only for direct debugging on the VPS database
+    # ports:
+    #   - 5432:5432
     volumes:
       - dbdata:/var/lib/postgresql/data
     env_file:
@@ -30,7 +31,9 @@ services:
       - codeExecution.env
 
   frontend:
-    image: codejam2025proton/frontend:latest
+    image:
+      codejam2025proton/frontend:latest
+      # 👇 Override the default Docker file command (CMD) to serve the production build
     command: sh -c "npx serve -s dist -l 5173"
     environment:
       - GRAPHQL_SCHEMA_URL=http://backend:3000
@@ -43,8 +46,10 @@ services:
     image: nginx
     volumes:
       - ./nginx:/etc/nginx
+      - ./logs:/var/log/nginx
+    # 👇 Allow to pass a variable when running the docker compose command. Defaults to port host 8080 otherwise.
     ports:
-      - 8080:80
+      - ${GATEWAY_PORT:-8000}:80
     depends_on:
       - backend
       - frontend

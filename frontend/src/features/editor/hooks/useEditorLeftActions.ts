@@ -3,33 +3,28 @@ import { debounce } from 'lodash'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { toast } from 'sonner'
-import {
-  adjectives,
-  animals,
-  colors,
-  Config,
-  uniqueNamesGenerator,
-} from 'unique-names-generator'
+import { uniqueNamesGenerator } from 'unique-names-generator'
 
+import { BASE_NAME_CONFIG } from '@/features/editor/config'
+import { useEditorContext } from '@/features/editor/hooks'
 import { EditorStatus, EditorUrlParams } from '@/features/editor/types'
 
 import { GET_ALL_SNIPPETS } from '@/shared/api/getUserSnippets'
 import { SAVE_SNIPPET } from '@/shared/api/saveSnippet'
-import { toastOptions } from '@/shared/config'
-import { Language } from '@/shared/gql/graphql'
+import { TOAST_OPTIONS } from '@/shared/config'
+import { useIsMobile } from '@/shared/hooks'
 
 const SAVE_SNIPPET_SHORTCUT = 'KeyS'
 
-const baseUniqueNameConfig: Config = {
-  dictionaries: [adjectives, colors, animals],
-  separator: ' ',
-}
-
-export default function useEditorLeftActions(code: string, language: Language) {
+export default function useEditorLeftActions() {
+  const isMobile = useIsMobile()
+  const navigate = useNavigate()
   const { snippetId, snippetSlug } = useParams<EditorUrlParams>()
+  const {
+    editorState: { code, language },
+  } = useEditorContext()
   const [status, setStatus] = useState<EditorStatus>('typing')
   const [saveSnippetMutation] = useMutation(SAVE_SNIPPET)
-  const navigate = useNavigate()
 
   const saveSnippet = useCallback(async () => {
     try {
@@ -40,7 +35,7 @@ export default function useEditorLeftActions(code: string, language: Language) {
           data: {
             code,
             language,
-            name: snippetSlug ?? uniqueNamesGenerator(baseUniqueNameConfig),
+            name: snippetSlug ?? uniqueNamesGenerator(BASE_NAME_CONFIG),
           },
           id: snippetId ?? '',
         },
@@ -57,12 +52,12 @@ export default function useEditorLeftActions(code: string, language: Language) {
       }
 
       toast.success('Snippet saved successfully', {
-        ...toastOptions.success,
+        ...TOAST_OPTIONS.success,
       })
     } catch (err: unknown) {
       console.error(err)
       toast.error("Oops! We couldn't save your snippet...", {
-        ...toastOptions.error,
+        ...TOAST_OPTIONS.error,
       })
     } finally {
       setStatus('typing')
@@ -97,5 +92,11 @@ export default function useEditorLeftActions(code: string, language: Language) {
     }
   }, [debouncedSaveSnippet])
 
-  return { debouncedSaveSnippet, SAVE_SNIPPET_SHORTCUT, status }
+  return {
+    code,
+    debouncedSaveSnippet,
+    isMobile,
+    SAVE_SNIPPET_SHORTCUT,
+    status,
+  }
 }

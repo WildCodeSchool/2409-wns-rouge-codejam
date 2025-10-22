@@ -1,5 +1,6 @@
 import { Plus } from 'lucide-react'
 
+import { useSidebarContext } from '@/features/sidebar/hooks'
 import {
   BASE_MENU_ITEM_CLASSES,
   COLLAPSED_MENU_ITEM_CLASSES,
@@ -7,16 +8,13 @@ import {
 
 import { TooltipButton } from '@/shared/components'
 import { SidebarMenuItem, useSidebar } from '@/shared/components/ui/sidebar'
-import { useIsMobile } from '@/shared/hooks/use-mobile'
+import { useIsMobile } from '@/shared/hooks'
 import { cn } from '@/shared/lib/utils'
 
-type AddSnippetProps = {
-  onAddClick: () => void
-}
-
-export default function AddSnippet({ onAddClick }: AddSnippetProps) {
+export default function AddSnippet() {
   const isMobile = useIsMobile()
   const { open } = useSidebar()
+  const { setEdit, openEditModal } = useSidebarContext()
 
   return (
     <SidebarMenuItem
@@ -31,7 +29,8 @@ export default function AddSnippet({ onAddClick }: AddSnippetProps) {
         tooltip="Add a new snippet"
         className="text-background min-h-10 w-full gap-1 rounded-md"
         onClick={() => {
-          onAddClick()
+          setEdit(false)
+          openEditModal()
         }}
       >
         <span>Add</span>

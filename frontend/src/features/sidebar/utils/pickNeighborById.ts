@@ -6,7 +6,7 @@ type WithId = { id: string }
  * @param id   The id of the item around which to pick a neighbor
  * @returns    The neighbor item or null
  */
-export function pickNeighborById<T extends WithId>(
+export default function pickNeighborById<T extends WithId>(
   list: readonly T[],
   id: string,
 ): T | null {

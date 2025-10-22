@@ -15,7 +15,7 @@ export const prefersDarkMediaQuery = window.matchMedia(
  */
 export function applyMode(mode: Mode) {
   const root = window.document.documentElement
-  root.classList.remove(...MODE_OPTIONS)
+  root.classList.remove(...Object.values(MODE_OPTIONS))
 
   if (mode === 'system') {
     const resolved = prefersDarkMediaQuery.matches ? 'dark' : 'light'

@@ -1,28 +1,28 @@
+import { useEditorContext } from '@/features/editor/hooks'
 import { resolveOutputBackgroundColor } from '@/features/editor/utils'
-import { useMode } from '@/features/mode/hooks'
+import { useModeContext } from '@/features/mode/hooks'
+
 import { Skeleton } from '@/shared/components/ui/skeleton'
 import { ExecutionStatus } from '@/shared/gql/graphql'
-import { useIsMobile } from '@/shared/hooks/use-mobile'
+import { useIsMobile } from '@/shared/hooks'
 import { cn } from '@/shared/lib/utils'
 
-const baseOutputClasses = 'font-editor w-full resize-none p-4 text-sm'
-const baseStatusClasses = 'absolute right-2 top-2 rounded-full w-3 h-3'
+const BASE_OUTPUT_CLASSES = 'font-editor w-full resize-none p-4 text-sm'
+const BASE_STATUS_CLASSES = 'absolute right-2 top-2 rounded-full w-3 h-3'
 
 type EditorOutputProps = {
-  output: string
-  status?: ExecutionStatus
   className?: string
 }
 
-export default function EditorOutput({
-  className,
-  output,
-  status,
-}: EditorOutputProps) {
-  const { isDarkMode } = useMode()
+export default function EditorOutput({ className }: EditorOutputProps) {
+  const { isDarkMode } = useModeContext()
+  const {
+    editorState: { output, executionStatus },
+  } = useEditorContext()
 
-  const isError = !!status && status === ExecutionStatus.Error
-  const isSuccess = !!status && status === ExecutionStatus.Success
+  const isError = !!executionStatus && executionStatus === ExecutionStatus.Error
+  const isSuccess =
+    !!executionStatus && executionStatus === ExecutionStatus.Success
   const outputValue =
     output || 'Click the "Run code" button to visualize the output here...'
 
@@ -37,7 +37,7 @@ export default function EditorOutput({
         readOnly
         value={outputValue}
         className={cn(
-          baseOutputClasses,
+          BASE_OUTPUT_CLASSES,
           isError ? 'text-destructive' : 'text-foreground/50',
           output && 'text-foreground',
           isDarkMode ? 'border-transparent' : 'border-input',
@@ -47,7 +47,7 @@ export default function EditorOutput({
 
       <div
         className={cn(
-          baseStatusClasses,
+          BASE_STATUS_CLASSES,
           isError ? 'bg-error' : isSuccess ? 'bg-success' : 'bg-warning',
         )}
       />
@@ -57,7 +57,7 @@ export default function EditorOutput({
 
 export function EditorOutputSkeleton() {
   const isMobile = useIsMobile()
-  const { isDarkMode } = useMode()
+  const { isDarkMode } = useModeContext()
 
   return (
     <div
@@ -68,7 +68,7 @@ export function EditorOutputSkeleton() {
     >
       <Skeleton
         className={cn(
-          baseOutputClasses,
+          BASE_OUTPUT_CLASSES,
           isDarkMode ? 'border-transparent' : 'border-input',
           resolveOutputBackgroundColor(isDarkMode),
         )}

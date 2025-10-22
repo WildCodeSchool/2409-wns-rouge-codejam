@@ -4,13 +4,11 @@ import { useCallback, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 
-import {
-  signInFormSchema,
-  SignInFormType,
-} from '@/features/auth/schemas/formSchema'
+import { signInFormSchema, SignInFormType } from '@/features/auth/schemas'
+
 import { LOGIN } from '@/shared/api/login'
 import { WHO_AM_I } from '@/shared/api/whoAmI'
-import { toastOptions } from '@/shared/config'
+import { TOAST_OPTIONS } from '@/shared/config'
 
 export default function useSignInForm(cbFn?: () => void) {
   const [loginMutation] = useMutation(LOGIN)
@@ -71,7 +69,7 @@ export default function useSignInForm(cbFn?: () => void) {
         }
 
         toast.success('Successful login', {
-          ...toastOptions.success,
+          ...TOAST_OPTIONS.success,
           description: `Welcome back ${data.login.username ?? 'Codejamer'} 👋`,
         })
 
@@ -81,7 +79,7 @@ export default function useSignInForm(cbFn?: () => void) {
         }
       } catch (_err: unknown) {
         toast.error("Oops! We couldn't log you in...", {
-          ...toastOptions.error,
+          ...TOAST_OPTIONS.error,
         })
       }
     },

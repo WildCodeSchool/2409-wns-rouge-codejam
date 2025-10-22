@@ -1,30 +1,23 @@
 import MonacoEditor from '@monaco-editor/react'
 
 import { BASE_OPTIONS } from '@/features/editor/config'
-import { useEditor } from '@/features/editor/hooks'
+import { useEditor, useEditorContext } from '@/features/editor/hooks'
 import { MonacoEditorInstance } from '@/features/editor/types'
 import { resolveOutputBackgroundColor } from '@/features/editor/utils'
 
 import { Skeleton } from '@/shared/components/ui/skeleton'
-import { Language } from '@/shared/gql/graphql'
-import { useIsMobile } from '@/shared/hooks/use-mobile'
+import { useIsMobile } from '@/shared/hooks'
 import { cn } from '@/shared/lib/utils'
 
-const baseEditorClasses =
+const BASE_EDITOR_CLASSES =
   'absolute h-full w-full rounded-md border border-transparent [&_.monaco-editor]:rounded-md [&_.overflow-guard]:rounded-md'
 
-type CodeEditorProps = {
-  code: string
-  language: Language
-  onChange: (nextCode?: string) => void
-}
-
-export default function CodeEditor({
-  code,
-  language,
-  onChange,
-}: CodeEditorProps) {
+export default function CodeEditor() {
   const isMobile = useIsMobile()
+  const {
+    editorState: { code, language },
+    updateCode,
+  } = useEditorContext()
   const { editorTheme, handleOnEditorMount, isDarkMode, loadingThemes } =
     useEditor()
 
@@ -41,8 +34,8 @@ export default function CodeEditor({
         loading={<EditorLoadingSkeleton />} // 👈 prevent displaying default loader and layout flickering
         value={code}
         theme={editorTheme}
-        className={cn(baseEditorClasses, !isDarkMode && 'border-input')}
-        onChange={onChange}
+        className={cn(BASE_EDITOR_CLASSES, !isDarkMode && 'border-input')}
+        onChange={updateCode}
         onMount={(editor: MonacoEditorInstance) => {
           handleOnEditorMount(editor, code)
         }}
@@ -76,7 +69,7 @@ function EditorLoadingSkeleton() {
 export function CodeEditorSkeleton() {
   return (
     <div className="relative h-full overflow-hidden rounded-md pt-4">
-      <Skeleton className={cn(baseEditorClasses)} />
+      <Skeleton className={cn(BASE_EDITOR_CLASSES)} />
     </div>
   )
 }

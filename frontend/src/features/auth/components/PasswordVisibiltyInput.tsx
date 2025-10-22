@@ -1,7 +1,9 @@
+import { Eye, EyeClosed } from 'lucide-react'
 import { useState } from 'react'
 import { ControllerRenderProps } from 'react-hook-form'
-import { Eye, EyeClosed } from 'lucide-react'
-import { SignUpFormType } from '@/features/auth/schemas/formSchema'
+
+import { SignUpFormType } from '@/features/auth/schemas'
+
 import { Button } from '@/shared/components/ui/button'
 import { FormControl } from '@/shared/components/ui/form'
 import { Input } from '@/shared/components/ui/input'

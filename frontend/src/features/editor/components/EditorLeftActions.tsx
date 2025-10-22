@@ -2,33 +2,27 @@ import { Save } from 'lucide-react'
 
 import { LanguageSelect } from '@/features/editor/components'
 import { useEditorLeftActions } from '@/features/editor/hooks'
+
 import { TooltipButton } from '@/shared/components'
 import { Skeleton } from '@/shared/components/ui/skeleton'
 import { Spinner } from '@/shared/components/ui/spinner'
-import { Language } from '@/shared/gql/graphql'
-import { useIsMobile } from '@/shared/hooks/use-mobile'
+import { useIsMobile } from '@/shared/hooks'
 import { cn } from '@/shared/lib/utils'
 
-type EditorLeftActionProps = {
-  code: string
-  language: Language
-  onChangeLanguage: (language: string) => void
-}
-
-export default function EditorLeftActions({
-  code,
-  language,
-  onChangeLanguage,
-}: EditorLeftActionProps) {
-  const isMobile = useIsMobile()
-  const { debouncedSaveSnippet, SAVE_SNIPPET_SHORTCUT, status } =
-    useEditorLeftActions(code, language)
+export default function EditorLeftActions() {
+  const {
+    code,
+    debouncedSaveSnippet,
+    isMobile,
+    SAVE_SNIPPET_SHORTCUT,
+    status,
+  } = useEditorLeftActions()
 
   const isSaving = status === 'saving'
 
   return (
     <div className="flex justify-start gap-4">
-      <LanguageSelect language={language} onChange={onChangeLanguage} />
+      <LanguageSelect />
 
       <TooltipButton
         tooltip={`Save current snippet (⌘⇧${SAVE_SNIPPET_SHORTCUT.toLowerCase().replace(/Key/i, '').toUpperCase()})`}

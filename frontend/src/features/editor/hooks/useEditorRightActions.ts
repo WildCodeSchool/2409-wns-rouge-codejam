@@ -2,45 +2,35 @@ import { useMutation } from '@apollo/client'
 import { debounce } from 'lodash'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import {
-  adjectives,
-  animals,
-  colors,
-  Config,
-  uniqueNamesGenerator,
-} from 'unique-names-generator'
 import { toast } from 'sonner'
+import { uniqueNamesGenerator } from 'unique-names-generator'
 
-import { EditorUrlParams, EditorStatus } from '@/features/editor/types'
+import { BASE_NAME_CONFIG } from '@/features/editor/config'
+import { useEditorContext } from '@/features/editor/hooks'
+import { EditorStatus, EditorUrlParams } from '@/features/editor/types'
 
 import { EXECUTE } from '@/shared/api/execute'
-import { GET_SNIPPET } from '@/shared/api/getSnippet'
 import { GET_ALL_SNIPPETS } from '@/shared/api/getUserSnippets'
-import { toastOptions } from '@/shared/config'
-import { ExecutionStatus, Language } from '@/shared/gql/graphql'
-import useSnippet from './useSnippet'
+import { TOAST_OPTIONS } from '@/shared/config'
+import { ExecutionStatus } from '@/shared/gql/graphql'
+import { useAppContext, useIsMobile } from '@/shared/hooks'
 
 const SHARE_SNIPPET_SHORTCUT = 'KeyC'
 const RUN_SNIPPET_SHORTCUT = 'KeyE'
 
-const baseUniqueNameConfig: Config = {
-  dictionaries: [adjectives, colors, animals],
-  separator: ' ',
-}
-
-export default function useEditorRightActions(
-  code: string,
-  language: Language,
-  onChangeOutput: (nextOutput: string) => void,
-  onChangeStatus: (nextStatus?: ExecutionStatus) => void,
-) {
+export default function useEditorRightActions() {
+  const isMobile = useIsMobile()
+  const navigate = useNavigate()
   const { snippetId, snippetSlug } = useParams<EditorUrlParams>()
-  const { snippet } = useSnippet(snippetId)
-
+  const { snippet } = useAppContext()
+  const {
+    editorState: { code, language },
+    updateOutput,
+    updateStatus,
+  } = useEditorContext()
   const [showModal, setShowModal] = useState(false)
   const [status, setStatus] = useState<EditorStatus>('typing')
   const [execute] = useMutation(EXECUTE)
-  const navigate = useNavigate()
 
   const runSnippet = useCallback(async () => {
     try {
@@ -51,17 +41,13 @@ export default function useEditorRightActions(
             name:
               snippetSlug && snippet
                 ? snippet.name
-                : uniqueNamesGenerator(baseUniqueNameConfig),
+                : uniqueNamesGenerator(BASE_NAME_CONFIG),
             code,
             language,
           },
           snippetId,
         },
-        refetchQueries: [
-          { query: GET_SNIPPET, variables: { id: snippetId } },
-          // !TODO: refetch only when user is logged in and run code without any existing snippet...
-          GET_ALL_SNIPPETS,
-        ],
+        refetchQueries: [GET_ALL_SNIPPETS],
       })
       if (data) {
         const {
@@ -79,8 +65,8 @@ export default function useEditorRightActions(
           setStatus('typing')
         }
         // Update state with the result and status
-        onChangeOutput(result)
-        onChangeStatus(status)
+        updateOutput(result)
+        updateStatus(status)
       }
     } catch (error: unknown) {
       if (error instanceof Error) {
@@ -93,29 +79,29 @@ export default function useEditorRightActions(
         } else {
           console.error('Error executing code:', error.message)
           toast.error("Oops! We couldn't run your code...", {
-            ...toastOptions.error,
+            ...TOAST_OPTIONS.error,
             description: error.message,
           })
         }
       } else {
         console.error('Unexpected error:', error)
         toast.error('Oops! Our service is temporarily unavailable...', {
-          ...toastOptions.error,
+          ...TOAST_OPTIONS.error,
         })
       }
     } finally {
       setStatus('typing')
     }
   }, [
-    snippetSlug,
     code,
+    execute,
     language,
+    navigate,
+    snippetSlug,
     snippet,
     snippetId,
-    navigate,
-    execute,
-    onChangeOutput,
-    onChangeStatus,
+    updateOutput,
+    updateStatus,
   ])
 
   const debouncedRunSnippet = useMemo(
@@ -136,8 +122,8 @@ export default function useEditorRightActions(
       const url = window.location.href
       await navigator.clipboard.writeText(url)
       toast.success('URL copied to clipboard', {
-        ...toastOptions.base,
-        icon: toastOptions.success.Icon,
+        ...TOAST_OPTIONS.base,
+        icon: TOAST_OPTIONS.success.Icon,
       })
     },
     [],
@@ -191,8 +177,10 @@ export default function useEditorRightActions(
 
   return {
     closeModal,
+    code,
     debouncedRunSnippet,
     debouncedShareUrl,
+    isMobile,
     RUN_SNIPPET_SHORTCUT,
     SHARE_SNIPPET_SHORTCUT,
     showModal,

@@ -1,8 +1,10 @@
 export { default as AddSnippet } from './AddSnippet'
-export {
-  default as EditorSidebar,
-  EditorSidebarSkeleton,
-} from './EditorSidebar'
+export { default as DeleteSnippetModal } from './DeleteSnippetModal'
+export { default as Sidebar, SidebarSkeleton } from './Sidebar'
+export { default as EditSnippetModal } from './EditSnippetModal'
+export { default as ManageSnippetModals } from './ManageSnippetModals'
 export { default as SidebarHeader } from './SidebarHeader'
+export { default as SidebarLayout } from './SidebarLayout'
 export { default as SidebarTrigger } from './SidebarTrigger'
 export { default as Snippet } from './Snippet'
+export { default as SnippetList } from './SnippetList'

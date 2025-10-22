@@ -1,1 +1,1 @@
-export { default as useEditorSidebar } from './useEditorSidebar'
+export { default as useSidebarContext } from './useSidebarContext'

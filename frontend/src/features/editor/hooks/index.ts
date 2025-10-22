@@ -1,5 +1,4 @@
 export { default as useEditor } from './useEditor'
+export { default as useEditorContext } from './useEditorContext'
 export { default as useEditorLeftActions } from './useEditorLeftActions'
 export { default as useEditorRightActions } from './useEditorRightActions'
-export { default as useEditorPage } from './useEditorPage'
-export { default as useSnippet } from './useSnippet'

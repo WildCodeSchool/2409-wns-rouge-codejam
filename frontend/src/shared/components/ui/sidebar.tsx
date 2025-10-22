@@ -21,10 +21,10 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/shared/components/ui/tooltip'
-import { useIsMobile } from '@/shared/hooks/use-mobile'
 import { cn } from '@/shared/lib/utils'
+import { useIsMobile } from '@/shared/hooks'
 
-const SIDEBAR_STORAGE_KEY = 'sidebar_is_open'
+const SIDEBAR_STORAGE_KEY = 'app_sidebar_is_open'
 const SIDEBAR_WIDTH = '16rem'
 const SIDEBAR_WIDTH_MOBILE = '14rem'
 const SIDEBAR_WIDTH_ICON = '3rem'

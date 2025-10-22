@@ -53,6 +53,7 @@ export type Execution = {
 export enum ExecutionStatus {
   Error = 'ERROR',
   Success = 'SUCCESS',
+  Timeout = 'TIMEOUT',
 }
 
 /** Supported programming languages */
@@ -373,8 +374,6 @@ export type GetAllSnippetsQuery = {
     __typename?: 'Snippet'
     id: string
     name: string
-    language: Language
-    code: string
     slug: string
   }>
 }
@@ -815,8 +814,6 @@ export const GetAllSnippetsDocument = {
               selections: [
                 { kind: 'Field', name: { kind: 'Name', value: 'id' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'name' } },
-                { kind: 'Field', name: { kind: 'Name', value: 'language' } },
-                { kind: 'Field', name: { kind: 'Name', value: 'code' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'slug' } },
               ],
             },

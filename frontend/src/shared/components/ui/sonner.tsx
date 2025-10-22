@@ -1,7 +1,7 @@
 import { useTheme } from 'next-themes'
 import { Toaster as Sonner, ToasterProps } from 'sonner'
 
-import { toasterOptions } from '@/shared/config'
+import { TOASTER_OPTIONS } from '@/shared/config'
 
 const Toaster = ({ ...props }: ToasterProps) => {
   const { theme = 'system' } = useTheme()
@@ -10,7 +10,7 @@ const Toaster = ({ ...props }: ToasterProps) => {
     <Sonner
       theme={theme as ToasterProps['theme']}
       className="toaster group"
-      toastOptions={toasterOptions}
+      toastOptions={TOASTER_OPTIONS}
       {...props}
     />
   )

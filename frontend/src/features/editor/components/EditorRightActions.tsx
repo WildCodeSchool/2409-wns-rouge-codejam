@@ -2,37 +2,32 @@ import { PlayIcon, Share2Icon } from 'lucide-react'
 
 import { Subscribe } from '@/features/editor/components'
 import { useEditorRightActions } from '@/features/editor/hooks'
+
 import { Modal, TooltipButton } from '@/shared/components'
 import { Skeleton } from '@/shared/components/ui/skeleton'
 import { Spinner } from '@/shared/components/ui/spinner'
-import { ExecutionStatus, Language } from '@/shared/gql/graphql'
-import { useIsMobile } from '@/shared/hooks/use-mobile'
+import { useIsMobile } from '@/shared/hooks'
 import { cn } from '@/shared/lib/utils'
 
-type EditorRightActionProps = {
-  code: string
-  language: Language
-  onChangeOutput: (nextOutput: string) => void
-  onChangeStatus: (nextStatus?: ExecutionStatus) => void
-}
+const BASE_BUTTON_CLASSES = 'min-w-24'
+const MOBILE_BUTTON_CLASSES = 'aspect-square min-w-[unset] rounded-full px-2!'
 
-export default function EditorRightActions({
-  code,
-  language,
-  onChangeOutput,
-  onChangeStatus,
-}: EditorRightActionProps) {
-  const isMobile = useIsMobile()
+const BASE_SKELETON_CLASSES = cn('h-9 ', BASE_BUTTON_CLASSES)
+const MOBILE_SKELETON_CLASSES = 'w-9 rounded-full'
+
+export default function EditorRightActions() {
   const {
+    closeModal,
+    code,
     debouncedRunSnippet,
     debouncedShareUrl,
+    isMobile,
     RUN_SNIPPET_SHORTCUT,
     SHARE_SNIPPET_SHORTCUT,
     status,
     showModal,
-    closeModal,
     snippetId,
-  } = useEditorRightActions(code, language, onChangeOutput, onChangeStatus)
+  } = useEditorRightActions()
 
   const isExecuting = status === 'executing'
   const disabled = !code || isExecuting || status === 'disabled'
@@ -44,10 +39,7 @@ export default function EditorRightActions({
         aria-disabled={disabled}
         disabled={disabled}
         onClick={debouncedRunSnippet}
-        className={cn(
-          'min-w-24',
-          isMobile && 'aspect-square min-w-[unset] rounded-full px-2!',
-        )}
+        className={cn(BASE_BUTTON_CLASSES, isMobile && MOBILE_BUTTON_CLASSES)}
       >
         {!isMobile && <span>Run</span>}
         {isExecuting ? (
@@ -63,10 +55,7 @@ export default function EditorRightActions({
         aria-disabled={!code}
         disabled={!code || !snippetId}
         onClick={debouncedShareUrl}
-        className={cn(
-          'min-w-24',
-          isMobile && 'aspect-square min-w-[unset] rounded-full px-2!',
-        )}
+        className={cn(BASE_BUTTON_CLASSES, isMobile && MOBILE_BUTTON_CLASSES)}
       >
         {!isMobile && <span>Share</span>}
         <Share2Icon aria-hidden="true" size={15} />
@@ -90,8 +79,18 @@ export function EditorRightActionsSkeleton() {
 
   return (
     <div className="flex justify-end gap-4">
-      <Skeleton className={cn('h-9', isMobile ? 'w-9 rounded-full' : 'w-24')} />
-      <Skeleton className={cn('h-9', isMobile ? 'w-9 rounded-full' : 'w-24')} />
+      <Skeleton
+        className={cn(
+          BASE_SKELETON_CLASSES,
+          isMobile && MOBILE_SKELETON_CLASSES,
+        )}
+      />
+      <Skeleton
+        className={cn(
+          BASE_SKELETON_CLASSES,
+          isMobile && MOBILE_SKELETON_CLASSES,
+        )}
+      />
     </div>
   )
 }
