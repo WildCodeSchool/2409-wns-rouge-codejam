@@ -17,6 +17,8 @@ COPY public public
 COPY index.html ./
 COPY src src
 
+RUN pnpm run build
+
 EXPOSE 5173
 
 CMD ["pnpm", "run", "dev-gen"]
