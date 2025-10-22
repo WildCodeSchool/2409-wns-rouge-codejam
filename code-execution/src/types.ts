@@ -6,7 +6,7 @@ export enum Language {
 export enum ExecutionStatus {
   SUCCESS = 'success',
   ERROR = 'error',
-  TIMEOUT = 'error',
+  TIMEOUT = 'timeout',
 }
 
 export type ShResult = {

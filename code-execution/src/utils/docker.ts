@@ -105,11 +105,19 @@ export async function copyFileFromDockerContainer(
  */
 export async function executeJSFileInDockerContainer(
   containerName: string,
+  timeoutInSeconds = 5,
 ): Promise<ShResult> {
   console.log(chalk.yellow('Executing script...'))
+
+  const startTime = performance.now()
+
+  // Adding a timeout directly as deno argument to avoid infinite loops
   const output = await sh(
-    `docker exec ${containerName} sh -c "deno ${DOCKER_CODE_FILEPATH} >> ${DOCKER_LOG_FILEPATH}"`,
+    `docker exec ${containerName} sh -c "timeout ${timeoutInSeconds}s deno ${DOCKER_CODE_FILEPATH} >> ${DOCKER_LOG_FILEPATH}"`,
   )
+  const endTime = performance.now()
+
+  console.log(`🕣 Duration: ${(endTime - startTime).toFixed(3)} milliseconds`)
 
   return output
 }
@@ -157,8 +165,9 @@ export async function runDockerContainer(
   console.log(chalk.yellow(`Starting container ${containerName}...`))
   // Running the container in detached mode allows to await for the `sh`, making sure the container is started, and avoid raising an error when stopping the container running the `sleep infinity` script
   await sh(
-    // The `NO_COLOR` environment variable is used to disable colored output in the container (avoid tedious cleanup during error formatting)
-    `docker run -e NO_COLOR=true -d --name ${containerName} denoland/deno:2.3.1 /bin/bash -c 'sleep infinity';`,
+    // The `NO_COLOR` environment variable is used to disable colored output in the container (avoid tedious cleanup during error formatting).
+    // Limit deno container resources.
+    `docker run -e NO_COLOR=true --memory 512m --cpus 0.5 --pids-limit 100 --network none -d --name ${containerName} denoland/deno:2.3.1 /bin/bash -c 'sleep infinity';`,
   )
 
   const isContainerStarted = await checkIfContainerStarted(containerName)

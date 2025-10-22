@@ -12,30 +12,22 @@ import { ExecutionStatus, ShResult } from '../types'
 export function sh(cmd: string, timeoutInMs = 30000): Promise<ShResult> {
   return new Promise((resolve, reject) => {
     exec(cmd, { timeout: timeoutInMs }, (error, stdout, stderr) => {
-      if (stderr) {
+      if (error) {
+        if (error.code === 124) {
+          console.log(chalk.red('⌛️Execution timeout!'))
+          return reject({
+            status: ExecutionStatus.TIMEOUT,
+            result: 'RangeError: Potential infinite loop detected.',
+          })
+        }
         console.log(chalk.red(`❌Execution failed!`))
         return reject({
           status: ExecutionStatus.ERROR,
-          // Does not work :
-          result: formatStdError(stderr),
-          // result: stderr,
+          result: formatStdError(stderr || error.message),
         })
       }
-      if (error) {
-        if (error.killed) {
-          console.log(chalk.red('⌛️Execution timeout!'))
-          return resolve({
-            status: ExecutionStatus.TIMEOUT,
-            result: stdout,
-          })
-        }
-        console.log(chalk.red('❌Execution failed!'))
-        return reject(new Error(JSON.stringify(error)))
-      }
-      resolve({
-        status: ExecutionStatus.SUCCESS,
-        result: stdout,
-      })
+      console.log(chalk.red('✅Execution succeeded!'))
+      resolve({ status: ExecutionStatus.SUCCESS, result: stdout })
     })
   })
 }
