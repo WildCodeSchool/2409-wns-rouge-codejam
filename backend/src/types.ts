@@ -42,6 +42,7 @@ export enum UserRole {
 export enum ExecutionStatus {
   SUCCESS = 'success',
   ERROR = 'error',
+  TIMEOUT = 'timeout',
 }
 
 export enum Language {

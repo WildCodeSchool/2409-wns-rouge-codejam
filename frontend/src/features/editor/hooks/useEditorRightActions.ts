@@ -110,6 +110,7 @@ export default function useEditorRightActions(
     snippetSlug,
     code,
     language,
+    snippet,
     snippetId,
     navigate,
     execute,
