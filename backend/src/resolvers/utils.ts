@@ -210,7 +210,8 @@ export function createCookieWithJwt(
 
   new Cookies(context.req, context.res).set('access_token', token, {
     httpOnly: true,
-    secure: false,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'strict',
   })
 }
 
