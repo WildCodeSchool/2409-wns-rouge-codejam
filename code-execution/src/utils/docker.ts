@@ -166,8 +166,14 @@ export async function runDockerContainer(
   // Running the container in detached mode allows to await for the `sh`, making sure the container is started, and avoid raising an error when stopping the container running the `sleep infinity` script
   await sh(
     // The `NO_COLOR` environment variable is used to disable colored output in the container (avoid tedious cleanup during error formatting).
-    // Limit deno container resources.
-    `docker run -e NO_COLOR=true --memory 512m --cpus 0.5 --pids-limit 100 --network none -d --name ${containerName} denoland/deno:2.3.1 /bin/bash -c 'sleep infinity';`,
+    // Limit deno container resources:
+    // --memory limits the memory usage,
+    // --cpus 0.5 limits the cpu usage (0.5 = half a core)
+    // --pids-limit, limits the child processes number,
+    // --network none, prevent from connecting to the network,
+    // --cap-drop all, limits the user permissions on the system
+    // --security-opt=no-new-privileges, prevent from a privileges elevation
+    `docker run -e NO_COLOR=true --memory 512m --cpus 0.5 --pids-limit 100 --network none --cap-drop all --security-opt=no-new-privileges -d --name ${containerName} denoland/deno:2.3.1 /bin/bash -c 'sleep infinity';`,
   )
 
   const isContainerStarted = await checkIfContainerStarted(containerName)
