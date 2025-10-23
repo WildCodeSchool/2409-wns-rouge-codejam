@@ -29,6 +29,11 @@ jobs:
         with:
           node-version: 20
 
+      # Install pnpm as package manager
+      - name: Install pnpm
+        shell: bash
+        run: npm install -g pnpm@latest-10
+
       # Clean install dependencies
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
