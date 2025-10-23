@@ -208,7 +208,9 @@ export function createCookieWithJwt(
     ...(expiresIn !== null && { expiresIn }),
   })
 
-  new Cookies(context.req, context.res).set('access_token', token, {
+  new Cookies(context.req, context.res, {
+    secure: process.env.NODE_ENV === 'production', // 👈 explicitally specify the connection as secure, rather than this module examining request (ensure sending cookies from "unsecured" (HTTP) intra server)
+  }).set('access_token', token, {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'strict',
