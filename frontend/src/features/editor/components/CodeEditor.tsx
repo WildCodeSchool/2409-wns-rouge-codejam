@@ -28,7 +28,6 @@ export default function CodeEditor() {
   return (
     <div className={cn('relative h-full', isMobile ? 'pt-2' : 'pt-4')}>
       <MonacoEditor
-        defaultLanguage="javascript"
         options={BASE_OPTIONS}
         language={language.toLowerCase()}
         loading={<EditorLoadingSkeleton />} // 👈 prevent displaying default loader and layout flickering
