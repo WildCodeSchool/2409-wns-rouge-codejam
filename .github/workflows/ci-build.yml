@@ -38,7 +38,7 @@ jobs:
       - name: Run tests
         run: cd $directory && pnpm run test:db
 
-  build-frontend:
+  build-and-publish-frontend:
     # Ensure frontend tests pass before building and pushing the Docker image
     needs: test-frontend
     # Run job only if:
@@ -56,7 +56,7 @@ jobs:
           docker-token: ${{ secrets.DOCKERHUB_TOKEN }}
           docker-repository: ${{ vars.DOCKERHUB_REPO_FRONTEND }}
 
-  build-backend:
+  build-and-publish-backend:
     # Ensure backend tests pass before building and pushing the Docker image
     needs: test-backend
     # Run job only if:
@@ -74,7 +74,7 @@ jobs:
           docker-token: ${{ secrets.DOCKERHUB_TOKEN }}
           docker-repository: ${{ vars.DOCKERHUB_REPO_BACKEND }}
 
-  build-code-execution:
+  build-and-publish-code-execution:
     # Run job only if:
     # - the commit is tagged starting with v
     runs-on: ubuntu-latest
