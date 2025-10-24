@@ -12,17 +12,18 @@ import { EditorStatus, EditorUrlParams } from '@/features/editor/types'
 import { GET_ALL_SNIPPETS } from '@/shared/api/getUserSnippets'
 import { SAVE_SNIPPET } from '@/shared/api/saveSnippet'
 import { TOAST_OPTIONS } from '@/shared/config'
-import { useIsMobile } from '@/shared/hooks'
+import { useAppContext, useIsMobile } from '@/shared/hooks'
 
 const SAVE_SNIPPET_SHORTCUT = 'KeyS'
 
 export default function useEditorLeftActions() {
   const isMobile = useIsMobile()
   const navigate = useNavigate()
-  const { snippetId, snippetSlug } = useParams<EditorUrlParams>()
+  const { snippetId } = useParams<EditorUrlParams>()
   const {
     editorState: { code, language },
   } = useEditorContext()
+  const { snippet } = useAppContext()
   const [status, setStatus] = useState<EditorStatus>('typing')
   const [saveSnippetMutation] = useMutation(SAVE_SNIPPET)
 
@@ -35,7 +36,7 @@ export default function useEditorLeftActions() {
           data: {
             code,
             language,
-            name: snippetSlug ?? uniqueNamesGenerator(BASE_NAME_CONFIG),
+            name: snippet?.name ?? uniqueNamesGenerator(BASE_NAME_CONFIG),
           },
           id: snippetId ?? '',
         },
@@ -62,7 +63,7 @@ export default function useEditorLeftActions() {
     } finally {
       setStatus('typing')
     }
-  }, [code, language, navigate, saveSnippetMutation, snippetId, snippetSlug])
+  }, [code, language, navigate, saveSnippetMutation, snippet, snippetId])
 
   const debouncedSaveSnippet = useMemo(
     () =>

@@ -3,8 +3,6 @@ import { useCallback, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { toast } from 'sonner'
 
-import { client } from '@/App'
-
 import { SnippetEditType } from '@/features/auth/schemas'
 import { useEditorContext } from '@/features/editor/hooks'
 import { EditorUrlParams } from '@/features/editor/types'
@@ -13,7 +11,6 @@ import { pickNeighborById } from '@/features/sidebar/utils'
 
 import { CREATE_SNIPPET } from '@/shared/api/createSnippet'
 import { DELETE_SNIPPET } from '@/shared/api/deleteSnippet'
-import { GET_SNIPPET } from '@/shared/api/getSnippet'
 import { GET_ALL_SNIPPETS } from '@/shared/api/getUserSnippets'
 import { UPDATE_SNIPPET } from '@/shared/api/updateSnippet'
 import { useSidebar } from '@/shared/components/ui/sidebar'
@@ -185,13 +182,11 @@ export default function SidebarContextProvider({
   )
 
   const selectSnippet = useCallback(
-    async (snippetId: Snippet['id'], snippetSlug: Snippet['slug']) => {
+    (snippetId: Snippet['id'], snippetSlug: Snippet['slug']) => {
       if (isMobile && openMobile) {
         setOpenMobile(false)
       }
-      await client.refetchQueries({
-        include: [GET_SNIPPET],
-      })
+
       navigate(`/editor/${snippetId}/${snippetSlug}`)
     },
     [isMobile, openMobile, setOpenMobile, navigate],
