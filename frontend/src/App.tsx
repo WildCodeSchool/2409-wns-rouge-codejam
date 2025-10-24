@@ -33,12 +33,12 @@ const logoutLink = new ErrorLink(({ graphQLErrors }) => {
   })
 })
 
-export const client = new ApolloClient({
+const client = new ApolloClient({
   cache: new InMemoryCache(),
   credentials: 'same-origin',
   defaultOptions: {
     watchQuery: {
-      fetchPolicy: 'cache-first',
+      fetchPolicy: 'cache-and-network',
     },
   },
   link: logoutLink.concat(httpLink),
