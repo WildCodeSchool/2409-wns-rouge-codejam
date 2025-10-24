@@ -31,7 +31,6 @@ export default function useEditorLeftActions() {
     try {
       setStatus('saving')
 
-      console.log('snippet ', snippet)
       const { data } = await saveSnippetMutation({
         variables: {
           data: {

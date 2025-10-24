@@ -149,10 +149,6 @@ Connect to the application with one of the following user credentials (⚠️ de
 
 ### Stop the application
 
-### Add a new service
-
-See [Confluence documentation](https://codejam.atlassian.net/wiki/spaces/~71202049db149a7a68479595e2e2bbf0072440/pages/21921793/Ajout+d+un+service).
-
 To stop the containers, run:
 
 ```sh
@@ -160,6 +156,10 @@ docker compose down
 ```
 
 or simply press <kbd>Ctrl</kbd>+<kbd>C</kbd> for a graceful stop.
+
+### Add a new service
+
+See [Confluence documentation](https://codejam.atlassian.net/wiki/spaces/~71202049db149a7a68479595e2e2bbf0072440/pages/21921793/Ajout+d+un+service).
 
 ## 🧪 Testing
 
